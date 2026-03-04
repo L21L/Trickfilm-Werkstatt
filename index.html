@@ -58,7 +58,7 @@ input,textarea,select{font-family:'Nunito',sans-serif;outline:none}
 .pnl{display:none;padding:12px 16px}
 .pnl.active{display:block}
 /* FIGUREN */
-.fi{display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:var(--r-sm);padding:9px 12px;margin-bottom:7px;border:1px solid var(--border)}
+.fi{display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:var(--r-sm);padding:9px 12px;margin-bottom:7px;border:1px solid var(--border);flex-wrap:wrap}
 .fe{font-size:1.4rem;flex-shrink:0}.fin{flex:1;min-width:0}
 .fn{font-weight:800;font-size:.88rem}.fr{font-size:.7rem;color:var(--muted)}
 .fd{background:none;border:none;color:var(--muted);font-size:1.1rem;padding:4px;cursor:pointer}
@@ -742,11 +742,59 @@ function renderFigs(){
   S.project.figures.forEach(function(f,i){
     var pts=(f.role||'').split(' '); var em=pts[0]||'🎭'; var rl=pts.slice(1).join(' ')||'';
     var d=document.createElement('div'); d.className='fi';
-    d.innerHTML='<div class="fe">'+em+'</div><div class="fin"><div class="fn">'+esc(f.name)+'</div><div class="fr">'+esc(rl)+'</div></div><button class="fd" onclick="delFig('+i+')">✕</button>';
+    var thumbHtml = f.drawing
+      ? '<img src="'+f.drawing+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;margin-top:6px;display:block">'
+      : '';
+    d.innerHTML=
+      '<div class="fe">'+em+'</div>'+
+      '<div class="fin"><div class="fn">'+esc(f.name)+'</div><div class="fr">'+esc(rl)+'</div></div>'+
+      '<button class="fd" onclick="delFig('+i+')">✕</button>'+
+      '<div style="grid-column:1/-1">'+thumbHtml+
+        '<button class="fig-draw-btn" onclick="openFigDraw('+i+')">'+(f.drawing?'✏️ Zeichnung bearbeiten':'✏️ Figur zeichnen')+'</button>'+
+      '</div>';
     list.appendChild(d);
   });
 }
 function delFig(i){ S.project.figures.splice(i,1); renderFigs(); sched(); }
+
+function openFigDraw(idx){
+  drawSceneIdx = -99 - idx; // negative offset to distinguish from scenes
+  var cv=document.getElementById('draw-cv');
+  var wrap=document.getElementById('draw-canvas-wrap');
+  cv.width=wrap.offsetWidth||340;
+  cv.height=Math.round(cv.width);
+  var ctx=cv.getContext('2d');
+  document.getElementById('draw-title').textContent='✏️ Figur: '+(S.project.figures[idx]&&S.project.figures[idx].name||'Figur '+(idx+1));
+  document.getElementById('draw-modal').classList.add('open');
+  drawHistory=[];
+  if(S.project.figures[idx]&&S.project.figures[idx].drawing){
+    var img=new Image();
+    img.onload=function(){ ctx.drawImage(img,0,0,cv.width,cv.height); saveDrawHistory(); };
+    img.src=S.project.figures[idx].drawing;
+  } else {
+    ctx.fillStyle='#1a1a2e'; ctx.fillRect(0,0,cv.width,cv.height);
+    saveDrawHistory();
+  }
+}
+
+// Override saveDrawing to handle both scenes and figures
+var _origSaveDrawing = saveDrawing;
+saveDrawing = function(){
+  var cv=document.getElementById('draw-cv');
+  if(drawSceneIdx >= 0 && S.project.scenes[drawSceneIdx]){
+    S.project.scenes[drawSceneIdx].drawing=cv.toDataURL('image/jpeg',.85);
+    renderScenes(); sched(); toast('✅ Zeichnung gespeichert!');
+    closeDrawModal();
+  } else if(drawSceneIdx <= -99){
+    var figIdx = -drawSceneIdx - 99;
+    if(S.project.figures[figIdx]){
+      S.project.figures[figIdx].drawing=cv.toDataURL('image/jpeg',.85);
+      renderFigs(); sched(); toast('✅ Figur-Zeichnung gespeichert!');
+      if(typeof checkBadge==='function') checkBadge('casting');
+    }
+    closeDrawModal();
+  }
+};
 
 // ── STORYBOARD ────────────────────────────────────────────────────
 function addScene(){
