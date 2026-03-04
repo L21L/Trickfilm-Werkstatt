@@ -167,6 +167,8 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
 /* BADGES */
 #badge-panel{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9000;display:none;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 #badge-panel.open{display:flex}
+#onboard-modal.open{display:flex}
+#help-modal.open{display:flex}
 .badge-box{background:var(--surface);border-radius:20px;padding:20px;width:90%;max-width:340px;max-height:80vh;overflow-y:auto}
 .badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
 .badge-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:10px;background:var(--s2);border:1px solid var(--border);font-size:.6rem;text-align:center;color:var(--muted)}
@@ -198,7 +200,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
   input,textarea{border:1px solid #ccc!important;background:#fff!important;color:#000!important}
 }
 /* DRAW MODAL */
-#draw-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:none;flex-direction:column}
+#draw-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;display:none;flex-direction:column}
 #draw-modal.open{display:flex}
 #draw-topbar{height:50px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 12px;flex-shrink:0}
 #draw-title{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--yellow);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -239,7 +241,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
 
     <!-- ═══ PLANEN ═══ -->
     <div class="page active" id="pg-plan">
-      <div class="ph"><h1>📋 Mein Projekt</h1><p>Plane deinen Stop-Motion-Film</p></div>
+      <div class="ph"><h1>📋 Mein Projekt</h1><p>Plane deinen Stop-Motion-Film <button onclick="showHelp('plan')" style="background:var(--yellow);color:#0f172a;border:none;border-radius:50%;width:20px;height:20px;font-weight:900;font-size:.7rem;cursor:pointer;margin-left:4px">?</button></p></div>
       <div class="tabs" id="plan-tabs">
         <button class="tab active" data-tab="gesch">📖 Geschichte</button>
         <button class="tab" data-tab="figs">🧸 Figuren</button>
@@ -313,6 +315,10 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
         <div id="cam-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
         <div id="shot-cnt">0 Fotos</div>
         <div id="cam-flash"></div>
+        <!-- Bewegungswarnung -->
+        <div id="motion-warn" style="display:none;position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(239,68,68,.92);color:#fff;font-weight:800;font-size:.8rem;padding:6px 14px;border-radius:20px;z-index:10;white-space:nowrap">⚠️ Kamera bewegt!</div>
+        <!-- Belichtungswarnung -->
+        <div id="exposure-warn" style="display:none;position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:rgba(251,191,36,.92);color:#0f172a;font-weight:800;font-size:.75rem;padding:5px 12px;border-radius:20px;z-index:10;white-space:nowrap" id="exposure-warn"></div>
       </div>
       <div class="cam-opts">
         <button class="cch active" id="cb-back" onclick="swCam('back')">🔭 Hinten</button>
@@ -321,6 +327,19 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
         <button class="cch" id="cb-onion" onclick="togOnion()">🧅 Zwiebelhaut</button>
         <button class="cch" id="cb-timer" onclick="togTimer()">⏱️ 3s-Timer</button>
         <button class="cch" id="cb-timelapse" onclick="togTimelapse()">⏩ Zeitraffer</button>
+        <button class="cch" id="cb-motion" onclick="togMotion()">📡 Bewegung</button>
+        <button class="cch" onclick="showHelp('kamera')" style="background:var(--yellow);color:#0f172a;font-weight:900">? Hilfe</button>
+        <button class="cch" onclick="showPreShootChecklist()">📋 Checkliste</button>
+      </div>
+      <!-- Szenen-Fortschritt -->
+      <div id="scene-progress-bar" style="display:none;padding:6px 16px;background:var(--surface);border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:.72rem;font-weight:800;color:var(--muted)">📍 Szene: <span id="sp-scene-name">–</span></span>
+          <span style="font-size:.72rem;font-weight:800;color:var(--yellow)"><span id="sp-count">0</span> / <span id="sp-target">10</span> Fotos</span>
+        </div>
+        <div style="height:6px;background:var(--s2);border-radius:3px;overflow:hidden">
+          <div id="sp-fill" style="height:100%;background:var(--yellow);border-radius:3px;width:0%;transition:width .3s"></div>
+        </div>
       </div>
       <!-- Zeitraffer-Einstellungen -->
       <div id="timelapse-bar" style="display:none;align-items:center;gap:10px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border)">
@@ -370,6 +389,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
         <button class="btn bs" style="font-size:.73rem;padding:6px 10px" onclick="revFrames()">↔ Umkehren</button>
         <button class="btn bs" style="font-size:.73rem;padding:6px 10px" onclick="rotSel()">↻ Drehen</button>
         <button class="btn bs" style="font-size:.73rem;padding:6px 10px" onclick="showBrightPanel()">☀️ Helligkeit</button>
+        <button class="btn bp" style="font-size:.73rem;padding:6px 10px;font-weight:900" onclick="showHelp('editor')">? Hilfe</button>
       </div>
       <!-- Helligkeit/Kontrast Panel -->
       <div id="bright-panel" style="display:none;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);gap:10px;flex-direction:column">
@@ -407,7 +427,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
 
     <!-- ═══ MUSIK ═══ -->
     <div class="page" id="pg-mus">
-      <div class="ph"><h1>🎵 Musik</h1><p>Lade eigene Musik hoch oder wähle aus der Bibliothek</p></div>
+      <div class="ph"><h1>🎵 Musik</h1><p>Wähle Musik für deinen Film <button onclick="showHelp('musik')" style="background:var(--yellow);color:#0f172a;border:none;border-radius:50%;width:20px;height:20px;font-weight:900;font-size:.7rem;cursor:pointer;margin-left:4px">?</button></p></div>
       <div id="sel-bar" class="sel-bar" style="display:none">
         <span style="font-size:1.2rem">🎵</span>
         <div style="flex:1;min-width:0"><div style="font-weight:800;font-size:.82rem" id="sel-ttl">–</div><div style="font-size:.7rem;color:var(--muted)" id="sel-art"></div></div>
@@ -452,7 +472,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
 
     <!-- ═══ EXPORT ═══ -->
     <div class="page" id="pg-exp">
-      <div class="ph"><h1>🎬 Film exportieren</h1><p>Erstelle dein fertiges Video</p></div>
+      <div class="ph"><h1>🎬 Film exportieren</h1><p>Erstelle dein fertiges Video <button onclick="showHelp('export')" style="background:var(--yellow);color:#0f172a;border:none;border-radius:50%;width:20px;height:20px;font-weight:900;font-size:.7rem;cursor:pointer;margin-left:4px">?</button></p></div>
       <div class="ex-sum">
         <div class="ex-row"><span class="ex-lbl">📸 Fotos</span><span class="ex-val" id="ex-ph">0</span></div>
         <div class="ex-row"><span class="ex-lbl">🎞️ Framerate</span><span class="ex-val" id="ex-fps">8 fps</span></div>
@@ -481,6 +501,9 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
       </div>
       <div style="padding:0 16px;margin-bottom:14px">
         <button class="btn bp bf" style="font-size:.95rem;padding:13px" onclick="doExport()" id="exp-btn">🎬 Film erstellen & herunterladen</button>
+        <div id="safari-notice" style="display:none;margin-top:8px;padding:9px 12px;background:rgba(251,191,36,.1);border:1px solid var(--yellow);border-radius:var(--r-sm);font-size:.73rem;color:var(--yellow)">
+          🍎 Safari erkannt – Export als MP4 via FFmpeg (beim ersten Mal ~30MB Download)
+        </div>
       </div>
       <div id="ep-wrap"><div id="ep-st">Wird verarbeitet...</div><div id="ep-bar"><div id="ep-fill"></div></div></div>
       <div id="ex-res">
@@ -534,6 +557,36 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
     <button class="nav-btn" onclick="goPage('pg-exp',this);updExpSum()"><span class="ni">🎬</span>Export</button>
   </nav>
 </div>
+<!-- ONBOARDING MODAL -->
+<div id="onboard-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:20000;display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--surface);border-radius:20px;padding:28px 22px;max-width:380px;width:100%;border:2px solid var(--yellow);text-align:center">
+    <div id="ob-icon" style="font-size:3.5rem;margin-bottom:14px">🎬</div>
+    <div id="ob-title" style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--yellow);margin-bottom:10px"></div>
+    <div id="ob-text" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:20px"></div>
+    <div id="ob-dots" style="display:flex;justify-content:center;gap:6px;margin-bottom:20px"></div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button id="ob-skip" onclick="closeOnboarding()" class="btn bs" style="font-size:.8rem;padding:8px 16px">Überspringen</button>
+      <button id="ob-next" onclick="onboardNext()" class="btn bp" style="font-size:.9rem;padding:10px 22px;font-weight:900">Weiter →</button>
+    </div>
+  </div>
+</div>
+
+<!-- HELP MODAL -->
+<div id="help-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:20000;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto">
+  <div style="background:var(--surface);border-radius:16px;padding:20px;max-width:400px;width:100%;border:1.5px solid var(--border);margin:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <span id="help-title" style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--yellow)"></span>
+      <button onclick="document.getElementById('help-modal').classList.remove('open')" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer">✕</button>
+    </div>
+    <div id="help-body"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+      <button onclick="showGlossar()" class="btn bs" style="font-size:.75rem;padding:7px 12px">📖 Glossar</button>
+      <button onclick="showPreShootChecklist()" class="btn bs" style="font-size:.75rem;padding:7px 12px">📋 Drehliste</button>
+      <button onclick="loadExampleProject()" class="btn bs" style="font-size:.75rem;padding:7px 12px">🎬 Beispielprojekt</button>
+    </div>
+  </div>
+</div>
+
 <!-- BADGE PANEL -->
 <div id="badge-panel">
   <div class="badge-box">
@@ -599,16 +652,6 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
 <div id="toast"></div>
 
 <script>
-// Error display overlay
-window.onerror = function(msg, src, line) {
-  var d = document.getElementById('err-overlay');
-  if(!d){ d=document.createElement('div'); d.id='err-overlay';
-    d.style.cssText='position:fixed;bottom:70px;left:0;right:0;background:#ef4444;color:#fff;font-size:11px;padding:8px 12px;z-index:99999;max-height:120px;overflow-y:auto;font-family:monospace;white-space:pre-wrap';
-    document.body.appendChild(d);
-  }
-  d.textContent += '❌ ' + msg + ' (Zeile ' + line + ')\n';
-  return false;
-};
 // ── STATE ──────────────────────────────────────────────────────────
 var S = {
   shots:[], fps:8, quality:'480p', format:'webm', vol:.8,
@@ -1412,16 +1455,231 @@ function updExpSum(){
   document.getElementById('ex-fps').textContent=S.fps+' fps';
   document.getElementById('ex-dur').textContent=dur;
   document.getElementById('ex-mus').textContent=S.music?S.music.t:'Keine';
-  document.getElementById('ex-fmt').textContent=expQ+' '+expFmt.toUpperCase();
+  var isSafari=/^((?!chrome|android).)*safari/i.test(navigator.userAgent)||!window.MediaRecorder;
+  document.getElementById('ex-fmt').textContent=expQ+' '+(isSafari?'GIF':expFmt.toUpperCase());
+  var notice=document.getElementById('safari-notice');
+  if(notice) notice.style.display=isSafari?'block':'none';
 }
 var QM={'480p':{w:640,h:480},'720p':{w:1280,h:720},'1080p':{w:1920,h:1080}};
+
 function doExport(){
   if(!S.shots.length){toast('⚠️ Keine Fotos vorhanden!');return;}
   var pw=document.getElementById('ep-wrap'); var res=document.getElementById('ex-res'); var btn=document.getElementById('exp-btn');
   pw.classList.add('vis'); res.classList.remove('vis'); btn.disabled=true; btn.textContent='⏳ Wird erstellt...';
   var title=(S.project.title||'mein-film').replace(/[^a-zA-Z0-9]/g,'-').toLowerCase();
-  if(expFmt==='gif') doWebM(title,btn,pw,res); // GIF fallback to WebM on Android
-  else doWebM(title,btn,pw,res);
+  var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || !window.MediaRecorder;
+  if(isSafari){
+    doFFmpegMP4(title,btn,pw,res);
+  } else {
+    doWebM(title,btn,pw,res);
+  }
+}
+
+// ── FFMPEG.WASM MP4 EXPORT (Safari + alle Browser) ───────────────
+function doFFmpegMP4(title,btn,pw,res){
+  var dim=QM[expQ]||QM['480p'];
+  var tot=S.shots.length;
+  var fadeDur=Math.min(Math.round(S.fps*0.5),Math.floor(tot/4));
+
+  function setStatus(txt){ document.getElementById('ep-st').textContent=txt; }
+  function setProgress(p){ document.getElementById('ep-fill').style.width=Math.round(p*100)+'%'; }
+
+  setStatus('⬇️ FFmpeg wird geladen (~30MB, einmalig)…');
+  setProgress(0.02);
+
+  // Load FFmpeg from CDN
+  var s1=document.createElement('script');
+  s1.src='https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.js';
+  s1.onerror=function(){ doFrameZip(title,btn,pw,res); };
+  s1.onload=function(){
+    var s2=document.createElement('script');
+    s2.src='https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js';
+    s2.onerror=function(){ doFrameZip(title,btn,pw,res); };
+    s2.onload=function(){
+      runFFmpeg(title,btn,pw,res,dim,tot,fadeDur,setStatus,setProgress);
+    };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+}
+
+async function runFFmpeg(title,btn,pw,res,dim,tot,fadeDur,setStatus,setProgress){
+  // FFmpeg.wasm braucht SharedArrayBuffer – nur verfügbar mit COOP/COEP Headern
+  // GitHub Pages unterstützt diese nicht → automatisch auf GIF wechseln
+  if(typeof SharedArrayBuffer === 'undefined'){
+    setStatus('⚠️ MP4 nicht möglich (fehlende Browser-Header) → GIF-Export…');
+    setTimeout(function(){ doGifExport(title,btn,pw,res); }, 800);
+    return;
+  }
+  try{
+    var ffmpeg = new FFmpeg();
+    ffmpeg.on('log', function(e){ console.log('[ffmpeg]', e.message); });
+    ffmpeg.on('progress', function(e){
+      if(e.progress) setProgress(0.3 + e.progress * 0.65);
+    });
+
+    setStatus('⬇️ FFmpeg Core wird geladen…');
+    var baseURL='https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+    await ffmpeg.load({
+      coreURL: baseURL+'/ffmpeg-core.js',
+      wasmURL: baseURL+'/ffmpeg-core.wasm',
+    });
+
+    // Render all frames to canvas and write as JPEG to FFmpeg FS
+    setStatus('🖼️ Frames werden gerendert…');
+    var cv=document.createElement('canvas'); cv.width=dim.w; cv.height=dim.h;
+    var ctx=cv.getContext('2d');
+
+    for(var i=0;i<tot;i++){
+      setProgress(0.05 + (i/tot)*0.25);
+      setStatus('Frame '+(i+1)+'/'+tot+' rendern…');
+      await new Promise(function(resolve,reject){
+        var img=new Image();
+        img.onload=async function(){
+          ctx.clearRect(0,0,dim.w,dim.h);
+          ctx.drawImage(img,0,0,dim.w,dim.h);
+          if(S.fadeIn&&i<fadeDur&&fadeDur>0){
+            ctx.fillStyle='rgba(0,0,0,'+(1-i/fadeDur)+')';
+            ctx.fillRect(0,0,dim.w,dim.h);
+          }
+          if(S.fadeOut&&i>tot-fadeDur&&fadeDur>0){
+            ctx.fillStyle='rgba(0,0,0,'+((i-(tot-fadeDur))/fadeDur)+')';
+            ctx.fillRect(0,0,dim.w,dim.h);
+          }
+          // Untertitel
+          (S.subtitles||[]).forEach(function(sub){
+            var fr=i+1;
+            if(fr>=sub.from&&fr<=sub.to&&sub.text){
+              var fh=Math.round(dim.h*0.055);
+              ctx.font='bold '+fh+'px Arial';
+              ctx.textAlign='center';
+              var y=sub.pos==='top'?fh*1.5:dim.h-fh*0.6;
+              ctx.fillStyle='rgba(0,0,0,0.65)';
+              ctx.fillRect(0,y-fh*1.1,dim.w,fh*1.4);
+              ctx.fillStyle='#fff';
+              ctx.fillText(sub.text,dim.w/2,y);
+            }
+          });
+          // Convert canvas to Uint8Array JPEG
+          cv.toBlob(async function(blob){
+            var ab=await blob.arrayBuffer();
+            var fn='frame'+String(i).padStart(4,'0')+'.jpg';
+            await ffmpeg.writeFile(fn, new Uint8Array(ab));
+            resolve();
+          },'image/jpeg',0.92);
+        };
+        img.onerror=reject;
+        img.src=S.shots[i];
+      });
+    }
+
+    setStatus('🎬 MP4 wird kodiert…');
+    setProgress(0.30);
+
+    // Build ffmpeg command
+    await ffmpeg.exec([
+      '-framerate', String(S.fps),
+      '-i', 'frame%04d.jpg',
+      '-c:v', 'libx264',
+      '-pix_fmt', 'yuv420p',
+      '-crf', '23',
+      '-movflags', '+faststart',
+      'output.mp4'
+    ]);
+
+    setStatus('📦 MP4 wird fertiggestellt…');
+    setProgress(0.96);
+
+    var data = await ffmpeg.readFile('output.mp4');
+    var blob = new Blob([data.buffer], {type:'video/mp4'});
+    var url = URL.createObjectURL(blob);
+    var link=document.getElementById('ex-link'); link.href=url; link.download='trickfilm-'+title+'.mp4';
+    var a=document.createElement('a'); a.href=url; a.download='trickfilm-'+title+'.mp4'; a.click();
+
+    S.project.exported=true; sched();
+    if(typeof checkBadge==='function') checkBadge('first-export');
+    setProgress(1.0);
+    setStatus('✅ MP4 fertig!');
+    res.classList.add('vis');
+    btn.disabled=false; btn.textContent='🎬 Film erstellen & herunterladen';
+    toast('🎉 MP4 fertig! Auch auf iPad 🍎',4000);
+
+  }catch(err){
+    console.error('FFmpeg Fehler:',err);
+    toast('⚠️ FFmpeg Fehler – Fallback: Frames-Download');
+    btn.disabled=false; btn.textContent='🎬 Film erstellen & herunterladen';
+    doFrameZip(title,btn,pw,res);
+  }
+}
+
+// Fallback: Einzelne Frames als JPEGs herunterladen (funktioniert überall)
+// GIF-Export Fallback (wenn SharedArrayBuffer nicht verfügbar)
+function doGifExport(title,btn,pw,res){
+  var dim=QM[expQ]||QM['480p'];
+  var gw=Math.min(dim.w,480), gh=Math.round(gw*dim.h/dim.w);
+  var cv=document.createElement('canvas'); cv.width=gw; cv.height=gh;
+  var ctx=cv.getContext('2d');
+  var tot=S.shots.length;
+  var fadeDur=Math.min(Math.round(S.fps*0.5),Math.floor(tot/4));
+  function setStatus(t){ document.getElementById('ep-st').textContent=t; }
+  function setProgress(p){ document.getElementById('ep-fill').style.width=Math.round(p*100)+'%'; }
+  setStatus('⬇️ GIF-Bibliothek wird geladen…');
+  var script=document.createElement('script');
+  script.src='https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js';
+  script.onerror=function(){ doFrameZip(title,btn,pw,res); };
+  script.onload=function(){
+    try{
+      var gif=new GIF({workers:2,quality:10,width:gw,height:gh,
+        workerScript:'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'});
+      var i=0;
+      function addFrame(){
+        if(i>=tot){ setStatus('GIF wird gerendert…'); gif.render(); return; }
+        setProgress(i/tot*0.8); setStatus('Frame '+(i+1)+'/'+tot);
+        var img=new Image();
+        img.onload=function(){
+          ctx.clearRect(0,0,gw,gh); ctx.drawImage(img,0,0,gw,gh);
+          if(S.fadeIn&&i<fadeDur&&fadeDur>0){ctx.fillStyle='rgba(0,0,0,'+(1-i/fadeDur)+')';ctx.fillRect(0,0,gw,gh);}
+          if(S.fadeOut&&i>tot-fadeDur&&fadeDur>0){ctx.fillStyle='rgba(0,0,0,'+((i-(tot-fadeDur))/fadeDur)+')';ctx.fillRect(0,0,gw,gh);}
+          gif.addFrame(cv,{copy:true,delay:Math.round(1000/S.fps)});
+          i++; setTimeout(addFrame,0);
+        };
+        img.src=S.shots[i];
+      }
+      gif.on('finished',function(blob){
+        var url=URL.createObjectURL(blob);
+        var link=document.getElementById('ex-link'); link.href=url; link.download='trickfilm-'+title+'.gif';
+        var a=document.createElement('a'); a.href=url; a.download='trickfilm-'+title+'.gif'; a.click();
+        S.project.exported=true; sched();
+        if(typeof checkBadge==='function') checkBadge('first-export');
+        setProgress(1); setStatus('✅ GIF fertig!');
+        res.classList.add('vis'); btn.disabled=false; btn.textContent='🎬 Film erstellen & herunterladen';
+        toast('🎉 GIF fertig! Tipp: ezgif.com für MP4-Umwandlung',4000);
+      });
+      gif.on('progress',function(p){ setProgress(0.8+p*0.2); });
+      addFrame();
+    }catch(e){ doFrameZip(title,btn,pw,res); }
+  };
+  document.head.appendChild(script);
+}
+
+function doFrameZip(title,btn,pw,res){
+  toast('⚠️ Kein Video möglich – Frames werden einzeln heruntergeladen');
+  var i=0;
+  function next(){
+    if(i>=S.shots.length){
+      document.getElementById('ep-fill').style.width='100%';
+      document.getElementById('ep-st').textContent='✅ '+S.shots.length+' Frames heruntergeladen';
+      res.classList.add('vis'); btn.disabled=false; btn.textContent='🎬 Film erstellen & herunterladen';
+      S.project.exported=true; sched();
+      return;
+    }
+    document.getElementById('ep-fill').style.width=Math.round(i/S.shots.length*100)+'%';
+    document.getElementById('ep-st').textContent='Frame '+(i+1)+'/'+S.shots.length;
+    var a=document.createElement('a'); a.href=S.shots[i];
+    a.download='frame-'+String(i+1).padStart(4,'0')+'.jpg'; a.click();
+    i++; setTimeout(next,300);
+  }
+  next();
 }
 function doWebM(title,btn,pw,res){
   var dim=QM[expQ]||QM['480p'];
@@ -2205,15 +2463,357 @@ renderSubtitles();
 // ═══════════════════════════════════════════════════════════════
 renderUploadedTracks();
 
+
+// ═══════════════════════════════════════════════════════════════
+// HILFE-SYSTEM, ONBOARDING, KAMERA-FEEDBACK
+// ═══════════════════════════════════════════════════════════════
+
+// ── HILFE-INHALTE pro Reiter ──────────────────────────────────
+var HELP = {
+  plan: {
+    title: '📋 So planst du deinen Film',
+    steps: [
+      {icon:'🎬', title:'Filmtitel', text:'Gib deinem Film einen tollen Namen! Er erscheint später im Export.'},
+      {icon:'📖', title:'Geschichte', text:'Beschreibe worum es geht, wie der Film beginnt, was das Problem ist und wie er endet.'},
+      {icon:'🎲', title:'Geschichte würfeln', text:'Keine Idee? Klick auf "Würfeln" – du bekommst eine fertige Geschichte als Startpunkt!'},
+      {icon:'🧸', title:'Figuren', text:'Erstelle alle Figuren die in deinem Film vorkommen. Du kannst sie auch zeichnen!'},
+      {icon:'🎞️', title:'Storyboard', text:'Zeichne jede Szene als kleines Bild. Das ist dein Plan fürs Drehen.'},
+      {icon:'📅', title:'Wochenplan', text:'Teile die Arbeit auf 10 Wochen auf. Hake ab was du schon erledigt hast!'},
+    ]
+  },
+  kamera: {
+    title: '📷 So fotografierst du richtig',
+    steps: [
+      {icon:'💡', title:'Licht ist wichtig!', text:'Stelle deine Figuren ans Fenster oder unter eine Lampe. Je mehr Licht, desto besser die Fotos!'},
+      {icon:'📌', title:'Kamera festhalten', text:'Lege dein Gerät auf einen Tisch oder klemme es fest. Auch kleinste Bewegungen sieht man im Film!'},
+      {icon:'🐢', title:'Langsam bewegen', text:'Bewege deine Figuren bei jedem Foto nur ganz wenig – etwa 5mm. Dann wird der Film flüssig.'},
+      {icon:'🧅', title:'Zwiebelhaut', text:'Schalte "Zwiebelhaut" ein – du siehst das letzte Foto als Hilfslinien für die nächste Position.'},
+      {icon:'📡', title:'Bewegungserkennung', text:'Schalte "Bewegung" ein – die App warnt dich wenn die Kamera versehentlich bewegt wurde!'},
+      {icon:'⏱️', title:'3s-Timer', text:'Nutze den Timer damit du die Kamera nicht beim Drücken verwackelst.'},
+    ]
+  },
+  editor: {
+    title: '🎞️ So bearbeitest du deinen Film',
+    steps: [
+      {icon:'▶', title:'Vorschau', text:'Drücke Play um deinen Film als Vorschau zu sehen. Passe die FPS-Geschwindigkeit an.'},
+      {icon:'↻', title:'Drehen', text:'Wähle Frames aus und klicke "Drehen" wenn ein Foto auf dem Kopf steht.'},
+      {icon:'☀️', title:'Helligkeit', text:'Zu dunkle Fotos? Wähle sie aus und erhöhe die Helligkeit mit dem Schieberegler.'},
+      {icon:'🎬', title:'Überblendung', text:'Fade-In und Fade-Out lassen deinen Film sanft beginnen und enden.'},
+      {icon:'📝', title:'Untertitel', text:'Füge Bauchbinden hinzu – Text der zu bestimmten Frames eingeblendet wird.'},
+    ]
+  },
+  musik: {
+    title: '🎵 Musik für deinen Film',
+    steps: [
+      {icon:'🎭', title:'Stimmung wählen', text:'Wähle Musik die zur Stimmung deines Films passt: fröhlich, abenteuerlich, spannend...'},
+      {icon:'▶', title:'Ausprobieren', text:'Drücke den Play-Button um Musik vorab anzuhören.'},
+      {icon:'✓', title:'Auswählen', text:'Klicke "+ Wählen" um die Musik für deinen Film festzulegen.'},
+      {icon:'📂', title:'Eigene Musik', text:'Du kannst auch eigene Musikdateien (MP3, WAV) von deinem Gerät hochladen.'},
+      {icon:'🔊', title:'Lautstärke', text:'Mit dem Lautstärke-Regler kannst du Musik leiser machen wenn sie zu laut ist.'},
+    ]
+  },
+  export: {
+    title: '🎬 Film exportieren',
+    steps: [
+      {icon:'📸', title:'Fotos nötig', text:'Du brauchst mindestens 5-10 Fotos um einen kurzen Film zu erstellen.'},
+      {icon:'🎵', title:'Musik auswählen', text:'Wähle vorher im Musik-Reiter eine Hintergrundmelodie aus.'},
+      {icon:'📐', title:'Qualität', text:'480p reicht für die Schule. 720p ist besser aber dauert länger.'},
+      {icon:'🎬', title:'Export starten', text:'Klicke auf den großen gelben Button. Der Export dauert je nach Anzahl der Fotos 10-60 Sekunden.'},
+      {icon:'🍎', title:'iPad/iPhone', text:'Auf Apple-Geräten wird automatisch ein GIF oder MP4 erstellt.'},
+    ]
+  },
+};
+
+// ── HILFE-MODAL ───────────────────────────────────────────────
+// SVG-Erklärgrafiken für jeden Reiter
+var HELP_SVG = {
+  plan: '<svg viewBox="0 0 280 80" style="width:100%;height:80px;display:block;margin-bottom:12px;border-radius:10px;background:#0f172a"><rect x="10" y="10" width="60" height="60" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-width="1.5"/><text x="40" y="38" text-anchor="middle" fill="#fbbf24" font-size="18">📖</text><text x="40" y="58" text-anchor="middle" fill="#94a3b8" font-size="8">Geschichte</text><line x1="75" y1="40" x2="95" y2="40" stroke="#334155" stroke-width="2" stroke-dasharray="4"/><rect x="100" y="10" width="60" height="60" rx="8" fill="#1e293b" stroke="#a855f7" stroke-width="1.5"/><text x="130" y="38" text-anchor="middle" fill="#a855f7" font-size="18">🧸</text><text x="130" y="58" text-anchor="middle" fill="#94a3b8" font-size="8">Figuren</text><line x1="165" y1="40" x2="185" y2="40" stroke="#334155" stroke-width="2" stroke-dasharray="4"/><rect x="190" y="10" width="60" height="60" rx="8" fill="#1e293b" stroke="#22c55e" stroke-width="1.5"/><text x="220" y="38" text-anchor="middle" fill="#22c55e" font-size="18">🎞️</text><text x="220" y="58" text-anchor="middle" fill="#94a3b8" font-size="8">Storyboard</text></svg>',
+
+  kamera: '<svg viewBox="0 0 280 80" style="width:100%;height:80px;display:block;margin-bottom:12px;border-radius:10px;background:#0f172a"><rect x="10" y="15" width="80" height="50" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/><circle cx="50" cy="38" r="14" fill="none" stroke="#3b82f6" stroke-width="2"/><circle cx="50" cy="38" r="6" fill="#3b82f6" opacity="0.6"/><text x="50" y="56" text-anchor="middle" fill="#94a3b8" font-size="7">📷 fest!</text><g><rect x="115" y="10" width="30" height="40" rx="4" fill="#22c55e" opacity="0.3" stroke="#22c55e" stroke-width="1"/><circle cx="130" cy="22" r="5" fill="#ec4899"/><text x="130" y="42" text-anchor="middle" fill="#22c55e" font-size="7">Figur</text><rect x="115" y="10" width="30" height="40" rx="4" fill="none" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3" opacity="0.5"/></g><text x="150" y="35" fill="#fbbf24" font-size="18">→</text><g opacity="0.5"><rect x="165" y="12" width="30" height="40" rx="4" fill="#22c55e" opacity="0.2" stroke="#22c55e" stroke-width="1" stroke-dasharray="2"/><circle cx="180" cy="24" r="5" fill="#ec4899" opacity="0.4"/></g><g><rect x="200" y="14" width="30" height="40" rx="4" fill="#22c55e" opacity="0.3" stroke="#22c55e" stroke-width="1"/><circle cx="215" cy="26" r="5" fill="#ec4899"/><text x="215" y="46" text-anchor="middle" fill="#22c55e" font-size="7">bewegt!</text></g><text x="240" y="58" fill="#fbbf24" font-size="7" text-anchor="middle">viele Fotos</text></svg>',
+
+  editor: '<svg viewBox="0 0 280 80" style="width:100%;height:80px;display:block;margin-bottom:12px;border-radius:10px;background:#0f172a"><rect x="8" y="8" width="30" height="22" rx="3" fill="#1e293b" stroke="#334155"/><rect x="8" y="8" width="30" height="22" rx="3" fill="none" stroke="#fbbf24" stroke-width="1.5"/><text x="23" y="23" text-anchor="middle" font-size="12">🐇</text><rect x="42" y="8" width="30" height="22" rx="3" fill="#1e293b" stroke="#334155"/><text x="57" y="23" text-anchor="middle" font-size="12">🐇</text><rect x="76" y="8" width="30" height="22" rx="3" fill="#1e293b" stroke="#334155"/><text x="91" y="23" text-anchor="middle" font-size="12">🐇</text><rect x="110" y="8" width="30" height="22" rx="3" fill="#1e293b" stroke="#334155"/><text x="125" y="23" text-anchor="middle" font-size="12">🐇</text><rect x="144" y="8" width="30" height="22" rx="3" fill="#1e293b" stroke="#334155"/><text x="159" y="23" text-anchor="middle" font-size="12">🐇</text><text x="140" y="50" text-anchor="middle" fill="#fbbf24" font-size="9">▶  8 fps → Film!</text><rect x="8" y="55" width="264" height="8" rx="4" fill="#1e293b"/><rect x="8" y="55" width="120" height="8" rx="4" fill="linear-gradient(90deg,#fbbf24,#f97316)"/><rect x="8" y="55" width="120" height="8" rx="4" fill="#fbbf24" opacity="0.7"/><text x="140" y="70" text-anchor="middle" fill="#94a3b8" font-size="7">Fortschritt</text></svg>',
+
+  musik: '<svg viewBox="0 0 280 80" style="width:100%;height:80px;display:block;margin-bottom:12px;border-radius:10px;background:#0f172a"><text x="30" y="45" font-size="30" text-anchor="middle">🎵</text><path d="M60 55 Q80 20 100 40 Q120 60 140 30 Q160 10 180 35 Q200 55 220 25 Q240 10 260 40" stroke="#a855f7" stroke-width="2" fill="none"/><circle cx="60" cy="55" r="3" fill="#a855f7"/><circle cx="100" cy="40" r="3" fill="#a855f7"/><circle cx="140" cy="30" r="3" fill="#a855f7"/><circle cx="180" cy="35" r="3" fill="#a855f7"/><circle cx="220" cy="25" r="3" fill="#a855f7"/><circle cx="260" cy="40" r="3" fill="#a855f7"/><text x="140" y="72" text-anchor="middle" fill="#94a3b8" font-size="7">Wähle die Stimmung für deinen Film</text></svg>',
+
+  export: '<svg viewBox="0 0 280 80" style="width:100%;height:80px;display:block;margin-bottom:12px;border-radius:10px;background:#0f172a"><rect x="10" y="10" width="100" height="60" rx="8" fill="#1e293b" stroke="#334155"/><text x="60" y="45" text-anchor="middle" font-size="11" fill="#94a3b8">📸 × 30 Fotos</text><text x="120" y="43" font-size="20" fill="#fbbf24">→</text><rect x="145" y="15" width="60" height="50" rx="8" fill="#1e293b" stroke="#22c55e" stroke-width="2"/><text x="175" y="42" text-anchor="middle" font-size="11" fill="#22c55e">🎬 .mp4</text><text x="215" y="43" font-size="16" fill="#fbbf24">→</text><text x="250" y="45" font-size="22" text-anchor="middle">📱</text><text x="140" y="74" text-anchor="middle" fill="#94a3b8" font-size="7">Fotos werden zum fertigen Film!</text></svg>',
+};
+
+function showHelp(tab){
+  var h = HELP[tab] || HELP['plan'];
+  var svgAnim = HELP_SVG[tab] || '';
+  var html = svgAnim + '<div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">';
+  h.steps.forEach(function(s){
+    html += '<div style="display:flex;gap:10px;align-items:flex-start;background:var(--s2);border-radius:10px;padding:10px">' +
+      '<span style="font-size:1.4rem;flex-shrink:0">'+s.icon+'</span>' +
+      '<div><div style="font-weight:800;font-size:.85rem;margin-bottom:2px">'+s.title+'</div>' +
+      '<div style="font-size:.78rem;color:var(--muted);line-height:1.5">'+s.text+'</div></div></div>';
+  });
+  html += '</div>';
+  document.getElementById('help-title').textContent = h.title;
+  document.getElementById('help-body').innerHTML = html;
+  document.getElementById('help-modal').classList.add('open');
+}
+
+// ── TOOLTIP BUBBLES (einmalig pro Reiter) ────────────────────
+var tooltipsSeen = JSON.parse(localStorage.getItem('ttSeen')||'{}');
+var TOOLTIPS = {
+  'pg-cam':  {text:'💡 Tipp: Zwiebelhaut einschalten hilft beim genauen Positionieren!', anchor:'cb-onion'},
+  'pg-edit': {text:'💡 Tipp: Wähle mehrere Frames aus und drehe oder passe Helligkeit an!', anchor:'exp-btn'},
+  'pg-mus':  {text:'💡 Tipp: Drücke ▶ um Musik anzuhören bevor du sie auswählst!', anchor:null},
+  'pg-exp':  {text:'💡 Tipp: Zuerst Musik auswählen, dann exportieren – beides zusammen!', anchor:null},
+  'pg-ki':   {text:'💡 Tipp: Frag die KI nach Ideen für deine Geschichte oder Figuren!', anchor:null},
+};
+function checkTooltip(pageId){
+  if(tooltipsSeen[pageId]) return;
+  var tip = TOOLTIPS[pageId]; if(!tip) return;
+  tooltipsSeen[pageId] = true;
+  localStorage.setItem('ttSeen', JSON.stringify(tooltipsSeen));
+  var d = document.createElement('div');
+  d.style.cssText='position:fixed;bottom:80px;left:16px;right:16px;background:linear-gradient(135deg,#1e3a5f,#1a2744);border:2px solid var(--yellow);border-radius:12px;padding:12px 16px;z-index:8000;font-size:.8rem;font-weight:700;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.4);display:flex;align-items:center;gap:10px';
+  d.innerHTML = '<span style="flex:1">'+tip.text+'</span><button onclick="this.parentNode.remove()" style="background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;flex-shrink:0">✕</button>';
+  document.body.appendChild(d);
+  setTimeout(function(){ if(d.parentNode) d.remove(); }, 5000);
+}
+
+// Tooltip beim Seitenwechsel
+var _origGoPage = goPage;
+goPage = function(id, btn){
+  _origGoPage(id, btn);
+  setTimeout(function(){ checkTooltip(id); }, 600);
+};
+
+// ── ONBOARDING (Erststart) ────────────────────────────────────
+var ONBOARD_STEPS = [
+  {icon:'🎬', title:'Willkommen in der Trickfilm-Werkstatt!', text:'Hier lernst du Schritt für Schritt wie du deinen eigenen Stop-Motion-Film machst. Das dauert nur 2 Minuten!'},
+  {icon:'🤔', title:'Was ist Stop-Motion?', text:'Bei Stop-Motion fotografierst du Figuren und bewegst sie dabei ganz langsam. Wenn du alle Fotos hintereinander abspielst, sieht es aus als würden sie sich bewegen – wie ein richtiger Trickfilm!'},
+  {icon:'📋', title:'Schritt 1: Planen', text:'Zuerst planst du deine Geschichte. Wer sind die Figuren? Was passiert? Zeichne deine Szenen im Storyboard.'},
+  {icon:'📷', title:'Schritt 2: Filmen', text:'Stelle deine Figuren auf, lege dein Gerät fest auf einen Tisch – und los! Mach viele kleine Fotos und bewege die Figuren dabei winzig.'},
+  {icon:'🎵', title:'Schritt 3: Musik & Export', text:'Wähle Musik die zu deinem Film passt, und exportiere dann deinen fertigen Film. Fertig!'},
+  {icon:'🚀', title:'Bereit?', text:'Fang einfach an! Tippe auf einen Reiter unten um zu beginnen. Bei Fragen findest du überall den <strong>?</strong>-Button. Viel Spaß! 🎉'},
+];
+var onboardStep = 0;
+function showOnboarding(){
+  document.getElementById('onboard-modal').classList.add('open');
+  renderOnboardStep();
+}
+function renderOnboardStep(){
+  var s = ONBOARD_STEPS[onboardStep];
+  document.getElementById('ob-icon').textContent = s.icon;
+  document.getElementById('ob-title').textContent = s.title;
+  document.getElementById('ob-text').innerHTML = s.text;
+  document.getElementById('ob-dots').innerHTML = ONBOARD_STEPS.map(function(_,i){
+    return '<div style="width:'+(i===onboardStep?'20px':'8px')+';height:8px;border-radius:4px;background:'+(i===onboardStep?'var(--yellow)':'var(--border)')+';transition:all .3s"></div>';
+  }).join('');
+  document.getElementById('ob-next').textContent = onboardStep === ONBOARD_STEPS.length-1 ? '🚀 Los geht\'s!' : 'Weiter →';
+  document.getElementById('ob-skip').style.display = onboardStep === ONBOARD_STEPS.length-1 ? 'none' : 'inline-flex';
+}
+function onboardNext(){
+  if(onboardStep < ONBOARD_STEPS.length-1){ onboardStep++; renderOnboardStep(); }
+  else { closeOnboarding(); }
+}
+function closeOnboarding(){
+  document.getElementById('onboard-modal').classList.remove('open');
+  localStorage.setItem('onboardDone','1');
+}
+
+// ── BEWEGUNGSERKENNUNG ────────────────────────────────────────
+var motionOn = false, motionCanvas = null, motionCtx = null, lastFrameData = null, motionWarnTimer = null;
+function togMotion(){
+  motionOn = !motionOn;
+  document.getElementById('cb-motion').classList.toggle('active', motionOn);
+  if(motionOn){ startMotionDetect(); toast('📡 Bewegungserkennung aktiv'); }
+  else { stopMotionDetect(); toast('📡 Bewegungserkennung aus'); }
+}
+function startMotionDetect(){
+  if(!motionCanvas){ motionCanvas=document.createElement('canvas'); motionCtx=motionCanvas.getContext('2d'); }
+  motionCanvas.width=80; motionCanvas.height=60;
+  lastFrameData=null;
+  requestAnimationFrame(motionLoop);
+}
+function stopMotionDetect(){
+  motionOn=false; lastFrameData=null;
+  var w=document.getElementById('motion-warn'); if(w) w.style.display='none';
+}
+function motionLoop(){
+  if(!motionOn) return;
+  var vid=document.getElementById('cam-vid');
+  if(!vid||!vid.readyState||vid.readyState<2){ requestAnimationFrame(motionLoop); return; }
+  motionCtx.drawImage(vid,0,0,80,60);
+  var cur=motionCtx.getImageData(0,0,80,60).data;
+  if(lastFrameData){
+    var diff=0, n=cur.length;
+    for(var i=0;i<n;i+=4){ diff+=Math.abs(cur[i]-lastFrameData[i])+Math.abs(cur[i+1]-lastFrameData[i+1])+Math.abs(cur[i+2]-lastFrameData[i+2]); }
+    var score=diff/(n/4*3);
+    var warn=document.getElementById('motion-warn');
+    if(score>18){
+      if(warn){ warn.style.display='block'; }
+      clearTimeout(motionWarnTimer);
+      motionWarnTimer=setTimeout(function(){ var w=document.getElementById('motion-warn'); if(w)w.style.display='none'; },1500);
+    }
+  }
+  lastFrameData=new Uint8ClampedArray(cur);
+  setTimeout(function(){ if(motionOn) requestAnimationFrame(motionLoop); },200);
+}
+
+// ── BELICHTUNGSERKENNUNG ──────────────────────────────────────
+var exposureCheckIv=null;
+function startExposureCheck(){
+  clearInterval(exposureCheckIv);
+  exposureCheckIv=setInterval(function(){
+    if(!motionCanvas) return;
+    var vid=document.getElementById('cam-vid');
+    if(!vid||vid.readyState<2) return;
+    if(!motionCanvas){ motionCanvas=document.createElement('canvas'); motionCtx=motionCanvas.getContext('2d'); }
+    motionCanvas.width=80; motionCanvas.height=60;
+    motionCtx.drawImage(vid,0,0,80,60);
+    var d=motionCtx.getImageData(0,0,80,60).data;
+    var sum=0,n=d.length;
+    for(var i=0;i<n;i+=4) sum+=(d[i]+d[i+1]+d[i+2])/3;
+    var avg=sum/(n/4);
+    var warn=document.getElementById('exposure-warn');
+    if(!warn) return;
+    if(avg<35){ warn.textContent='🌑 Zu dunkel – mehr Licht!'; warn.style.display='block'; }
+    else if(avg>220){ warn.textContent='☀️ Zu hell – weniger Licht!'; warn.style.display='block'; }
+    else { warn.style.display='none'; }
+  },2000);
+}
+
+// Patch initCam to start exposure check
+var _origInitCam = initCam;
+initCam = function(){
+  _origInitCam();
+  setTimeout(function(){
+    if(!motionCanvas){ motionCanvas=document.createElement('canvas'); motionCtx=motionCanvas.getContext('2d'); }
+    startExposureCheck();
+  }, 1500);
+};
+
+// ── SZENEN-FORTSCHRITTSANZEIGE ────────────────────────────────
+var sceneTargetPhotos = 10;
+function updSceneProgress(){
+  var bar=document.getElementById('scene-progress-bar'); if(!bar) return;
+  var scenes=S.project.scenes||[];
+  if(!scenes.length){ bar.style.display='none'; return; }
+  // Find current scene (first without enough photos – simple heuristic)
+  var perScene = Math.max(1, Math.round(S.shots.length / Math.max(scenes.length,1)));
+  var curScene = scenes[Math.min(Math.floor(S.shots.length/sceneTargetPhotos), scenes.length-1)];
+  bar.style.display='block';
+  document.getElementById('sp-scene-name').textContent = curScene ? curScene.title : '–';
+  var sceneShots = S.shots.length % sceneTargetPhotos;
+  document.getElementById('sp-count').textContent = sceneShots;
+  document.getElementById('sp-target').textContent = sceneTargetPhotos;
+  document.getElementById('sp-fill').style.width = Math.min(100,Math.round(sceneShots/sceneTargetPhotos*100))+'%';
+}
+// Patch addShot
+var _origAddShot2 = addShot;
+addShot = function(url){
+  _origAddShot2(url);
+  updSceneProgress();
+};
+
+// ── GLOSSAR ───────────────────────────────────────────────────
+var GLOSSAR = [
+  {w:'Stop-Motion',  e:'Eine Technik bei der Objekte fotografiert und leicht bewegt werden. Im Film sieht es dann aus als würden sie sich selbst bewegen.'},
+  {w:'Frame',        e:'Ein einzelnes Foto. Viele Frames hintereinander ergeben den Film.'},
+  {w:'FPS',          e:'Frames per Second = Bilder pro Sekunde. Bei 8 FPS werden 8 Fotos pro Sekunde abgespielt. Je höher, desto flüssiger.'},
+  {w:'Storyboard',   e:'Eine Bildfolge (wie ein Comic) die zeigt was in jeder Szene passiert – dein Drehplan!'},
+  {w:'Zwiebelhaut',  e:'Das letzte Foto wird als halbtransparentes Bild eingeblendet damit du weißt wo du die Figur positionieren musst.'},
+  {w:'Onion Skinning',e:'Englischer Begriff für Zwiebelhaut.'},
+  {w:'Zeitraffer',   e:'Die App macht automatisch alle paar Sekunden ein Foto – praktisch für lange Bewegungen.'},
+  {w:'Szene',        e:'Ein Abschnitt deines Films – wie ein Kapitel in einem Buch.'},
+  {w:'Export',       e:'Aus allen Fotos wird ein Video-Datei (MP4 oder WebM) erstellt die du abspeichern oder teilen kannst.'},
+  {w:'Fade-In',      e:'Der Film beginnt mit einer Schwarzblende die aufhellt – professioneller Filmstart!'},
+  {w:'Fade-Out',     e:'Der Film endet mit einer Verdunkelung – professionelles Filmende!'},
+  {w:'WebM',         e:'Ein Videoformat für Android und PC. Wird von Chrome unterstützt.'},
+  {w:'MP4',          e:'Das bekannteste Videoformat – wird auf allen Geräten abgespielt, auch iPhone und iPad.'},
+];
+function showGlossar(){
+  var html=GLOSSAR.map(function(g){
+    return '<div style="padding:9px 0;border-bottom:1px solid var(--border)">' +
+      '<div style="font-weight:800;font-size:.85rem;color:var(--yellow)">'+g.w+'</div>' +
+      '<div style="font-size:.78rem;color:var(--muted);margin-top:2px;line-height:1.5">'+g.e+'</div></div>';
+  }).join('');
+  document.getElementById('help-title').textContent='📖 Fachbegriffe erklärt';
+  document.getElementById('help-body').innerHTML='<div>'+html+'</div>';
+  document.getElementById('help-modal').classList.add('open');
+}
+
+// ── CHECKLISTE VOR DEM DREHEN ─────────────────────────────────
+var CHECK_ITEMS=[
+  {id:'ck1',text:'💡 Licht ist gut – keine Schatten auf den Figuren'},
+  {id:'ck2',text:'📌 Kamera liegt fest auf dem Tisch oder ist eingeklemmt'},
+  {id:'ck3',text:'🧸 Alle Figuren sind bereit und aufgebaut'},
+  {id:'ck4',text:'🌄 Hintergrund ist aufgebaut und fest'},
+  {id:'ck5',text:'🔇 Kein Wind oder Erschütterungen in der Nähe'},
+  {id:'ck6',text:'🧅 Zwiebelhaut ist eingeschaltet'},
+  {id:'ck7',text:'⏱️ Timer ist eingeschaltet (verhindert Verwackeln)'},
+  {id:'ck8',text:'📖 Ich habe mein Storyboard vor mir'},
+];
+function showPreShootChecklist(){
+  var html='<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">';
+  CHECK_ITEMS.forEach(function(c){
+    html+='<label style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:11px 13px;cursor:pointer;font-size:.82rem;font-weight:700">'+
+      '<input type="checkbox" id="'+c.id+'" style="width:20px;height:20px;accent-color:var(--green);flex-shrink:0">'+
+      '<span>'+c.text+'</span></label>';
+  });
+  html+='</div><button onclick="checkAllPreShoot()" class="btn bp bf" style="margin-top:14px">✓ Alles ok – los geht\'s!</button>';
+  document.getElementById('help-title').textContent='📋 Checkliste vor dem Drehen';
+  document.getElementById('help-body').innerHTML=html;
+  document.getElementById('help-modal').classList.add('open');
+}
+function checkAllPreShoot(){
+  var missing=CHECK_ITEMS.filter(function(c){ return !document.getElementById(c.id)||!document.getElementById(c.id).checked; });
+  if(missing.length>0){
+    toast('⚠️ Noch '+missing.length+' Punkte nicht abgehakt!');
+  } else {
+    document.getElementById('help-modal').classList.remove('open');
+    goPage('pg-cam', document.querySelectorAll('.nav-btn')[1]);
+    setTimeout(initCam,100);
+    toast('🎬 Perfekt! Viel Spaß beim Drehen!');
+  }
+}
+
+// ── BEISPIEL-PROJEKT ──────────────────────────────────────────
+function loadExampleProject(){
+  if(!confirm('Ein Beispielprojekt laden? Dein aktuelles Projekt wird dabei überschrieben.')) return;
+  S.project = {
+    title: 'Der mutige Ritter Felix',
+    about: 'Ein kleiner Ritter besiegt einen Drachen – und findet dabei einen Freund.',
+    beg: 'Im Dorf Sonnenberg lebt der kleine Ritter Felix. Eines Morgens erscheint ein riesiger Drache!',
+    ten: 'Der Drache feuert Flammen auf die Häuser. Felix muss ihn aufhalten – aber er hat Angst.',
+    end: 'Felix entdeckt dass der Drache Hunger hat. Er bringt ihm Essen – und sie werden Freunde.',
+    figures: [
+      {name:'Felix', role:'🦸 Held·in'},
+      {name:'Funke', role:'🐉 Drache'},
+      {name:'Bürgermeister', role:'👑 König·in'},
+    ],
+    scenes: [
+      {title:'Szene 1: Felix wacht auf', notes:'Felix liegt in seinem kleinen Bett. Die Sonne scheint.', drawing:null},
+      {title:'Szene 2: Der Drache erscheint', notes:'Riesiger Schatten über dem Dorf. Alle laufen weg!', drawing:null},
+      {title:'Szene 3: Felix ist mutig', notes:'Felix nimmt sein Schwert und geht zum Drachen.', drawing:null},
+      {title:'Szene 4: Das Geheimnis', notes:'Der Drache weint – er hat Hunger!', drawing:null},
+      {title:'Szene 5: Freunde!', notes:'Felix und Funke essen zusammen. Das Dorf jubelt.', drawing:null},
+    ],
+    weekplan: null, progress: [0,0,0,0,0,0], badges:{}, subtitles:[], exported:false,
+  };
+  loadFields(); renderFigs(); renderScenes(); renderWk(); renderProg(); sched();
+  document.getElementById('help-modal').classList.remove('open');
+  toast('🎬 Beispielprojekt geladen! Schau dir alles an.');
+}
+
+// Onboarding beim Start
+if(!localStorage.getItem('onboardDone')){
+  setTimeout(showOnboarding, 800);
+}
+
 if('serviceWorker' in navigator){
-  // Unregister alte Service Worker damit kein alter Cache die neue Version blockiert
   navigator.serviceWorker.getRegistrations().then(function(regs){
     regs.forEach(function(r){ r.unregister(); });
   });
-  var swCode="const CV='tf-v3';self.addEventListener('install',function(e){self.skipWaiting()});self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.filter(function(k){return k!==CV}).map(function(k){return caches.delete(k)}))}).then(function(){return clients.claim()}))});self.addEventListener('fetch',function(e){if(e.request.url.includes('generativelanguage')||e.request.url.includes('fonts.google')){return;}e.respondWith(fetch(e.request).then(function(r){var c=r.clone();caches.open(CV).then(function(cache){cache.put(e.request,c)});return r}).catch(function(){return caches.match(e.request)}))});";
+  var swCode="const CV='tf-v4';self.addEventListener('install',function(e){self.skipWaiting()});self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.filter(function(k){return k!==CV}).map(function(k){return caches.delete(k)}))}).then(function(){return clients.claim()}))});self.addEventListener('fetch',function(e){if(e.request.url.includes('generativelanguage')||e.request.url.includes('fonts.google')||e.request.url.includes('unpkg.com')){return;}e.respondWith(fetch(e.request).then(function(r){var c=r.clone();caches.open(CV).then(function(cache){cache.put(e.request,c)});return r}).catch(function(){return caches.match(e.request)}))});";
   var blob=new Blob([swCode],{type:'application/javascript'});
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function(){});
 }
 </script>
 </body>
-</html>
+            </html>
