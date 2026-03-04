@@ -2171,7 +2171,12 @@ renderSubtitles();
 // ═══════════════════════════════════════════════════════════════
 renderUploadedTracks();
 
-  var swCode="self.addEventListener('install',function(e){self.skipWaiting()});\nself.addEventListener('activate',function(e){e.waitUntil(clients.claim())});\nself.addEventListener('fetch',function(e){if(e.request.url.includes('pixabay.com')||e.request.url.includes('fonts.googleapis')){return;}e.respondWith(caches.open('tf-v1').then(function(c){return c.match(e.request).then(function(r){return r||fetch(e.request).then(function(nr){c.put(e.request,nr.clone());return nr;}).catch(function(){return r;});});}));});";
+if('serviceWorker' in navigator){
+  // Unregister alte Service Worker damit kein alter Cache die neue Version blockiert
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    regs.forEach(function(r){ r.unregister(); });
+  });
+  var swCode="const CV='tf-v3';self.addEventListener('install',function(e){self.skipWaiting()});self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.filter(function(k){return k!==CV}).map(function(k){return caches.delete(k)}))}).then(function(){return clients.claim()}))});self.addEventListener('fetch',function(e){if(e.request.url.includes('generativelanguage')||e.request.url.includes('fonts.google')){return;}e.respondWith(fetch(e.request).then(function(r){var c=r.clone();caches.open(CV).then(function(cache){cache.put(e.request,c)});return r}).catch(function(){return caches.match(e.request)}))});";
   var blob=new Blob([swCode],{type:'application/javascript'});
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function(){});
 }
