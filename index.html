@@ -85,10 +85,10 @@ input,textarea,select{font-family:'Nunito',sans-serif;outline:none}
 .page.flex-page{display:none;flex-direction:column;overflow:hidden;padding-bottom:0}
 .page.flex-page.active{display:flex;animation:pgIn .28s cubic-bezier(.22,1,.36,1)}
 /* NAV */
-#nav{height:60px;flex-shrink:0;background:rgba(6,9,20,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(6,1fr);z-index:10;position:relative;}
+#nav{height:68px;flex-shrink:0;background:rgba(6,9,20,.95);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);z-index:10;position:relative;}
 #nav::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--teal),var(--blue),transparent);opacity:.3;}
-.nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;color:var(--muted);font-size:0.55rem;font-weight:800;text-transform:uppercase;letter-spacing:.3px;padding:6px 2px;position:relative;transition:color .15s}
-.nav-btn .ni{font-size:1.3rem;line-height:1}
+.nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;color:var(--muted);font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:8px 4px;position:relative;transition:color .2s;width:100%;border:none;cursor:pointer;}
+.nav-btn .ni{font-size:1.55rem;line-height:1;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
 .nav-btn.active{color:var(--yellow)}
 .nav-btn.active .ni{transform:scale(1.12);filter:drop-shadow(0 0 6px rgba(255,209,102,.5))}
 .nav-btn.active::after{content:'';position:absolute;top:0;left:25%;right:25%;height:2px;background:linear-gradient(90deg,var(--yellow),var(--orange));border-radius:0 0 2px 2px;box-shadow:0 0 8px rgba(255,209,102,.4);}
@@ -1166,36 +1166,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
     </div>
 
     <!-- ═══ KI-ASSISTENT ═══ -->
-    <div class="page flex-page" id="pg-ki">
-      <div style="flex-shrink:0">
-        <div class="ph"><h1>🤖 KI-Assistent</h1><p>Dein persönlicher Filmberater</p></div>
-        <div id="ki-setup" style="margin:0 16px 12px;padding:13px;background:linear-gradient(135deg,#1e293b,#1a2744);border:1.5px solid var(--yellow);border-radius:var(--r)">
-          <div style="font-weight:800;font-size:.88rem;color:var(--yellow);margin-bottom:5px">🔑 Google Gemini API-Key</div>
-          <div style="font-size:.73rem;color:var(--muted);margin-bottom:9px;line-height:1.5">Kostenlos & kein Guthaben nötig! Key holen auf <span style="color:var(--blue)">aistudio.google.com</span> → „Get API Key"</div>
-          <div style="display:flex;gap:7px">
-            <input class="inp" id="ki-key" type="password" placeholder="AIza..." style="flex:1;font-size:.8rem">
-            <button class="btn bp" style="padding:9px 12px;font-size:.8rem;flex-shrink:0" onclick="saveKiKey()">✓ OK</button>
-          </div>
-          <div id="ki-key-status" style="font-size:.7rem;margin-top:6px;color:var(--muted)"></div>
-        </div>
-        <div style="padding:0 16px 10px">
-          <div class="lbl" style="margin-bottom:7px">⚡ Schnell-Aktionen</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-            <button class="ki-qbtn" onclick="kiQuick('geschichte')">✍️ Geschichte verbessern</button>
-            <button class="ki-qbtn" onclick="kiQuick('figuren')">🎭 Figur-Ideen generieren</button>
-            <button class="ki-qbtn" onclick="kiQuick('szenen')">🎬 Szenen vorschlagen</button>
-            <button class="ki-qbtn" onclick="kiQuick('hintergrund')">🎨 SVG-Hintergrund malen</button>
-            <button class="ki-qbtn" onclick="kiQuick('drehtipps')">💡 Stop-Motion Tipps</button>
-            <button class="ki-qbtn" onclick="kiQuick('dialog')">💬 Dialog schreiben</button>
-          </div>
-        </div>
-      </div>
-      <div id="ki-chat" style="flex:1;overflow-y:auto;padding:0 16px 10px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch"></div>
-      <div style="flex-shrink:0;padding:10px 16px 12px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:7px">
-        <textarea id="ki-input" class="inp" rows="2" placeholder="Frag mich etwas über deinen Film..." style="flex:1;font-size:.83rem;resize:none"></textarea>
-        <button id="ki-send" class="btn bp" style="align-self:flex-end;padding:10px 13px;font-size:.95rem;flex-shrink:0" onclick="kiSend()">➤</button>
-      </div>
-    </div>
+    
 
   </div>
 
@@ -1204,7 +1175,6 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
     <button class="nav-btn" onclick="goPage('pg-cam',this);setTimeout(initCam,100)"><span class="ni">📷</span>Kamera</button>
     <button class="nav-btn" onclick="goPage('pg-edit',this);renderFrames()"><span class="ni">🎞️</span>Editor</button>
     <button class="nav-btn" onclick="goPage('pg-mus',this)"><span class="ni">🎵</span>Musik</button>
-    <button class="nav-btn" onclick="goPage('pg-ki',this);initKI()"><span class="ni">🤖</span>KI</button>
     <button class="nav-btn" onclick="goPage('pg-exp',this);updExpSum()"><span class="ni">🎬</span>Export</button>
   </nav>
 </div>
@@ -2862,11 +2832,6 @@ function appInit(){
 // ═══════════════════════════════════════════════════════════════
 var kiHistory = [];
 var kiKey = '';
-
-function initKI(){
-  var saved = localStorage.getItem('ki_key');
-  if(saved){ kiKey=saved; document.getElementById('ki-key').value=saved; showKiKeyStatus(true); }
-}
 
 function saveKiKey(){
   var v = document.getElementById('ki-key').value.trim();
