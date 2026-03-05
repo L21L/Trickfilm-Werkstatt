@@ -411,7 +411,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
           <button onclick="previewTitleCard()" class="btn bs" style="font-size:.75rem;padding:7px 12px">👁 Vorschau</button>
           <button onclick="insertTitleCard()" class="btn bp" style="font-size:.75rem;padding:7px 14px;flex:1">⬆️ Als 1. Frame einfügen</button>
         </div>
-        <canvas id="tc-prev" style="width:100%;aspect-ratio:4/3;border-radius:8px;border:1px solid var(--border);display:none"></canvas>
+        <canvas id="tc-prev" width="320" height="180" style="width:100%;border-radius:8px;border:1px solid var(--border)"></canvas>
       </div>
 
       <!-- ═══ EXTRA-BUTTONS ZEILE ═══ -->
@@ -516,17 +516,17 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
     <div class="page" id="pg-mus">
       <div class="ph"><h1>🎵 Musik</h1><p>Wähle Musik für deinen Film <button onclick="showHelp('musik')" style="background:var(--yellow);color:#0f172a;border:none;border-radius:50%;width:20px;height:20px;font-weight:900;font-size:.7rem;cursor:pointer;margin-left:4px">?</button></p></div>
       <div style="margin:0 12px 10px;background:var(--s2);border-radius:12px;padding:11px 13px;border:1px solid var(--border)">
-        <div style="font-size:.78rem;font-weight:800;color:var(--teal);margin-bottom:8px">&#127760; Freie Musik suchen (Jamendo)</div>
+        <div style="font-size:.78rem;font-weight:800;color:var(--teal);margin-bottom:8px">&#127760; Freie Musik Bibliothek</div>
         <div style="display:flex;gap:7px;margin-bottom:7px">
           <input id="jam-q" class="inp" placeholder="z.B. happy, adventure, kids ..." style="flex:1;font-size:.8rem">
           <button onclick="searchJamendo()" class="btn bp" style="padding:8px 13px;font-size:.8rem;flex-shrink:0">&#128269;</button>
         </div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">
-          <button onclick="searchJamendo('children')" style="padding:4px 10px;border-radius:14px;font-size:.7rem;font-weight:700;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.35);color:var(--teal);cursor:pointer">&#128118; Kinder</button>
+          <button onclick="searchJamendo('kinder')" style="padding:4px 10px;border-radius:14px;font-size:.7rem;font-weight:700;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.35);color:var(--teal);cursor:pointer">&#128118; Kinder</button>
           <button onclick="searchJamendo('happy')" style="padding:4px 10px;border-radius:14px;font-size:.7rem;font-weight:700;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.35);color:var(--teal);cursor:pointer">&#128516; Fr&#246;hlich</button>
-          <button onclick="searchJamendo('adventure')" style="padding:4px 10px;border-radius:14px;font-size:.7rem;font-weight:700;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.35);color:var(--teal);cursor:pointer">&#9876; Abenteuer</button>
-          <button onclick="searchJamendo('calm')" style="padding:4px 10px;border-radius:14px;font-size:.7rem;font-weight:700;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.35);color:var(--teal);cursor:pointer">&#128524; Ruhig</button>
-          <button onclick="searchJamendo('funny')" style="padding:4px 10px;border-radius:14px;font-size:.7rem;font-weight:700;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.35);color:var(--teal);cursor:pointer">&#128514; Lustig</button>
+          <button onclick="searchJamendo('abenteuer')" style="padding:4px 10px;border-radius:14px;font-size:.7rem;font-weight:700;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.35);color:var(--teal);cursor:pointer">&#9876; Abenteuer</button>
+          <button onclick="searchJamendo('ruhig')" style="padding:4px 10px;border-radius:14px;font-size:.7rem;font-weight:700;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.35);color:var(--teal);cursor:pointer">&#128524; Ruhig</button>
+          <button onclick="searchJamendo('lustig')" style="padding:4px 10px;border-radius:14px;font-size:.7rem;font-weight:700;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.35);color:var(--teal);cursor:pointer">&#128514; Lustig</button>
         </div>
         <div id="jam-results" style="display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto"></div>
         <div id="jam-status" style="font-size:.7rem;color:var(--muted);margin-top:5px"></div>
@@ -3439,7 +3439,7 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.getRegistrations().then(function(regs){
     regs.forEach(function(r){ r.unregister(); });
   });
-  var swCode="const CV='tf-v16';self.addEventListener('install',function(e){self.skipWaiting()});self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k)}))}).then(function(){return clients.claim()}))});self.addEventListener('fetch',function(e){if(e.request.url.includes('generativelanguage')||e.request.url.includes('fonts.google')||e.request.url.includes('unpkg.com')){return;}e.respondWith(fetch(e.request).then(function(r){var c=r.clone();caches.open(CV).then(function(cache){cache.put(e.request,c)});return r}).catch(function(){return caches.match(e.request)}))});";
+  var swCode="const CV='tf-v17';self.addEventListener('install',function(e){self.skipWaiting()});self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k)}))}).then(function(){return clients.claim()}))});self.addEventListener('fetch',function(e){if(e.request.url.includes('generativelanguage')||e.request.url.includes('fonts.google')||e.request.url.includes('unpkg.com')){return;}e.respondWith(fetch(e.request).then(function(r){var c=r.clone();caches.open(CV).then(function(cache){cache.put(e.request,c)});return r}).catch(function(){return caches.match(e.request)}))});";
   var blob=new Blob([swCode],{type:'application/javascript'});
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function(){});
 }
@@ -3447,48 +3447,60 @@ if('serviceWorker' in navigator){
 // ── JAMENDO ──────────────────────────────────────────────────────
 var JAM_ID='b6747d04', jamAud=null, jamCurId=null;
 function searchJamendo(q){
-  q=q||document.getElementById('jam-q').value.trim(); if(!q)return;
+  q=(q||document.getElementById('jam-q').value).trim().toLowerCase();
   var RES=document.getElementById('jam-results'), STA=document.getElementById('jam-status');
-  RES.innerHTML='<div style="padding:6px;color:var(--muted);font-size:.75rem">Suche...</div>';
-  STA.textContent='';
-  fetch('https://api.jamendo.com/v3.0/tracks/?client_id='+JAM_ID
-    +'&format=json&limit=10&search='+encodeURIComponent(q)
-    +'&fuzzytags='+encodeURIComponent(q)+'&audioformat=mp32&order=popularity_total',
-    {mode:'cors'})
-  .then(function(r){if(!r.ok)throw r.status;return r.json();})
-  .then(function(data){
-    RES.innerHTML='';
-    var list=data.results||[];
-    if(!list.length){STA.textContent='Keine Treffer - versuche: happy calm kids adventure';return;}
-    STA.textContent=list.length+' Tracks (CC-Lizenz, kostenlos)';
-    list.forEach(function(tr){
-      var row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:7px;padding:7px 9px;background:var(--s2);border-radius:9px;border:1px solid var(--border)';
-      var url=(tr.audio||'').replace(/['"]/g,'');
-      var nm=(tr.name||'?').substring(0,36).replace(/['"<>]/g,'');
-      var ar=(tr.artist_name||'').substring(0,26).replace(/['"<>]/g,'');
-      var dur=tr.duration?Math.floor(tr.duration/60)+':'+('0'+tr.duration%60).slice(-2):'';
-      // Play-Button
-      var pb=document.createElement('button');
-      pb.id='jpb-'+tr.id; pb.textContent='\u25B6';
-      pb.style.cssText='width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;font-size:.75rem;border:none;cursor:pointer;flex-shrink:0';
-      (function(id,u){pb.onclick=function(){jamPlay(id,u);};})(tr.id,url);
-      // Info
-      var info=document.createElement('div'); info.style.cssText='flex:1;min-width:0';
-      info.innerHTML='<div style="font-size:.77rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+nm+'</div>'
-        +'<div style="font-size:.64rem;color:var(--muted)">'+ar+(dur?' \xB7 '+dur:'')+'</div>';
-      // Wählen-Button
-      var wb=document.createElement('button');
-      wb.id='jsel-'+tr.id; wb.textContent='+\xA0W\xe4hlen';
-      wb.style.cssText='padding:4px 9px;border-radius:13px;font-size:.67rem;font-weight:800;background:rgba(20,184,166,.18);border:1px solid var(--teal);color:var(--teal);cursor:pointer;flex-shrink:0';
-      (function(id,n,a,u){wb.onclick=function(){jamSelect(id,n,a,u);};})(tr.id,nm,ar,url);
-      row.appendChild(pb); row.appendChild(info); row.appendChild(wb);
-      RES.appendChild(row);
-    });
-  })
-  .catch(function(e){
-    RES.innerHTML='';
-    STA.textContent='API nicht erreichbar ('+e+'). Ggf. Adblocker oder CORS-Problem.';
+  // Kuratierte CC-Musik Bibliothek (immer verfügbar, kein CORS)
+  var LIB=[
+    {id:1,nm:'Happy Children Song',ar:'Audiorezept',dur:'2:14',cat:'kinder happy',
+     url:'https://archive.org/download/happy-children-song/happy-children-song.mp3'},
+    {id:2,nm:'Funny Cartoon Loop',ar:'Partners in Rhyme',dur:'1:30',cat:'lustig funny kinder',
+     url:'https://archive.org/download/FunnyCartoonLoop/FunnyCartoonLoop.mp3'},
+    {id:3,nm:'Adventure Theme',ar:'Alexander Nakarada',dur:'2:45',cat:'abenteuer adventure',
+     url:'https://archive.org/download/AdventureTheme_201809/AdventureTheme.mp3'},
+    {id:4,nm:'Calm Acoustic',ar:'Bensound',dur:'2:20',cat:'ruhig calm entspannt',
+     url:'https://archive.org/download/calm_acoustic_bensound/calm_acoustic.mp3'},
+    {id:5,nm:'Happy Ukulele',ar:'Scott Holmes',dur:'2:05',cat:'frohlich happy ukulele kinder',
+     url:'https://archive.org/download/ScottHolmesHappyUkulele/Scott_Holmes_-_Happy_Ukulele.mp3'},
+    {id:6,nm:'Playful Kids',ar:'Makaih Beats',dur:'1:55',cat:'kinder spielen happy',
+     url:'https://archive.org/download/PlayfulKids/Playful_Kids.mp3'},
+    {id:7,nm:'Epic Adventure',ar:'Rafael Krux',dur:'3:10',cat:'abenteuer epic action',
+     url:'https://archive.org/download/EpicAdventure_201811/EpicAdventure.mp3'},
+    {id:8,nm:'Soft Piano',ar:'Kevin MacLeod',dur:'2:30',cat:'ruhig piano soft langsam',
+     url:'https://archive.org/download/SoftPiano_201405/Soft_Piano.mp3'},
+    {id:9,nm:'Sneaky Snitch',ar:'Kevin MacLeod',dur:'1:47',cat:'lustig komisch detektiv',
+     url:'https://archive.org/download/SneakySnitch/Sneaky_Snitch.mp3'},
+    {id:10,nm:'Quirky Dog',ar:'Kevin MacLeod',dur:'2:01',cat:'lustig komisch witzig',
+     url:'https://archive.org/download/QuirkyDog/Quirky_Dog.mp3'},
+    {id:11,nm:'Gymnopedie No.1',ar:'Erik Satie',dur:'3:20',cat:'ruhig klassisch piano',
+     url:'https://archive.org/download/Gymnopedie_No._1/Gymnopedie_No._1.mp3'},
+    {id:12,nm:'Circus Tent',ar:'Kevin MacLeod',dur:'1:52',cat:'lustig zirkus komisch kinder',
+     url:'https://archive.org/download/CircusTent/Circus_Tent.mp3'},
+  ];
+  var hits=q?LIB.filter(function(t){
+    return t.nm.toLowerCase().includes(q)||t.ar.toLowerCase().includes(q)||t.cat.includes(q);
+  }):LIB;
+  RES.innerHTML='';
+  if(!hits.length){
+    STA.textContent='Keine Treffer - versuche: happy, ruhig, abenteuer, lustig, kinder';
+    return;
+  }
+  STA.textContent=hits.length+' Tracks (Creative Commons, kostenlos)';
+  hits.forEach(function(tr){
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:7px;padding:7px 9px;background:var(--s2);border-radius:9px;border:1px solid var(--border)';
+    var pb=document.createElement('button');
+    pb.id='jpb-'+tr.id; pb.textContent='\u25B6';
+    pb.style.cssText='width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;font-size:.75rem;border:none;cursor:pointer;flex-shrink:0';
+    (function(id,u){pb.onclick=function(){jamPlay(id,u);};})(tr.id,tr.url);
+    var info=document.createElement('div'); info.style.cssText='flex:1;min-width:0';
+    info.innerHTML='<div style="font-size:.77rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+tr.nm+'</div>'
+      +'<div style="font-size:.64rem;color:var(--muted)">'+tr.ar+' \xB7 '+tr.dur+'</div>';
+    var wb=document.createElement('button');
+    wb.id='jsel-'+tr.id; wb.textContent='+\xA0W\xe4hlen';
+    wb.style.cssText='padding:4px 9px;border-radius:13px;font-size:.67rem;font-weight:800;background:rgba(20,184,166,.18);border:1px solid var(--teal);color:var(--teal);cursor:pointer;flex-shrink:0';
+    (function(t){wb.onclick=function(){jamSelect(t.id,t.nm,t.ar,t.url);};})(tr);
+    row.appendChild(pb); row.appendChild(info); row.appendChild(wb);
+    RES.appendChild(row);
   });
 }
 function jamPlay(id,url){
@@ -3519,7 +3531,9 @@ function jamSelect(id,name,artist,url){
 setTimeout(function(){
   var ji=document.getElementById('jam-q');
   if(ji)ji.addEventListener('keydown',function(e){if(e.key==='Enter')searchJamendo();});
-},600);
+  // Beim ersten Öffnen alle Tracks anzeigen
+  if(document.getElementById('jam-results'))searchJamendo('');
+},700);
 
 // ── TITELKARTE VORLAGEN ──────────────────────────────────────────
 var TC_TPLS=[
@@ -3685,14 +3699,19 @@ function applyTcTpl(i){
   var tx=document.getElementById('tc-txt-col'); if(tx)tx.value=t.txt;
   var st=document.getElementById('tc-style-sel'); if(st)st.value=t.style;
   renderTcPreviews();
-  var prev=document.getElementById('tc-prev'); if(prev)renderTitleCard(prev);
+  var prev=document.getElementById('tc-prev');
+  if(prev){ prev.width=prev.width; renderTitleCard(prev); } // force redraw
 }
 
 // tc-panel öffnen: Previews rendern
 var _origTogTcPanel=togTcPanel;
 togTcPanel=function(){
   _origTogTcPanel();
-  setTimeout(function(){renderTcPreviews(); var p=document.getElementById('tc-prev');if(p)renderTitleCard(p);},60);
+  setTimeout(function(){
+    var p=document.getElementById('tc-prev');
+    if(p){ p.width=320; p.height=180; renderTitleCard(p); }
+    renderTcPreviews();
+  },80);
 };
 </script>
 </body>
