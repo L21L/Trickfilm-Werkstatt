@@ -42,8 +42,8 @@ input,textarea,select{font-family:'Nunito',sans-serif;outline:none}
 #topbar-logo{font-family:'Fredoka One',cursive;display:flex;align-items:center;gap:9px;flex-shrink:0;position:relative}
 
 /* ── FILMSTREIFEN ── */
-#logo-film{width:28px;align-self:stretch;background:linear-gradient(180deg,#111d30,#0a1220);border-radius:5px;border:1px solid #1a3050;display:flex;flex-direction:column;padding:14px 0;gap:0;position:relative;overflow:hidden}
-#logo-film::before,#logo-film::after{content:'';position:absolute;left:0;right:0;height:14px;background:repeating-linear-gradient(90deg,transparent 0px,transparent 3px,#060914 3px,#060914 7px,transparent 7px,transparent 10px,#060914 10px,#060914 14px,transparent 14px,transparent 17px,#060914 17px,#060914 21px);background-size:28px 7px;background-color:#0d1a28}
+#logo-film{width:22px;height:38px;background:linear-gradient(180deg,#111d30,#0a1220);border-radius:4px;border:1px solid #1a3050;display:flex;flex-direction:column;padding:10px 0;gap:0;position:relative;overflow:hidden;flex-shrink:0}
+#logo-film::before,#logo-film::after{content:'';position:absolute;left:0;right:0;height:10px;background:repeating-linear-gradient(90deg,transparent 0px,transparent 2px,#060914 2px,#060914 5px,transparent 5px,transparent 7px,#060914 7px,#060914 10px,transparent 10px,transparent 12px,#060914 12px,#060914 15px);background-size:22px 6px;background-color:#0d1a28}
 #logo-film::before{top:0}
 #logo-film::after{bottom:0}
 .logo-frame{flex:1;margin:0 3px;background:#0a1525;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:7px;border:1px solid #162035;min-height:0}
@@ -246,9 +246,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
 .voice-rec-btn.recording{animation:pulse-rec 1s infinite}
 @keyframes pulse-rec{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}
 .voice-play-btn{width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;border:none;display:flex;align-items:center;justify-content:center;font-size:.8rem;cursor:pointer;flex-shrink:0}
-/* QR MODAL */
-#qr-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:center;justify-content:center}
-#qr-modal.open{display:flex}
+
 .qr-box{background:var(--surface);border-radius:20px;padding:24px;width:88%;max-width:320px;text-align:center}
 #qr-canvas{border-radius:12px;margin:14px auto;display:block;background:#fff;padding:12px}
 /* PRINT / PDF styles – hidden normally */
@@ -325,7 +323,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
   <!-- Fixed overlay buttons – always on top -->
   <div style="position:fixed;top:0;right:0;height:52px;display:flex;align-items:center;gap:2px;padding-right:10px;z-index:9999;pointer-events:none">
     <button onclick="showBadges()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;padding:6px;pointer-events:all;-webkit-tap-highlight-color:transparent" title="Abzeichen">🏆</button>
-    <button onclick="showQR()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;padding:6px;pointer-events:all;-webkit-tap-highlight-color:transparent" title="Teilen">📱</button>
+    
   </div>
   <div id="pages">
 
@@ -792,16 +790,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
 </div>
 <div id="badge-toast"></div>
 
-<!-- QR MODAL -->
-<div id="qr-modal">
-  <div class="qr-box">
-    <div style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--yellow);margin-bottom:4px">📱 Film teilen</div>
-    <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px">Scanne diesen QR-Code um das Projekt zu öffnen</div>
-    <canvas id="qr-canvas" width="200" height="200"></canvas>
-    <div id="qr-url" style="font-size:.65rem;color:var(--muted);word-break:break-all;margin-bottom:12px"></div>
-    <button class="btn bp bf" onclick="document.getElementById('qr-modal').classList.remove('open')">Schließen</button>
-  </div>
-</div>
+
 
 <!-- DRAW MODAL -->
 <div id="draw-modal">
