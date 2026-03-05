@@ -3040,18 +3040,27 @@ function showBadgeToast(msg){
 }
 
 function showBadges(){
-  checkAllBadges();
+  var panel = document.getElementById('badge-panel');
+  if(!panel){ alert('badge-panel fehlt!'); return; }
   var grid = document.getElementById('badge-grid');
-  grid.innerHTML = '';
-  BADGES.forEach(function(b){
-    var earned = !!earnedBadges[b.id];
-    var div = document.createElement('div');
-    div.className = 'badge-item' + (earned?' earned':'');
-    div.innerHTML = '<span class="bi">'+b.icon+'</span><span>'+b.name+'</span>';
-    div.title = b.desc + (earned ? '\n✅ Verdient!' : '\n🔒 '+b.desc);
-    grid.appendChild(div);
-  });
-  document.getElementById('badge-panel').classList.add('open');
+  try{checkAllBadges();}catch(e){console.warn('checkAllBadges:',e);}
+  if(grid){
+    grid.innerHTML = '';
+    try{
+      (typeof BADGES!=='undefined'?BADGES:[]).forEach(function(b){
+        var earned = !!earnedBadges[b.id];
+        var div = document.createElement('div');
+        div.className = 'badge-item'+(earned?' earned':'');
+        div.innerHTML = '<span class="bi">'+b.icon+'</span><span>'+b.name+'</span>';
+        grid.appendChild(div);
+      });
+    }catch(e){console.warn('badges render:',e);}
+  }
+  // Alle möglichen display-Wege
+  panel.removeAttribute('hidden');
+  panel.style.cssText += ';display:flex!important;';
+  panel.classList.add('open');
+  console.log('badge-panel opened, display:', getComputedStyle(panel).display);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -4184,7 +4193,7 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.getRegistrations().then(function(regs){
     regs.forEach(function(r){ r.unregister(); });
   });
-  var swCode="const CV='tf-v13';self.addEventListener('install',function(e){self.skipWaiting()});self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k)}))}).then(function(){return clients.claim()}))});self.addEventListener('fetch',function(e){if(e.request.url.includes('generativelanguage')||e.request.url.includes('fonts.google')||e.request.url.includes('unpkg.com')){return;}e.respondWith(fetch(e.request).then(function(r){var c=r.clone();caches.open(CV).then(function(cache){cache.put(e.request,c)});return r}).catch(function(){return caches.match(e.request)}))});";
+  var swCode="const CV='tf-v40';self.addEventListener('install',function(e){self.skipWaiting()});self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k)}))}).then(function(){return clients.claim()}))});self.addEventListener('fetch',function(e){if(e.request.url.includes('generativelanguage')||e.request.url.includes('fonts.google')||e.request.url.includes('unpkg.com')){return;}e.respondWith(fetch(e.request).then(function(r){var c=r.clone();caches.open(CV).then(function(cache){cache.put(e.request,c)});return r}).catch(function(){return caches.match(e.request)}))});";
   var blob=new Blob([swCode],{type:'application/javascript'});
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function(){});
 }
@@ -4645,7 +4654,9 @@ async function aiSend(quickMsg){
 
   }catch(err){
     aiHideThinking();
-    aiAddMsg('bot','⚠️ Fehler: '+err.message);
+    var errMsg = err && err.message ? err.message : String(err);
+    aiAddMsg('bot','⚠️ Verbindungsfehler: '+errMsg+' – bitte GitHub-Seite im Browser öffnen, nicht als Datei.');
+    console.error('KI Fehler:', err);
   }
 
   aiThinking = false;
