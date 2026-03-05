@@ -601,10 +601,11 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
       </div>
       <div style="padding:0 16px;margin-bottom:14px"><div class="lbl" style="margin-bottom:6px">Format</div>
         <div class="chip-row" style="padding:0">
-          <button class="chip active" id="fmt-webm" onclick="setFmt(this,'webm')">📹 WebM (Android Chrome)</button>
-          <button class="chip" id="fmt-gif" onclick="setFmt(this,'gif')">🎞️ GIF (überall)</button>
+          <button class="chip active" id="fmt-webm" onclick="setFmt(this,'webm')">📹 WebM</button>
+          <button class="chip" id="fmt-mp4" onclick="setFmt(this,'mp4')">🎬 MP4</button>
+          <button class="chip" id="fmt-gif" onclick="setFmt(this,'gif')">🎞️ GIF</button>
         </div>
-        <div style="font-size:.7rem;color:var(--muted);margin-top:5px">💡 WebM läuft perfekt auf Android. GIF funktioniert überall, aber ohne Musik.</div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:5px" id="fmt-hint">💡 WebM läuft auf Android/Chrome. MP4 auf allen Geräten. GIF überall, aber ohne Musik.</div>
       </div>
       <div style="padding:0 16px;margin-bottom:14px">
         <div class="lbl" style="margin-bottom:7px">💬 Untertitel / Bauchbinde</div>
@@ -618,6 +619,21 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
         </div>
       </div>
       <div id="ep-wrap"><div id="ep-st">Wird verarbeitet...</div><div id="ep-bar"><div id="ep-fill"></div></div></div>
+      <div style="margin:14px 16px 0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+        <div style="font-size:.78rem;font-weight:900;color:var(--teal);margin-bottom:12px">&#128190; Projekt sichern &amp; laden</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <button class="btn bp" onclick="exportProject()" style="font-size:.78rem;padding:10px 8px;flex-direction:column;gap:3px"><span>&#128229;</span><span>Projekt speichern</span><span style="font-size:.6rem;font-weight:600;opacity:.8">(.json)</span></button>
+          <button class="btn bs" onclick="importProject()" style="font-size:.78rem;padding:10px 8px;flex-direction:column;gap:3px;border:1.5px solid var(--border)"><span>&#128228;</span><span>Projekt laden</span><span style="font-size:.6rem;font-weight:600;opacity:.8">(.json)</span></button>
+        </div>
+        <div style="font-size:.7rem;color:var(--muted);margin-bottom:12px;line-height:1.5">&#128161; <strong style="color:var(--text)">Speichern</strong> sichert alle Fotos + Daten als eine Datei. Mit <strong style="color:var(--text)">Laden</strong> alles wiederherstellen.</div>
+        <div style="border-top:1px solid var(--border);padding-top:10px">
+          <div style="font-size:.72rem;font-weight:900;color:var(--muted);margin-bottom:8px">Nur Fotos</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="btn bs" onclick="exportPhotos()" style="font-size:.75rem;padding:9px 8px;border:1.5px solid var(--border)">&#128247; Fotos exportieren</button>
+            <button class="btn bs" onclick="importPhotos()" style="font-size:.75rem;padding:9px 8px;border:1.5px solid var(--border)">&#128247; Fotos importieren</button>
+          </div>
+        </div>
+      </div>
       <div id="ex-res">
         <div style="font-size:2rem;margin-bottom:6px">🎉</div>
         <div style="font-weight:800;margin-bottom:3px">Film fertig!</div>
@@ -802,14 +818,22 @@ var selFrames = new Set();
 var saveT;
 function sched(){ clearTimeout(saveT); saveT=setTimeout(persist,600); }
 function persist(){
-  try{ var c=JSON.parse(JSON.stringify(S)); c.selectedFrames=[]; localStorage.setItem('tfws',JSON.stringify(c)); }catch(e){}
+  try{
+    var snap=JSON.parse(JSON.stringify(S)); snap.selectedFrames=[];
+    var meta=JSON.parse(JSON.stringify(snap)); meta.shots=[];
+    localStorage.setItem('tfws',JSON.stringify(meta));
+    idbSaveShots(snap.shots);
+  }catch(e){try{localStorage.setItem('tfws',JSON.stringify(S));}catch(e2){}}
 }
 function restore(){
   try{
     var r=localStorage.getItem('tfws'); if(!r)return;
     var d=JSON.parse(r);
-    ['shots','fps','quality','format','vol','music'].forEach(function(k){ if(d[k]!==undefined)S[k]=d[k]; });
-    if(d.project) Object.assign(S.project,d.project);
+    ['fps','quality','format','vol','music'].forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
+    if(d.project)Object.assign(S.project,d.project);
+    idbLoadShots(function(shots){
+      if(shots&&shots.length){S.shots=shots;updFilmstrip();updShotCnt();renderFrames();}
+    });
   }catch(e){}
 }
 
@@ -817,8 +841,18 @@ function restore(){
 function goPage(id,btn){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active')});
-  document.getElementById(id).classList.add('active');
-  if(btn)btn.classList.add('active');
+  var el=document.getElementById(id); if(!el)return;
+  el.classList.add('active');
+  if(btn){
+    btn.classList.add('active');
+    var ni=btn.querySelector('.ni');
+    if(ni){ni.style.animation='none';setTimeout(function(){ni.style.animation='navPop .35s cubic-bezier(.34,1.56,.64,1)';},10);}
+    var rip=document.createElement('span');
+    rip.style.cssText='position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,209,102,.15);transform:scale(0);animation:ripplePop .5s ease-out forwards;pointer-events:none;top:50%;left:50%;margin:-40px 0 0 -40px;';
+    btn.appendChild(rip);setTimeout(function(){rip.remove();},520);
+  }
+  if(typeof SFX!=='undefined')SFX.nav();
+  if(typeof _checkTooltipOnNav!=='undefined')_checkTooltipOnNav(id);
 }
 
 // ── TOAST ──────────────────────────────────────────────────────────
@@ -1587,7 +1621,14 @@ function setQ(btn,q){ expQ=q; document.querySelectorAll('.qbtn').forEach(functio
 function setFmt(btn,fmt){
   expFmt=fmt;
   document.querySelectorAll('#pg-exp .chip').forEach(function(b){b.classList.remove('active')});
-  btn.classList.add('active'); updExpSum();
+  btn.classList.add('active');
+  var hint=document.getElementById('fmt-hint');
+  if(hint){
+    if(fmt==='mp4')hint.innerHTML='&#127916; MP4: Beste Kompatibilität für iPhone, iPad & alle Geräte. Empfohlen!';
+    else if(fmt==='webm')hint.innerHTML='&#128249; WebM: Schnell, mit Musik. Optimal für Android & Chrome.';
+    else hint.innerHTML='&#127902;&#65039; GIF: Funktioniert überall, aber ohne Musik und größere Datei.';
+  }
+  updExpSum();
 }
 function updExpSum(){
   var n=S.shots.length; var dur=n?(n/S.fps).toFixed(1)+'s':'0.0s';
@@ -1608,7 +1649,11 @@ function doExport(){
   pw.classList.add('vis'); res.classList.remove('vis'); btn.disabled=true; btn.textContent='⏳ Wird erstellt...';
   var title=(S.project.title||'mein-film').replace(/[^a-zA-Z0-9]/g,'-').toLowerCase();
   var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || !window.MediaRecorder;
-  if(isSafari){
+  if(expFmt==='mp4'){
+    doMP4Export(title,btn,pw,res);
+  } else if(expFmt==='gif'){
+    doGifExport(title,btn,pw,res);
+  } else if(isSafari){
     doFFmpegMP4(title,btn,pw,res);
   } else {
     doWebM(title,btn,pw,res);
@@ -3644,6 +3689,175 @@ setTimeout(function(){
   var sb=document.getElementById('shoot-btn');
   if(sb)sb.addEventListener('click',function(){SFX.shoot();},true);
 },300);
+
+// ── MP4 EXPORT ────────────────────────────────────────────────────
+function doMP4Export(title,btn,pw,res){
+  var dim=QM[expQ]||QM['480p'];
+  var setStatus=function(t){document.getElementById('ep-st').textContent=t;};
+  var setProgress=function(p){document.getElementById('ep-fill').style.width=Math.round(p*100)+'%';};
+
+  // Prüfe welche MIME-Types unterstützt werden
+  var mimeTypes=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=h264','video/webm;codecs=vp9','video/webm'];
+  var mime='';
+  for(var i=0;i<mimeTypes.length;i++){
+    if(window.MediaRecorder&&MediaRecorder.isTypeSupported(mimeTypes[i])){
+      mime=mimeTypes[i]; break;
+    }
+  }
+
+  setStatus('🎬 MP4 wird erstellt…');
+  setProgress(0.05);
+
+  var cv=document.createElement('canvas');
+  cv.width=dim.w; cv.height=dim.h;
+  var ctx=cv.getContext('2d');
+  var stream=cv.captureStream(S.fps);
+  var chunks=[];
+
+  // Musik hinzufügen falls vorhanden
+  if(S.music&&S.music.url&&window.AudioContext){
+    try{
+      var ac=new AudioContext();
+      var src=ac.createMediaElementSource(new Audio(S.music.url));
+      var dest=ac.createMediaStreamDestination();
+      src.connect(dest); src.connect(ac.destination);
+      dest.stream.getAudioTracks().forEach(function(t){stream.addTrack(t);});
+    }catch(e){}
+  }
+
+  var rec=new MediaRecorder(stream,{
+    mimeType:mime||'video/webm',
+    videoBitsPerSecond:dim.w>=1280?6000000:3000000
+  });
+  rec.ondataavailable=function(e){if(e.data&&e.data.size>0)chunks.push(e.data);};
+  rec.onstop=function(){
+    var isRealMP4=mime.includes('mp4');
+    var blobType=isRealMP4?'video/mp4':'video/webm';
+    var ext=isRealMP4?'mp4':'mp4'; // Immer .mp4 als Dateiname
+    var blob=new Blob(chunks,{type:blobType});
+    var url=URL.createObjectURL(blob);
+    var link=document.getElementById('ex-link');
+    link.href=url; link.download=title+'.'+ext; link.textContent='⬇️ '+title+'.'+ext+' herunterladen';
+    res.classList.add('vis'); pw.classList.remove('vis');
+    btn.disabled=false; btn.textContent='🎬 Film erstellen & herunterladen';
+    setProgress(1);
+    toast('🎉 MP4 fertig!');
+    if(typeof checkBadge==='function')checkBadge('first-export');
+  };
+
+  rec.start();
+  var idx=0, total=S.shots.length;
+  var frameDur=1000/S.fps;
+
+  function drawFrame(){
+    if(idx>=total){
+      // 1 Sekunde Schwarzbild am Ende
+      ctx.fillStyle='#000'; ctx.fillRect(0,0,dim.w,dim.h);
+      setTimeout(function(){rec.stop();},500);
+      return;
+    }
+    setProgress(0.05+0.9*(idx/total));
+    setStatus('🎬 Frame '+( idx+1)+' / '+total+'…');
+    var img=new Image();
+    img.onload=function(){
+      ctx.drawImage(img,0,0,dim.w,dim.h);
+      idx++;
+      setTimeout(drawFrame, frameDur);
+    };
+    img.onerror=function(){
+      ctx.fillStyle='#000'; ctx.fillRect(0,0,dim.w,dim.h);
+      idx++; setTimeout(drawFrame, frameDur);
+    };
+    img.src=S.shots[idx].data;
+  }
+
+  // 0.5s Schwarzbild am Anfang
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,dim.w,dim.h);
+  setTimeout(drawFrame, 500);
+}
+
+// ── INDEXEDDB ────────────────────────────────────────────────────
+var IDB_NAME='trickfilm-db',IDB_VER=1,idbDb=null;
+function idbOpen(cb){
+  if(idbDb){cb(idbDb);return;}
+  var req=indexedDB.open(IDB_NAME,IDB_VER);
+  req.onupgradeneeded=function(e){var db=e.target.result;if(!db.objectStoreNames.contains('shots'))db.createObjectStore('shots',{keyPath:'idx'});};
+  req.onsuccess=function(e){idbDb=e.target.result;cb(idbDb);};
+  req.onerror=function(){cb(null);};
+}
+function idbSaveShots(shots){
+  idbOpen(function(db){
+    if(!db)return;
+    var tx=db.transaction('shots','readwrite'),st=tx.objectStore('shots');
+    st.clear();
+    shots.forEach(function(s,i){st.put(Object.assign({},s,{idx:i}));});
+  });
+}
+function idbLoadShots(cb){
+  idbOpen(function(db){
+    if(!db){cb([]);return;}
+    var tx=db.transaction('shots','readonly'),st=tx.objectStore('shots'),req=st.getAll();
+    req.onsuccess=function(){cb((req.result||[]).sort(function(a,b){return a.idx-b.idx;}));};
+    req.onerror=function(){cb([]);};
+  });
+}
+// ── PROJEKT EXPORT ────────────────────────────────────────────────
+function exportProject(){
+  toast('\u23F3 Wird exportiert\u2026');
+  setTimeout(function(){
+    var data={version:1,exported:new Date().toISOString(),project:S.project,fps:S.fps,quality:S.quality,format:S.format,vol:S.vol,music:S.music,shots:S.shots};
+    var blob=new Blob([JSON.stringify(data)],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='trickfilm-'+(S.project.title||'projekt').replace(/[^a-zA-Z0-9]/g,'-').toLowerCase()+'-'+new Date().toISOString().slice(0,10)+'.json';
+    a.click();toast('\u2705 Projekt gespeichert!');
+  },100);
+}
+function exportPhotos(){
+  if(!S.shots.length){toast('\u26A0\uFE0F Keine Fotos!');return;}
+  S.shots.forEach(function(s,i){
+    setTimeout(function(){var a=document.createElement('a');a.href=s.data;a.download='frame-'+String(i+1).padStart(3,'0')+'.jpg';a.click();},i*80);
+  });
+  setTimeout(function(){toast('\u2705 '+S.shots.length+' Fotos heruntergeladen!');},S.shots.length*80+200);
+}
+function importProject(){
+  var inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  inp.onchange=function(){
+    var file=inp.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        var data=JSON.parse(e.target.result);
+        if(!data.project){toast('\u26A0\uFE0F Ung\xfcltige Datei');return;}
+        if(!confirm('Projekt "'+data.project.title+'" laden?\nAktuelles Projekt wird \xfcberschrieben!'))return;
+        if(data.project)Object.assign(S.project,data.project);
+        ['fps','quality','format','vol','music'].forEach(function(k){if(data[k]!=null)S[k]=data[k];});
+        if(data.shots&&data.shots.length){S.shots=data.shots;idbSaveShots(S.shots);}
+        loadFields();renderFigs();renderScenes();renderMus();updSelBar();updFilmstrip();renderFrames();updShotCnt();sched();
+        toast('\u2705 "'+data.project.title+'" geladen! ('+S.shots.length+' Fotos)');
+      }catch(err){toast('\u26A0\uFE0F Fehler: '+err.message);}
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+function importPhotos(){
+  var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.multiple=true;
+  inp.onchange=function(){
+    var files=Array.from(inp.files).sort(function(a,b){return a.name.localeCompare(b.name);});
+    if(!files.length)return;
+    var loaded=0;
+    files.forEach(function(file){
+      var reader=new FileReader();
+      reader.onload=function(e){
+        S.shots.push({data:e.target.result,w:640,h:480});
+        if(++loaded===files.length){idbSaveShots(S.shots);updFilmstrip();renderFrames();updShotCnt();sched();toast('\u2705 '+loaded+' Fotos importiert!');}
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+  inp.click();
+}
 </script>
 </body>
 </html>
