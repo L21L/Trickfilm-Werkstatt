@@ -284,9 +284,298 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
 /* TOAST */
 #toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(13,20,36,.95);backdrop-filter:blur(16px);border:1px solid var(--border2);padding:9px 18px;border-radius:30px;font-weight:700;font-size:.82rem;opacity:0;transition:all .22s;z-index:9999;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.45);pointer-events:none}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ════════════════════════════════════════════════════
+   FILMSTUDIO INTRO
+════════════════════════════════════════════════════ */
+#intro-screen{
+  position:fixed;inset:0;z-index:99999;
+  background:#000;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  overflow:hidden;
+  transition:opacity .8s ease;
+}
+#intro-screen.hidden{opacity:0;pointer-events:none;}
+
+#intro-stars{
+  position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;
+}
+
+/* ── Filmstreifen-Vorhang ── */
+#intro-strip-top,#intro-strip-bot{
+  position:absolute;left:0;right:0;height:50%;
+  background:repeating-linear-gradient(
+    90deg,
+    #0a0a0a 0px,#0a0a0a 60px,
+    #111 60px,#111 64px
+  );
+  z-index:2;
+  transition:transform 1s cubic-bezier(.77,0,.18,1);
+}
+#intro-strip-top{top:0;transform:translateY(0);}
+#intro-strip-top.open{transform:translateY(-100%);}
+#intro-strip-bot{bottom:0;transform:translateY(0);}
+#intro-strip-bot.open{transform:translateY(100%);}
+
+/* Sprocket holes auf Vorhang */
+#intro-strip-top::after,#intro-strip-bot::before{
+  content:'';position:absolute;left:0;right:0;height:28px;
+  background:repeating-linear-gradient(
+    90deg,transparent 0,transparent 44px,
+    #000 44px,#000 60px
+  );
+}
+#intro-strip-top::after{bottom:0;}
+#intro-strip-bot::before{top:0;}
+
+/* ── Spotlight ── */
+#intro-spot{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 40% 55% at 50% 50%,
+    transparent 0%,transparent 40%,
+    rgba(0,0,0,.85) 70%,rgba(0,0,0,.97) 100%);
+  z-index:3;
+  opacity:0;
+  transition:opacity .8s ease;
+  pointer-events:none;
+}
+#intro-spot.on{opacity:1;}
+
+/* ── Logo Container ── */
+#intro-logo{
+  position:relative;z-index:4;
+  display:flex;align-items:center;gap:0;
+  opacity:0;transform:scale(.7);
+  transition:opacity .6s ease,transform .6s cubic-bezier(.34,1.56,.64,1);
+}
+#intro-logo.vis{opacity:1;transform:scale(1);}
+
+/* Filmstreifen im Intro-Logo */
+#il-film{
+  width:60px;height:220px;
+  background:linear-gradient(180deg,#1a2640,#0d1424);
+  border-radius:8px;border:1.5px solid #2a3a55;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+  flex-shrink:0;
+}
+.il-sprocket{
+  flex-shrink:0;height:28px;
+  background:#0d1a28;
+  display:flex;align-items:center;justify-content:space-around;
+  padding:0 8px;
+}
+.il-sprocket span{
+  width:10px;height:14px;background:#000;border-radius:3px;
+  display:block;
+}
+.il-frames{
+  flex:1;display:flex;flex-direction:column;
+  padding:4px 6px;gap:3px;
+}
+.il-frame{
+  flex:1;background:#0a1525;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;border:1px solid #162035;
+  opacity:0;transform:translateX(-10px);
+  transition:opacity .3s,transform .3s;
+}
+.il-frame.vis{opacity:1;transform:translateX(0);}
+
+/* Kamera im Intro */
+#il-cam{
+  position:relative;width:100px;height:72px;
+  margin:0 24px;flex-shrink:0;
+}
+#il-cam-bump{
+  position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+  width:38px;height:20px;
+  background:linear-gradient(145deg,#ffe566,#ff9f1c);
+  border-radius:8px 8px 0 0;
+}
+#il-cam-body{
+  width:100px;height:72px;
+  background:linear-gradient(145deg,#ffe566,#ff9f1c,#ffb347);
+  border-radius:14px;
+  box-shadow:0 6px 30px rgba(255,160,0,.4),0 0 60px rgba(255,160,0,.15),
+    inset 0 2px 0 rgba(255,255,255,.3);
+  position:relative;
+  opacity:0;transform:scale(.5) rotate(-8deg);
+  transition:opacity .5s,transform .5s cubic-bezier(.34,1.56,.64,1);
+}
+#il-cam-body.vis{opacity:1;transform:scale(1) rotate(0deg);}
+
+#il-lens-out{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:52px;height:52px;border-radius:50%;
+  background:#060914;
+  border:3px solid rgba(255,209,102,.7);
+  box-shadow:0 0 20px rgba(255,160,0,.3);
+  display:flex;align-items:center;justify-content:center;
+}
+#il-lens-mid{
+  width:36px;height:36px;border-radius:50%;
+  background:#0a1220;border:2px solid rgba(255,160,0,.35);
+  display:flex;align-items:center;justify-content:center;
+}
+#il-lens-in{
+  width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#4cc9f0,#06d6a0 55%,#0a9060);
+  box-shadow:0 0 12px rgba(6,214,160,.8);
+  animation:lensPulse 2s ease-in-out infinite;
+}
+#il-rec{
+  position:absolute;top:8px;right:8px;
+  width:10px;height:10px;border-radius:50%;
+  background:#ff4d6d;
+  box-shadow:0 0 8px #ff4d6d;
+  animation:recBlink 1.4s ease-in-out infinite;
+}
+#il-vf{
+  position:absolute;top:10px;left:7px;
+  width:14px;height:10px;
+  background:#060914;border-radius:3px;
+  border:1px solid rgba(255,209,102,.2);
+}
+
+/* Text im Intro */
+#il-text{
+  display:flex;flex-direction:column;gap:4px;
+  opacity:0;transform:translateX(30px);
+  transition:opacity .6s ease,transform .6s cubic-bezier(.22,1,.36,1);
+}
+#il-text.vis{opacity:1;transform:translateX(0);}
+
+#il-meine{
+  font-family:'Fredoka One',cursive;
+  font-size:14px;letter-spacing:6px;
+  color:rgba(255,209,102,.55);text-transform:uppercase;
+}
+#il-trickfilm{
+  font-family:'Fredoka One',cursive;
+  font-size:72px;line-height:.95;letter-spacing:-1px;
+  background:linear-gradient(135deg,#ffe566,#ff9f1c 50%,#ffd166);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter:drop-shadow(0 0 30px rgba(255,160,0,.4));
+}
+#il-divider{
+  height:2px;position:relative;overflow:hidden;
+  background:rgba(255,255,255,.05);border-radius:1px;
+}
+#il-divider span{
+  position:absolute;top:0;left:-100%;
+  width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,#06d6a0,#4cc9f0,transparent);
+  animation:introShimmer 1.5s ease-out forwards;
+  animation-delay:2.2s;
+}
+@keyframes introShimmer{0%{left:-100%}100%{left:100%}}
+#il-werkstatt{
+  font-family:'Fredoka One',cursive;
+  font-size:24px;letter-spacing:10px;
+  background:linear-gradient(90deg,#06d6a0,#4cc9f0);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+/* Tagline */
+#intro-tagline{
+  position:relative;z-index:4;
+  font-family:'Fredoka One',cursive;
+  font-size:15px;letter-spacing:3px;
+  color:rgba(255,255,255,.35);
+  margin-top:28px;
+  opacity:0;transform:translateY(10px);
+  transition:opacity .6s ease,transform .6s ease;
+}
+#intro-tagline.vis{opacity:1;transform:translateY(0);}
+
+/* Skip Button */
+#intro-skip{
+  position:fixed;bottom:28px;right:24px;z-index:5;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.4);
+  font-family:'Fredoka One',cursive;
+  font-size:12px;letter-spacing:1px;
+  padding:8px 16px;border-radius:20px;
+  cursor:pointer;
+  opacity:0;
+  transition:opacity .3s,background .2s,color .2s;
+}
+#intro-skip.vis{opacity:1;}
+#intro-skip:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);}
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FILMSTUDIO INTRO ANIMATION
+═══════════════════════════════════════════════════════════ -->
+<div id="intro-screen">
+  <canvas id="intro-stars"></canvas>
+
+  <!-- Phase 1: Filmstreifen von oben -->
+  <div id="intro-strip-top"></div>
+  <div id="intro-strip-bot"></div>
+
+  <!-- Phase 2: Spotlight -->
+  <div id="intro-spot"></div>
+
+  <!-- Phase 3: Logo Reveal -->
+  <div id="intro-logo">
+
+    <!-- Filmstreifen links -->
+    <div id="il-film">
+      <div class="il-sprocket top">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="il-frames">
+        <div class="il-frame" id="ilf1">🎬</div>
+        <div class="il-frame" id="ilf2">⭐</div>
+        <div class="il-frame" id="ilf3">▶</div>
+        <div class="il-frame" id="ilf4">🎵</div>
+      </div>
+      <div class="il-sprocket bot">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Kamera -->
+    <div id="il-cam">
+      <div id="il-cam-bump"></div>
+      <div id="il-cam-body">
+        <div id="il-lens-out">
+          <div id="il-lens-mid">
+            <div id="il-lens-in"></div>
+          </div>
+        </div>
+        <div id="il-rec"></div>
+        <div id="il-vf"></div>
+      </div>
+    </div>
+
+    <!-- Text -->
+    <div id="il-text">
+      <div id="il-meine">Meine</div>
+      <div id="il-trickfilm">Trickfilm</div>
+      <div id="il-divider"><span></span></div>
+      <div id="il-werkstatt">Werkstatt</div>
+    </div>
+
+  </div>
+
+  <!-- Tagline -->
+  <div id="intro-tagline">Deine Ideen. Dein Film.</div>
+
+  <!-- Skip Button -->
+  <button id="intro-skip" onclick="skipIntro()">Überspringen ▶</button>
+</div>
+
 <div id="app">
   <div id="topbar">
     <div id="topbar-logo">
@@ -2184,22 +2473,172 @@ function doWebMRaw(title,btn,pw,res,dim,audioBuffer){
 // ── UTIL ──────────────────────────────────────────────────────────
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+// ════════════════════════════════════════════════════════════════
+// FILMSTUDIO INTRO
+// ════════════════════════════════════════════════════════════════
+(function(){
+  var el = document.getElementById('intro-screen');
+  if(!el) return;
+
+  // Sterne-Canvas
+  var sc = document.getElementById('intro-stars');
+  var sctx = sc.getContext('2d');
+  var stars = [];
+  function resizeSc(){
+    sc.width=window.innerWidth; sc.height=window.innerHeight;
+    stars=[];
+    for(var i=0;i<120;i++){
+      stars.push({
+        x:Math.random()*sc.width,
+        y:Math.random()*sc.height,
+        r:Math.random()*1.5+.3,
+        o:Math.random(),
+        sp:Math.random()*.5+.2
+      });
+    }
+  }
+  resizeSc();
+  window.addEventListener('resize',resizeSc);
+
+  var rafId;
+  function drawStars(){
+    sctx.clearRect(0,0,sc.width,sc.height);
+    stars.forEach(function(s){
+      s.o+=.01*s.sp*(Math.random()>.5?1:-1);
+      s.o=Math.max(.05,Math.min(.9,s.o));
+      sctx.beginPath();
+      sctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      sctx.fillStyle='rgba(255,255,255,'+s.o+')';
+      sctx.fill();
+    });
+    rafId=requestAnimationFrame(drawStars);
+  }
+  drawStars();
+
+  // Audio - Intro Sound
+  function playIntroSound(){
+    try{
+      var ac=new(window.AudioContext||window.webkitAudioContext)();
+      // Tiefer Rumble beim Filmstreifen
+      function tone(f,t,v,d,delay){
+        var osc=ac.createOscillator(),g=ac.createGain();
+        osc.connect(g);g.connect(ac.destination);
+        osc.type=t;osc.frequency.value=f;
+        g.gain.setValueAtTime(0,ac.currentTime+delay);
+        g.gain.linearRampToValueAtTime(v,ac.currentTime+delay+.02);
+        g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+delay+d);
+        osc.start(ac.currentTime+delay);
+        osc.stop(ac.currentTime+delay+d+.05);
+      }
+      // Filmstreifen Geräusch (0.4s)
+      tone(80,'sawtooth',.08,.4,0.4);
+      tone(120,'square',.04,.3,0.5);
+      // Kamera-Erscheinen (1.5s)
+      tone(440,'sine',.06,.15,1.5);
+      tone(660,'sine',.05,.12,1.55);
+      // Logo-Akkord (1.8s)
+      [523,659,784,1047].forEach(function(n,i){tone(n,'sine',.07,.4,1.8+i*.06);});
+      // Shimmer (2.2s)
+      tone(2093,'sine',.04,.5,2.2);
+      tone(2637,'sine',.03,.4,2.3);
+    }catch(e){}
+  }
+
+  // Sequenz
+  function runIntro(){
+    playIntroSound();
+
+    // Phase 0: Sofort Skip-Button zeigen
+    setTimeout(function(){
+      document.getElementById('intro-skip').classList.add('vis');
+    },300);
+
+    // Phase 1: Filmstreifen-Vorhang öffnet sich (0.4s)
+    setTimeout(function(){
+      document.getElementById('intro-strip-top').classList.add('open');
+      document.getElementById('intro-strip-bot').classList.add('open');
+    },400);
+
+    // Phase 2: Spotlight (1.0s)
+    setTimeout(function(){
+      document.getElementById('intro-spot').classList.add('on');
+    },1000);
+
+    // Phase 3: Kamera erscheint (1.5s)
+    setTimeout(function(){
+      document.getElementById('il-cam-body').classList.add('vis');
+    },1500);
+
+    // Phase 4: Filmstreifen-Frames (1.7s, gestaffelt)
+    [0,1,2,3].forEach(function(i){
+      setTimeout(function(){
+        var f=document.getElementById('ilf'+(i+1));
+        if(f)f.classList.add('vis');
+      },1700+i*80);
+    });
+
+    // Phase 5: Text (1.9s)
+    setTimeout(function(){
+      document.getElementById('il-text').classList.add('vis');
+    },1900);
+
+    // Phase 6: Logo komplett sichtbar (1.5s)
+    setTimeout(function(){
+      document.getElementById('intro-logo').classList.add('vis');
+    },1500);
+
+    // Phase 7: Tagline (2.4s)
+    setTimeout(function(){
+      document.getElementById('intro-tagline').classList.add('vis');
+    },2400);
+
+    // Phase 8: Intro beendet (3.8s)
+    setTimeout(function(){
+      finishIntro();
+    },3800);
+  }
+
+  function finishIntro(){
+    cancelAnimationFrame(rafId);
+    el.classList.add('hidden');
+    setTimeout(function(){
+      el.style.display='none';
+      appInit();
+      if(!localStorage.getItem('onboardDone')){
+        setTimeout(showOnboarding,400);
+      }
+    },800);
+  }
+
+  window.skipIntro=function(){
+    finishIntro();
+  };
+
+  // Intro starten
+  runIntro();
+
+  // Onboarding jetzt nicht mehr automatisch starten (Intro macht das)
+  // (wird in finishIntro aufgerufen)
+})();
+
 // ── INIT ──────────────────────────────────────────────────────────
-restore();
-loadFields();
-renderFigs();
-initFigTpl();
-renderWk();
-renderProg();
-renderMus();
-updSelBar();
-updFilmstrip();
-renderScenes();
-updShotCnt();
-document.getElementById('fps-sl').value=S.fps;
-document.getElementById('fps-disp').textContent=S.fps+' fps';
-document.getElementById('vol-sl').value=Math.round(S.vol*100);
-document.getElementById('vol-disp').textContent=Math.round(S.vol*100)+'%';
+function appInit(){
+  restore();
+  loadFields();
+  renderFigs();
+  initFigTpl();
+  renderWk();
+  renderProg();
+  renderMus();
+  updSelBar();
+  updFilmstrip();
+  renderScenes();
+  updShotCnt();
+  document.getElementById('fps-sl').value=S.fps;
+  document.getElementById('fps-disp').textContent=S.fps+' fps';
+  document.getElementById('vol-sl').value=Math.round(S.vol*100);
+  document.getElementById('vol-disp').textContent=Math.round(S.vol*100)+'%';
+}
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -3227,10 +3666,7 @@ function loadExampleProject(){
   toast('🎬 Beispielprojekt geladen! Schau dir alles an.');
 }
 
-// Onboarding beim Start
-if(!localStorage.getItem('onboardDone')){
-  setTimeout(showOnboarding, 800);
-}
+// Onboarding wird vom Intro gestartet (skipIntro/finishIntro)
 
 // ── HINTERGRUND IM ZEICHENFENSTER LADEN ──────────────────────────
 function togBgPicker(){
