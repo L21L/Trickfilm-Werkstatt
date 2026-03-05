@@ -222,7 +222,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
 .ki-dot:nth-child(2){animation-delay:.2s}.ki-dot:nth-child(3){animation-delay:.4s}
 @keyframes kdot{0%,60%,100%{opacity:.3;transform:scale(1)}30%{opacity:1;transform:scale(1.3)}}
 /* BADGES */
-#badge-panel{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9000;display:none;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+#badge-panel{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100000;display:none;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 #badge-panel.open{display:flex}
 #onboard-modal{display:none;align-items:center;justify-content:center}
 #onboard-modal.open{display:flex}
@@ -680,6 +680,10 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
 @media(max-width:360px){
   #ai-panel{width:calc(100vw - 32px);right:16px;}
 }
+
+#badge-btn{position:fixed;top:8px;right:12px;z-index:100001;background:none;border:none;font-size:1.4rem;cursor:pointer;padding:8px;border-radius:50%;-webkit-tap-highlight-color:transparent;transition:transform .2s cubic-bezier(.34,1.56,.64,1);}
+#badge-btn:hover{transform:scale(1.2);}
+#badge-btn:active{transform:scale(.9);}
 </style>
 </head>
 <body>
@@ -780,11 +784,7 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
   </div>
     <span id="topbar-sub">Mein Film</span>
   </div>
-  <!-- Fixed overlay buttons – always on top -->
-  <div style="position:fixed;top:0;right:0;height:52px;display:flex;align-items:center;gap:2px;padding-right:10px;z-index:9999;">
-    <button onclick="showBadges()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;padding:6px;pointer-events:all;-webkit-tap-highlight-color:transparent" title="Abzeichen">🏆</button>
-    
-  </div>
+
   <div id="pages">
 
     <!-- ═══ PLANEN ═══ -->
@@ -1276,6 +1276,9 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
      KI-ASSISTENT CHAT
 ═══════════════════════════════════════════════════ -->
 <!-- Chat Bubble Button -->
+<!-- Badge -->
+<button onclick="showBadges()" id="badge-btn" title="Abzeichen">🏆</button>
+
 <button id="ai-bubble" onclick="aiToggle()" title="KI-Assistent">
   <span id="ai-bubble-icon">🎬</span>
   <span id="ai-bubble-badge" class="ai-badge hidden">!</span>
@@ -3644,6 +3647,7 @@ var ONBOARD_STEPS = [
 ];
 var onboardStep = 0;
 function showOnboarding(){
+  onboardStep = 0;
   document.getElementById('onboard-modal').classList.add('open');
   renderOnboardStep();
 }
@@ -4610,6 +4614,7 @@ async function aiSend(quickMsg){
 
     var resp = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
+      mode:'cors',
       headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
@@ -4619,6 +4624,7 @@ async function aiSend(quickMsg){
       })
     });
 
+    if(!resp.ok){throw new Error('HTTP '+resp.status+': '+resp.statusText);}
     var data = await resp.json();
     var answer = (data.content&&data.content[0]&&data.content[0].text)
       ? data.content[0].text
@@ -4639,7 +4645,7 @@ async function aiSend(quickMsg){
 
   }catch(err){
     aiHideThinking();
-    aiAddMsg('bot','🔌 Verbindungsfehler. Bist du online? Versuch es nochmal!');
+    aiAddMsg('bot','⚠️ Fehler: '+err.message);
   }
 
   aiThinking = false;
