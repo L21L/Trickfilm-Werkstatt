@@ -509,6 +509,177 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
 }
 #intro-skip.vis{opacity:1;}
 #intro-skip:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);}
+
+/* ════════════════════════════════════════════════════
+   KI-ASSISTENT
+════════════════════════════════════════════════════ */
+
+/* Bubble Button */
+#ai-bubble{
+  position:fixed;bottom:80px;right:16px;z-index:9000;
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,#ffe566,#ff9f1c);
+  border:none;cursor:pointer;
+  box-shadow:0 4px 20px rgba(255,160,0,.45),0 2px 8px rgba(0,0,0,.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;
+  animation:bubblePulse 3s ease-in-out infinite;
+}
+#ai-bubble:hover{transform:scale(1.12);box-shadow:0 6px 28px rgba(255,160,0,.6);}
+#ai-bubble:active{transform:scale(.93);}
+#ai-bubble.open{animation:none;transform:scale(1.05);}
+@keyframes bubblePulse{
+  0%,100%{box-shadow:0 4px 20px rgba(255,160,0,.45),0 2px 8px rgba(0,0,0,.4);}
+  50%{box-shadow:0 4px 28px rgba(255,160,0,.7),0 0 0 8px rgba(255,160,0,.08);}
+}
+.ai-badge{
+  position:absolute;top:2px;right:2px;
+  width:14px;height:14px;border-radius:50%;
+  background:#ff4d6d;
+  font-size:9px;color:#fff;font-weight:900;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid #060914;
+}
+.ai-badge.hidden{display:none;}
+
+/* Chat Panel */
+#ai-panel{
+  position:fixed;bottom:144px;right:16px;z-index:9000;
+  width:320px;max-height:480px;
+  background:var(--surface,#111827);
+  border:1px solid rgba(255,209,102,.2);
+  border-radius:18px;
+  display:flex;flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 0 1px rgba(6,214,160,.08);
+  transform:scale(.92) translateY(12px);
+  transform-origin:bottom right;
+  opacity:0;pointer-events:none;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .2s ease;
+  overflow:hidden;
+}
+#ai-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all;}
+
+/* Header */
+#ai-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;
+  background:linear-gradient(135deg,rgba(255,209,102,.08),rgba(6,214,160,.05));
+  border-bottom:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+#ai-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,#ffe566,#ff9f1c);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+  box-shadow:0 0 12px rgba(255,160,0,.3);
+}
+#ai-name{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--yellow,#ffd166);}
+#ai-status{font-size:.65rem;color:var(--teal,#06d6a0);opacity:.8;}
+#ai-close{
+  background:none;border:none;color:var(--muted,#6b8cae);
+  font-size:1rem;cursor:pointer;padding:4px 6px;border-radius:6px;
+  transition:background .15s,color .15s;
+}
+#ai-close:hover{background:rgba(255,255,255,.06);color:#fff;}
+
+/* Messages */
+#ai-messages{
+  flex:1;overflow-y:auto;
+  padding:12px;
+  display:flex;flex-direction:column;
+  gap:8px;
+  min-height:80px;
+}
+#ai-messages::-webkit-scrollbar{width:3px;}
+#ai-messages::-webkit-scrollbar-track{background:transparent;}
+#ai-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+
+.ai-msg{
+  max-width:86%;
+  padding:8px 12px;
+  border-radius:14px;
+  font-size:.78rem;line-height:1.5;
+  animation:msgIn .2s cubic-bezier(.22,1,.36,1);
+}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.ai-msg.user{
+  align-self:flex-end;
+  background:linear-gradient(135deg,rgba(255,209,102,.18),rgba(255,160,0,.12));
+  color:#ffe0a0;
+  border:1px solid rgba(255,209,102,.15);
+  border-bottom-right-radius:4px;
+}
+.ai-msg.bot{
+  align-self:flex-start;
+  background:rgba(255,255,255,.05);
+  color:var(--text,#e0e8f0);
+  border:1px solid rgba(255,255,255,.06);
+  border-bottom-left-radius:4px;
+}
+.ai-msg.bot.thinking{
+  color:var(--muted,#6b8cae);
+  font-style:italic;
+}
+.ai-dot{display:inline-block;animation:dotBounce .9s ease-in-out infinite;}
+.ai-dot:nth-child(2){animation-delay:.15s;}
+.ai-dot:nth-child(3){animation-delay:.3s;}
+@keyframes dotBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+/* Suggestions */
+#ai-suggestions{
+  display:flex;flex-wrap:wrap;gap:5px;
+  padding:6px 12px 2px;
+  flex-shrink:0;
+}
+.ai-sug{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.55);
+  font-size:.65rem;padding:4px 10px;border-radius:20px;
+  cursor:pointer;white-space:nowrap;
+  transition:background .15s,color .15s,border-color .15s;
+  font-family:inherit;
+}
+.ai-sug:hover{background:rgba(255,209,102,.1);border-color:rgba(255,209,102,.25);color:#ffd166;}
+
+/* Input Row */
+#ai-input-row{
+  display:flex;align-items:flex-end;gap:8px;
+  padding:10px 12px;
+  border-top:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+#ai-input{
+  flex:1;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  color:var(--text,#e0e8f0);
+  border-radius:12px;padding:8px 12px;
+  font-size:.78rem;font-family:inherit;
+  resize:none;outline:none;
+  transition:border-color .15s;
+  max-height:120px;
+}
+#ai-input:focus{border-color:rgba(255,209,102,.35);}
+#ai-input::placeholder{color:var(--muted,#6b8cae);}
+#ai-send{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#ffe566,#ff9f1c);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:#060914;
+  transition:transform .15s,box-shadow .15s;
+  box-shadow:0 2px 10px rgba(255,160,0,.3);
+}
+#ai-send:hover{transform:scale(1.08);box-shadow:0 4px 16px rgba(255,160,0,.5);}
+#ai-send:active{transform:scale(.93);}
+#ai-send:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+@media(max-width:360px){
+  #ai-panel{width:calc(100vw - 32px);right:16px;}
+}
 </style>
 </head>
 <body>
@@ -1130,6 +1301,51 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
 </div>
 
 <div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     KI-ASSISTENT CHAT
+═══════════════════════════════════════════════════ -->
+<!-- Chat Bubble Button -->
+<button id="ai-bubble" onclick="aiToggle()" title="KI-Assistent">
+  <span id="ai-bubble-icon">🎬</span>
+  <span id="ai-bubble-badge" class="ai-badge hidden">!</span>
+</button>
+
+<!-- Chat Panel -->
+<div id="ai-panel">
+  <div id="ai-header">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div id="ai-avatar">🎬</div>
+      <div>
+        <div id="ai-name">Kamera-Karl</div>
+        <div id="ai-status">Dein Filmassistent ✨</div>
+      </div>
+    </div>
+    <button id="ai-close" onclick="aiToggle()">✕</button>
+  </div>
+
+  <div id="ai-messages">
+    <!-- Nachrichten erscheinen hier -->
+  </div>
+
+  <div id="ai-suggestions">
+    <button class="ai-sug" onclick="aiSend('Gib mir eine Filmidee!')">💡 Filmidee</button>
+    <button class="ai-sug" onclick="aiSend('Wie mache ich guten Stop-Motion?')">🎞 Tipps</button>
+    <button class="ai-sug" onclick="aiSend('Hilf mir mit dem Storyboard')">🖊 Storyboard</button>
+    <button class="ai-sug" onclick="aiSend('Was kann diese App alles?')">❓ App-Hilfe</button>
+  </div>
+
+  <div id="ai-input-row">
+    <textarea id="ai-input" placeholder="Frag mich etwas…" rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend();}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+    <button id="ai-send" onclick="aiSend()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+
 
 <script>
 // ── STATE ──────────────────────────────────────────────────────────
@@ -3727,86 +3943,8 @@ function loadBgIntoCanvas(bg){
 }
 
 // ── VORLESE-FUNKTION (Text-to-Speech) ────────────────────────────
-var ttsActive = false, ttsUtterance = null;
+// TTS entfernt
 
-function ttsSpeak(text){
-  if(!window.speechSynthesis){ toast('⚠️ Vorlesen nicht unterstützt'); return; }
-  window.speechSynthesis.cancel();
-  if(ttsActive && ttsUtterance && ttsUtterance.text === text){
-    ttsActive = false; ttsUtterance = null;
-    updTtsButtons(); return;
-  }
-  ttsUtterance = new SpeechSynthesisUtterance(text);
-  ttsUtterance.lang = 'de-DE';
-  ttsUtterance.rate = 0.9;
-  ttsUtterance.pitch = 1.1;
-  ttsUtterance.onend = function(){ ttsActive=false; ttsUtterance=null; updTtsButtons(); };
-  ttsUtterance.onerror = function(){ ttsActive=false; ttsUtterance=null; };
-  window.speechSynthesis.speak(ttsUtterance);
-  ttsActive = true;
-  updTtsButtons();
-}
-
-function ttsSpeakEl(el){
-  // Liest den Textinhalt eines Elements vor
-  var text = el.innerText || el.textContent || '';
-  text = text.replace(/[?✕✓▶⏹↩🗑️]/g,'').trim();
-  if(text) ttsSpeak(text);
-}
-
-function updTtsButtons(){
-  document.querySelectorAll('.tts-btn').forEach(function(b){
-    b.textContent = ttsActive ? '🔊' : '👂';
-  });
-}
-
-// Globaler TTS-Button: überall schwebend
-function initTTS(){
-  if(!window.speechSynthesis) return;
-  // Floating Vorleser-Button
-  var fab = document.createElement('div');
-  fab.id = 'tts-fab';
-  fab.innerHTML = '👂';
-  fab.title = 'Vorlesen';
-  fab.style.cssText = 'position:fixed;bottom:72px;right:14px;width:44px;height:44px;border-radius:50%;background:var(--purple);color:#fff;font-size:1.3rem;display:flex;align-items:center;justify-content:center;z-index:8500;cursor:pointer;box-shadow:0 3px 12px rgba(168,85,247,.5);-webkit-tap-highlight-color:transparent;user-select:none;transition:transform .15s';
-  fab.onclick = function(){
-    // Liest aktuell sichtbare Seite vor
-    var activePage = document.querySelector('.page.active');
-    if(!activePage) return;
-    if(ttsActive){ window.speechSynthesis.cancel(); ttsActive=false; fab.innerHTML='👂'; fab.style.transform=''; return; }
-    // Sammle lesbaren Text der aktiven Seite
-    var texts = [];
-    activePage.querySelectorAll('h1,h2,.ph p,label,input[type=text],textarea,.fn,.fr,.wk-title,.ki-msg').forEach(function(el){
-      var t = (el.tagName==='INPUT'||el.tagName==='TEXTAREA') ? el.value : el.innerText||el.textContent;
-      t = t && t.replace(/[👁️✕✓▶⏹↩🗑️📋📷🎞️🎵🤖🎬]/g,'').trim();
-      if(t && t.length>2) texts.push(t);
-    });
-    var fullText = texts.slice(0,12).join('. ');
-    if(!fullText){ toast('Kein Text zum Vorlesen'); return; }
-    ttsUtterance = new SpeechSynthesisUtterance(fullText);
-    ttsUtterance.lang = 'de-DE'; ttsUtterance.rate = 0.9; ttsUtterance.pitch = 1.1;
-    ttsUtterance.onend = function(){ ttsActive=false; fab.innerHTML='👂'; fab.style.transform=''; };
-    window.speechSynthesis.speak(ttsUtterance);
-    ttsActive = true;
-    fab.innerHTML = '🔊';
-    fab.style.transform = 'scale(1.15)';
-  };
-  document.body.appendChild(fab);
-
-  // Lange antippen / long-press auf beliebigen Text → vorlesen
-  var lpTimer = null, lpEl = null;
-  document.addEventListener('touchstart', function(e){
-    lpEl = e.target;
-    lpTimer = setTimeout(function(){
-      var t = lpEl && (lpEl.innerText||lpEl.textContent||'');
-      t = t.replace(/[?✕✓▶⏹↩]/g,'').trim();
-      if(t && t.length > 3){ ttsSpeak(t); }
-    }, 600);
-  }, {passive:true});
-  document.addEventListener('touchend', function(){ clearTimeout(lpTimer); }, {passive:true});
-  document.addEventListener('touchmove', function(){ clearTimeout(lpTimer); }, {passive:true});
-}
-initTTS();
 
 // ════════════════════════════════════════════════════════════════
 // FEATURE 1: GREEN SCREEN (Chroma Keying)
@@ -4409,6 +4547,134 @@ function importPhotos(){
     });
   };
   inp.click();
+}
+
+// ════════════════════════════════════════════════════════════════
+// KI-ASSISTENT
+// ════════════════════════════════════════════════════════════════
+var aiOpen = false;
+var aiHistory = [];
+var aiThinking = false;
+
+var AI_SYSTEM = "Du bist Kamera-Karl, ein freundlicher und begeisterter Filmassistent für die App 'Meine Trickfilm Werkstatt'. Die App ist eine Stop-Motion-App für Kinder und Jugendliche. Du hilfst bei: Filmideen und Geschichten, Storyboard-Tipps, Stop-Motion-Techniken, Animationstipps, kreativen Ideen für Figuren und Hintergründe, und beantwortest Fragen zur App. Du sprichst kindgerecht, motivierend und begeistert. Antworte immer auf Deutsch, kurz und klar (max 3-4 Sätze). Nutze gelegentlich passende Emojis. Bei Filmideen sei kreativ und konkret.";
+
+function aiToggle(){
+  aiOpen = !aiOpen;
+  document.getElementById('ai-panel').classList.toggle('open', aiOpen);
+  document.getElementById('ai-bubble').classList.toggle('open', aiOpen);
+  document.getElementById('ai-bubble-badge').classList.add('hidden');
+  if(aiOpen){
+    if(aiHistory.length===0) aiGreet();
+    setTimeout(function(){document.getElementById('ai-input').focus();},200);
+    aiScrollBottom();
+  }
+  if(typeof SFX!=='undefined') SFX.tap();
+}
+
+function aiGreet(){
+  aiAddMsg('bot','👋 Hallo! Ich bin Kamera-Karl, dein Filmassistent! Ich helfe dir mit Ideen, Tipps und Tricks rund ums Trickfilmen. Was kann ich für dich tun? 🎬');
+}
+
+function aiAddMsg(role, text){
+  var msgs = document.getElementById('ai-messages');
+  var div = document.createElement('div');
+  div.className = 'ai-msg ' + role;
+  div.innerHTML = text.replace(/\n/g,'<br>');
+  msgs.appendChild(div);
+  aiScrollBottom();
+  return div;
+}
+
+function aiScrollBottom(){
+  var msgs = document.getElementById('ai-messages');
+  setTimeout(function(){ msgs.scrollTop = msgs.scrollHeight; }, 50);
+}
+
+function aiShowThinking(){
+  var msgs = document.getElementById('ai-messages');
+  var div = document.createElement('div');
+  div.className = 'ai-msg bot thinking';
+  div.id = 'ai-thinking';
+  div.innerHTML = '<span class="ai-dot">●</span><span class="ai-dot">●</span><span class="ai-dot">●</span>';
+  msgs.appendChild(div);
+  aiScrollBottom();
+}
+
+function aiHideThinking(){
+  var el = document.getElementById('ai-thinking');
+  if(el) el.remove();
+}
+
+async function aiSend(quickMsg){
+  if(aiThinking) return;
+  var input = document.getElementById('ai-input');
+  var text = quickMsg || input.value.trim();
+  if(!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  // Panel öffnen falls zu
+  if(!aiOpen) aiToggle();
+
+  // User-Nachricht
+  aiAddMsg('user', text);
+  aiHistory.push({role:'user', content:text});
+
+  // Sende-Button sperren
+  aiThinking = true;
+  document.getElementById('ai-send').disabled = true;
+
+  // Tippen-Indikator
+  aiShowThinking();
+  if(typeof SFX!=='undefined') SFX.tap();
+
+  try{
+    // Kontext aus aktueller App-Session mitgeben
+    var ctx = '';
+    if(typeof S !== 'undefined'){
+      ctx = ' [App-Kontext: Projekt "' + (S.project.title||'Unbenannt') + '", ' + S.shots.length + ' Fotos, ' + S.project.figures.length + ' Figuren, ' + S.project.scenes.length + ' Szenen]';
+    }
+
+    var messages = aiHistory.map(function(m){return{role:m.role,content:m.content};});
+    messages[messages.length-1].content += ctx;
+
+    var resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:400,
+        system: AI_SYSTEM,
+        messages: messages
+      })
+    });
+
+    var data = await resp.json();
+    var answer = (data.content&&data.content[0]&&data.content[0].text)
+      ? data.content[0].text
+      : 'Ups, da ist etwas schiefgelaufen. Versuch es nochmal! 🙈';
+
+    aiHideThinking();
+    aiAddMsg('bot', answer);
+    aiHistory.push({role:'assistant', content:answer});
+
+    // Max 20 Nachrichten im Verlauf behalten
+    if(aiHistory.length > 20) aiHistory = aiHistory.slice(-20);
+
+    // Benachrichtigungs-Badge wenn Panel zu
+    if(!aiOpen){
+      document.getElementById('ai-bubble-badge').classList.remove('hidden');
+    }
+    if(typeof SFX!=='undefined') SFX.nav();
+
+  }catch(err){
+    aiHideThinking();
+    aiAddMsg('bot','🔌 Verbindungsfehler. Bist du online? Versuch es nochmal!');
+  }
+
+  aiThinking = false;
+  document.getElementById('ai-send').disabled = false;
+  setTimeout(function(){document.getElementById('ai-input').focus();},100);
 }
 </script>
 </body>
