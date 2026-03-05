@@ -936,6 +936,7 @@ var SFX=(function(){
     success:function(){[523,659,784,1047].forEach(function(n,i){tone(n,'sine',.08,.15,i*.08);});},
     del:function(){tone(250,'sawtooth',.07,.18);},
     tap:function(){tone(1100,'sine',.03,.06);},
+    tab:function(){tone(520,'sine',.04,.06);setTimeout(function(){tone(780,'sine',.03,.05);},55);},
   };
 })();
 
@@ -954,6 +955,7 @@ document.getElementById('plan-tabs').addEventListener('click',function(e){
   document.querySelectorAll('.pnl').forEach(function(x){x.classList.remove('active')});
   b.classList.add('active');
   var p=document.getElementById('tab-'+b.dataset.tab); if(p)p.classList.add('active');
+  if(typeof SFX!=='undefined')SFX.tab();
 });
 
 // ── GESCHICHTE ────────────────────────────────────────────────────
@@ -1060,6 +1062,7 @@ function addFig(){
   var name=document.getElementById('fi-name').value.trim();
   var role=document.getElementById('fi-role').value;
   if(!name){toast('Bitte einen Namen eingeben! 📝');return;}
+  if(typeof SFX!=='undefined')SFX.tap();
   S.project.figures.push({name:name,role:role});
   document.getElementById('fi-name').value='';
   renderFigs(); sched(); toast('✅ Figur hinzugefügt!');
@@ -1083,10 +1086,11 @@ function renderFigs(){
     list.appendChild(d);
   });
 }
-function delFig(i){ S.project.figures.splice(i,1); renderFigs(); sched(); }
+function delFig(i){ if(typeof SFX!=='undefined')SFX.del(); S.project.figures.splice(i,1); renderFigs(); sched(); }
 
 // ── STORYBOARD ────────────────────────────────────────────────────
 function addScene(){
+  if(typeof SFX!=='undefined')SFX.tap();
   S.project.scenes.push({title:'Szene '+(S.project.scenes.length+1),notes:'',drawing:null});
   renderScenes(); sched();
 }
@@ -1122,7 +1126,7 @@ function renderScenes(){
   if(typeof checkBadge==='function') checkBadge('storyboarder');
 }
 function updScene(i,k,v){ if(S.project.scenes[i])S.project.scenes[i][k]=v; sched(); }
-function delScene(i){ S.project.scenes.splice(i,1); renderScenes(); sched(); }
+function delScene(i){ if(typeof SFX!=='undefined')SFX.del(); S.project.scenes.splice(i,1); renderScenes(); sched(); }
 
 // ── DRAW MODAL ────────────────────────────────────────────────────
 var drawSceneIdx=-1, drawTool='pen', drawColor='#f1f5f9', drawBrushSize=5;
@@ -1468,7 +1472,7 @@ function togGrid(){
   if(g) g.style.display=gridOn?'grid':'none';
   document.getElementById('cb-grid').classList.toggle('active',gridOn);
 }
-function togOnion(){ onionOn=!onionOn; document.getElementById('cb-onion').classList.toggle('active',onionOn); drawOnion(); }
+function togOnion(){ onionOn=!onionOn; document.getElementById('cb-onion').classList.toggle('active',onionOn); drawOnion(); if(typeof SFX!=='undefined')SFX.tap(); }
 function drawOnion(){
   var cv=document.getElementById('onion-cv'); if(!cv)return;
   if(!onionOn||!S.shots.length){cv.style.display='none';return;}
@@ -1486,7 +1490,7 @@ function drawOnion(){
   };
   img.src=S.shots[S.shots.length-1].data||S.shots[S.shots.length-1];
 }
-function togTimer(){ timerOn=!timerOn; document.getElementById('cb-timer').classList.toggle('active',timerOn); toast(timerOn?'⏱️ 3s-Timer an':'Timer aus'); }
+function togTimer(){ timerOn=!timerOn; if(typeof SFX!=='undefined')SFX.tap(); document.getElementById('cb-timer').classList.toggle('active',timerOn); toast(timerOn?'⏱️ 3s-Timer an':'Timer aus'); }
 function takeShot(){
   if(timerOn&&!timerActive){ timerActive=true; var n=3,iv=setInterval(function(){ toast(n+'...',850); n--; if(n<0){clearInterval(iv);timerActive=false;doSnap();} },1000); return; }
   doSnap();
@@ -1506,10 +1510,10 @@ function doSnap(){
   var f=document.getElementById('cam-flash'); if(f){f.style.opacity='1'; setTimeout(function(){f.style.opacity='0';},70);}
   addShot(cv.toDataURL('image/jpeg',.85));
 }
-function addShot(url){ S.shots.push(url); updFilmstrip(); drawOnion(); sched(); updShotCnt(); if(typeof checkBadge==='function'){checkBadge('fotograf');checkBadge('regisseur');} }
+function addShot(url){ if(typeof SFX!=='undefined')SFX.shoot(); S.shots.push(url); updFilmstrip(); drawOnion(); sched(); updShotCnt(); if(typeof checkBadge==='function'){checkBadge('fotograf');checkBadge('regisseur');} }
 function updShotCnt(){ var el=document.getElementById('shot-cnt'); if(el)el.textContent=S.shots.length+(S.shots.length===1?' Foto':' Fotos'); }
-function undoShot(){ if(!S.shots.length)return; S.shots.pop(); updFilmstrip(); drawOnion(); sched(); updShotCnt(); toast('↩ Letztes Foto entfernt'); }
-function clearShots(){ if(!S.shots.length)return; if(!confirm('Alle '+S.shots.length+' Fotos löschen?'))return; S.shots=[]; updFilmstrip(); sched(); updShotCnt(); toast('🗑️ Alle Fotos gelöscht'); }
+function undoShot(){ if(!S.shots.length)return; if(typeof SFX!=='undefined')SFX.del(); S.shots.pop(); updFilmstrip(); drawOnion(); sched(); updShotCnt(); toast('↩ Letztes Foto entfernt'); }
+function clearShots(){ if(!S.shots.length)return; if(!confirm('Alle '+S.shots.length+' Fotos löschen?'))return; if(typeof SFX!=='undefined')SFX.del(); S.shots=[]; updFilmstrip(); sched(); updShotCnt(); toast('🗑️ Alle Fotos gelöscht'); }
 function updFilmstrip(){
   var strip=document.getElementById('filmstrip'); var empty=document.getElementById('fs-empty');
   if(!S.shots.length){ strip.innerHTML=''; strip.appendChild(empty); empty.style.display='flex'; return; }
@@ -1906,6 +1910,7 @@ async function runFFmpeg(title,btn,pw,res,dim,tot,fadeDur,setStatus,setProgress)
     S.project.exported=true; sched();
     if(typeof checkBadge==='function') checkBadge('first-export');
     setProgress(1.0);
+    if(typeof SFX!=='undefined')SFX.success();
     setStatus('✅ MP4 fertig!');
     res.classList.add('vis');
     btn.disabled=false; btn.textContent='🎬 Film erstellen & herunterladen';
@@ -1958,7 +1963,7 @@ function doGifExport(title,btn,pw,res){
         var a=document.createElement('a'); a.href=url; a.download='trickfilm-'+title+'.gif'; a.click();
         S.project.exported=true; sched();
         if(typeof checkBadge==='function') checkBadge('first-export');
-        setProgress(1); setStatus('✅ GIF fertig!');
+        setProgress(1); setStatus('✅ GIF fertig!'); if(typeof SFX!=='undefined')SFX.success();
         res.classList.add('vis'); btn.disabled=false; btn.textContent='🎬 Film erstellen & herunterladen';
         toast('🎉 GIF fertig! Tipp: ezgif.com für MP4-Umwandlung',4000);
       });
@@ -2069,6 +2074,7 @@ function doWebMWithBuffer(title,btn,pw,res,dim,totalDur,audioBuffer,sampleRate){
     document.getElementById('ep-st').textContent='✅ Fertig!';
     document.getElementById('ep-fill').style.width='100%';
     res.classList.add('vis'); btn.disabled=false; btn.textContent='🎬 Film erstellen & herunterladen';
+    if(typeof SFX!=='undefined')SFX.success();
     toast('🎉 Film fertig!',3000);
   };
 
@@ -2141,6 +2147,7 @@ function doWebMRaw(title,btn,pw,res,dim,audioBuffer){
     document.getElementById('ep-st').textContent='✅ Fertig!';
     document.getElementById('ep-fill').style.width='100%';
     res.classList.add('vis'); btn.disabled=false; btn.textContent='🎬 Film erstellen & herunterladen';
+    if(typeof SFX!=='undefined')SFX.success();
     toast('🎉 Film fertig!',3000);
   };
   rec.start();
@@ -2389,6 +2396,7 @@ function checkBadge(id){
   earnedBadges[id] = Date.now();
   S.project.badges = earnedBadges;
   sched();
+  if(typeof SFX!=='undefined')SFX.success();
   showBadgeToast(badge.icon+' '+badge.name+' freigeschaltet!');
 }
 
@@ -3689,6 +3697,7 @@ function jamPlay(id,url){
 }
 function jamSelect(id,name,artist,url){
   if(jamAud)jamAud.pause();
+  if(typeof SFX!=='undefined')SFX.success();
   S.music={id:'jam_'+id,t:name,a:artist,url:url,g:'online',e:'\uD83C\uDFB5',dur:'?'};
   updSelBar();renderMus();sched();
   document.querySelectorAll('[id^="jsel-"]').forEach(function(b){b.textContent='+\xA0W\xe4hlen';b.style.color='';b.style.borderColor='';});
@@ -3795,10 +3804,7 @@ document.addEventListener('click',function(e){
   if(txt.includes('\uD83D\uDDD1')||txt.includes('l\xF6schen'))SFX.del();
   else if(btn.id==='shoot-btn'){}// shoot sound kommt via shoot-btn listener
 },true);
-setTimeout(function(){
-  var sb=document.getElementById('shoot-btn');
-  if(sb)sb.addEventListener('click',function(){SFX.shoot();},true);
-},300);
+// shoot sound is now in addShot()
 
 // ── MP4 EXPORT ────────────────────────────────────────────────────
 function doMP4Export(title,btn,pw,res){
