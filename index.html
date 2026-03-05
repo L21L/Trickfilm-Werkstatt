@@ -230,6 +230,10 @@ body::before{
 .prog{height:6px;background:var(--s2);border-radius:3px;overflow:hidden}
 .prog-bar{height:100%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:3px;transition:width .4s cubic-bezier(.22,1,.36,1)}
 
+/* ── MODALS ── */
+[id$="-modal"]{display:none}
+[id$="-modal"].open{display:flex}
+
 /* ── MISC ── */
 .sec-lbl{font-size:.65rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:12px 16px 4px}
 .sb-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:all .2s}
