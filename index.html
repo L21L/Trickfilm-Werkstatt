@@ -1179,11 +1179,11 @@ input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;bord
   </nav>
 </div>
 <!-- ONBOARDING MODAL -->
-<div id="onboard-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:20000;align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--surface);border-radius:20px;padding:28px 22px;max-width:380px;width:100%;border:2px solid var(--yellow);text-align:center">
+<div id="onboard-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:20000;align-items:center;justify-content:center;padding:16px;overflow-y:auto;">
+  <div style="background:var(--surface);border-radius:20px;padding:24px 20px;max-width:380px;width:100%;border:2px solid var(--yellow);text-align:center;max-height:92vh;overflow-y:auto;margin:auto;">
     <div id="ob-icon" style="font-size:3.5rem;margin-bottom:14px">🎬</div>
     <div id="ob-title" style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--yellow);margin-bottom:10px"></div>
-    <div id="ob-text" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:20px"></div>
+    <div id="ob-text" style="font-size:.88rem;color:var(--text);line-height:1.7;margin-bottom:20px"></div>
     <div id="ob-dots" style="display:flex;justify-content:center;gap:6px;margin-bottom:20px"></div>
     <div style="display:flex;gap:10px;justify-content:center">
       <button id="ob-skip" onclick="closeOnboarding()" class="btn bs" style="font-size:.8rem;padding:8px 16px">Überspringen</button>
@@ -1954,14 +1954,19 @@ function drawOnion(){
   cv.style.display='block';
   var img=new Image();
   img.onload=function(){
-    // Dimensionen vom Video nehmen, nicht vom Canvas (verhindert Versatz)
-    var vid=document.getElementById('cam-vid');
-    var w = (vid&&vid.videoWidth) ? vid.videoWidth : (cv.parentElement.offsetWidth||640);
-    var h = (vid&&vid.videoHeight) ? vid.videoHeight : (cv.parentElement.offsetHeight||480);
-    cv.width=w; cv.height=h;
+    // Canvas-Größe = angezeigte Box-Größe (nicht Video-Auflösung)
+    var box=cv.parentElement;
+    var bw=box.offsetWidth||320, bh=box.offsetHeight||240;
+    cv.width=bw; cv.height=bh;
     var ctx=cv.getContext('2d');
-    ctx.clearRect(0,0,w,h);
-    ctx.drawImage(img,0,0,w,h);
+    ctx.clearRect(0,0,bw,bh);
+    // object-fit:cover nachbilden: Bild so skalieren/zentrieren wie das Video
+    var iw=img.naturalWidth, ih=img.naturalHeight;
+    if(!iw||!ih){ctx.drawImage(img,0,0,bw,bh);return;}
+    var scale=Math.max(bw/iw, bh/ih);
+    var sw=iw*scale, sh=ih*scale;
+    var sx=(bw-sw)/2, sy=(bh-sh)/2;
+    ctx.drawImage(img,sx,sy,sw,sh);
   };
   img.src=S.shots[S.shots.length-1].data||S.shots[S.shots.length-1];
 }
