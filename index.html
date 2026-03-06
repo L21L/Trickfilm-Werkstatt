@@ -1130,11 +1130,62 @@ textarea.field-input{min-height:80px;line-height:1.5}
 
   <!-- MUSIK -->
   <section id="pg-mus" class="page" aria-label="Musik">
-    <div class="placeholder-card">
-      <div class="ph-icon">🎵</div>
-      <h1 class="ph-title">Musik</h1>
-      <p class="ph-sub">Wird in Schritt 5 gebaut</p>
-      <div class="ph-badge">Kommt bald</div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:16px">
+
+      <!-- ── Aktuelle Auswahl ── -->
+      <div id="sel-bar" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+        <div id="sel-bar-empty" style="color:var(--muted);font-size:14px;text-align:center;padding:4px 0">
+          Kein Track ausgewählt – wähle einen Track aus der Bibliothek
+        </div>
+        <div id="sel-bar-active" style="display:none">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span style="font-size:20px">🎵</span>
+            <div style="flex:1;min-width:0">
+              <div id="sel-track-name" style="font-family:'Fredoka One',cursive;font-size:16px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+              <div id="sel-track-artist" style="font-size:12px;color:var(--muted)"></div>
+            </div>
+            <button id="sel-play-btn" onclick="musTogglePlay()" style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--yellow);font-family:'Fredoka One',cursive;font-size:13px;padding:7px 14px;border-radius:var(--r-sm);transition:all .2s">▶ Play</button>
+            <button onclick="musRemove()" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red);font-family:'Fredoka One',cursive;font-size:13px;padding:7px 12px;border-radius:var(--r-sm)">✕ Entfernen</button>
+          </div>
+          <div style="margin-top:12px;display:flex;align-items:center;gap:10px">
+            <span style="font-size:12px;color:var(--muted);flex-shrink:0">🔊 Lautstärke</span>
+            <input type="range" id="mus-vol-slider" min="0" max="100" value="80"
+              oninput="musSetVol(this.value)"
+              style="flex:1;accent-color:var(--yellow)"/>
+            <span id="mus-vol-val" style="font-family:'Fredoka One',cursive;font-size:13px;color:var(--yellow);min-width:34px;text-align:right">80%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Bibliothek ── -->
+      <div>
+        <div class="sec-title">📚 Bibliothek</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+          Lade die Tracks einmalig hoch – danach sind sie dauerhaft gespeichert.
+        </p>
+        <div id="mus-lib-list" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+
+      <!-- ── Eigene Musik ── -->
+      <div>
+        <div class="sec-title">🎤 Eigene Musik</div>
+        <!-- Drop Zone -->
+        <div id="mus-drop-zone"
+          style="border:2px dashed var(--border);border-radius:var(--r);padding:28px 16px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px"
+          ondragover="musDragOver(event)" ondragleave="musDragLeave(event)" ondrop="musDrop(event)"
+          onclick="$('mus-file-input').click()">
+          <div style="font-size:36px;margin-bottom:8px">📂</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--muted)">Datei hierher ziehen oder klicken</div>
+          <div style="font-size:12px;color:var(--border);margin-top:4px">MP3, WAV, OGG</div>
+          <input type="file" id="mus-file-input" accept="audio/mp3,audio/mpeg,audio/wav,audio/ogg" multiple style="display:none" onchange="musUploadFiles(this.files)"/>
+        </div>
+        <!-- Eigene Track-Liste -->
+        <div id="mus-custom-list" style="display:flex;flex-direction:column;gap:10px"></div>
+        <div id="mus-custom-empty" style="color:var(--muted);font-size:13px;text-align:center;padding:10px 0;display:none">
+          Noch keine eigenen Tracks hochgeladen.
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -1370,8 +1421,11 @@ function loadState() {
     if (saved.fps)     S.fps     = saved.fps;
     if (saved.quality) S.quality = saved.quality;
     if (saved.groups)  S.groups  = saved.groups;
+    if (saved.vol  != null) S.vol   = saved.vol;
+    if (saved.music != null) S.music = saved.music;
   } catch(e){}
 }
+function persist() { scheduleSave(); }
 function migrateShots() {
   // Add IDs to shots that don't have them (migration from old format)
   S.shots = S.shots.map((s, i) => {
@@ -2078,10 +2132,51 @@ let idbDb = null;
 
 function idbOpen(cb) {
   if (idbDb) { cb(idbDb); return; }
-  const req = indexedDB.open(IDB_NAME, 1);
-  req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE, {keyPath:'id'});
+  const req = indexedDB.open(IDB_NAME, 2);
+  req.onupgradeneeded = e => {
+    const db = e.target.result;
+    if (!db.objectStoreNames.contains('shots')) db.createObjectStore('shots', {keyPath:'id'});
+    if (!db.objectStoreNames.contains('music')) db.createObjectStore('music', {keyPath:'key'});
+  };
   req.onsuccess = e => { idbDb = e.target.result; cb(idbDb); };
   req.onerror   = () => cb(null);
+}
+function idbSaveMusic(key, arrayBuffer, cb) {
+  idbOpen(db => {
+    if (!db) return;
+    const tx = db.transaction('music', 'readwrite');
+    tx.objectStore('music').put({ key, data: arrayBuffer });
+    tx.oncomplete = () => cb && cb();
+  });
+}
+function idbGetMusic(key, cb) {
+  idbOpen(db => {
+    if (!db) { cb(null); return; }
+    const req = db.transaction('music').objectStore('music').get(key);
+    req.onsuccess = e => cb(e.target.result?.data || null);
+  });
+}
+function idbHasMusic(key, cb) {
+  idbOpen(db => {
+    if (!db) { cb(false); return; }
+    const req = db.transaction('music').objectStore('music').getKey(key);
+    req.onsuccess = e => cb(!!e.target.result);
+  });
+}
+function idbDeleteMusic(key, cb) {
+  idbOpen(db => {
+    if (!db) return;
+    const tx = db.transaction('music', 'readwrite');
+    tx.objectStore('music').delete(key);
+    tx.oncomplete = () => cb && cb();
+  });
+}
+function idbListMusicKeys(cb) {
+  idbOpen(db => {
+    if (!db) { cb([]); return; }
+    const req = db.transaction('music').objectStore('music').getAllKeys();
+    req.onsuccess = e => cb(e.target.result || []);
+  });
 }
 function idbSaveShots(shots) {
   idbOpen(db => {
@@ -3516,6 +3611,338 @@ function initEditor() {
 }
 
 /* ═══════════════════════════════════════════════
+   MUSIK TAB
+   ═══════════════════════════════════════════════ */
+const MUSIC_LIB = [
+  { key: 'musicfox_friendship_forever', name: 'Friendship Forever', artist: 'Musicfox', genre: '🎵 Pop' },
+  { key: 'musicfox_dancing_street',     name: 'Dancing Street',     artist: 'Musicfox', genre: '🎵 Pop' },
+  { key: 'musicfox_shopping_street',    name: 'Shopping Street',    artist: 'Musicfox', genre: '🎵 Pop' },
+];
+
+let currentAudioCtx  = null;
+let currentAudioSrc  = null;
+let currentGainNode  = null;
+let musIsPlaying     = false;
+
+// Preview state (separate from main playback)
+let prevAudioCtx = null;
+let prevAudioSrc = null;
+let previewKey   = null;
+
+function musPlayTrack() {
+  musStop();
+  if (!S.music) return;
+  idbGetMusic(S.music.key, buffer => {
+    if (!buffer) return;
+    try {
+      currentAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      currentAudioCtx.decodeAudioData(buffer.slice(0), decoded => {
+        currentGainNode = currentAudioCtx.createGain();
+        currentGainNode.gain.value = S.vol;
+        currentAudioSrc = currentAudioCtx.createBufferSource();
+        currentAudioSrc.buffer = decoded;
+        currentAudioSrc.loop = true;
+        currentAudioSrc.connect(currentGainNode);
+        currentGainNode.connect(currentAudioCtx.destination);
+        currentAudioSrc.start();
+        musIsPlaying = true;
+        musUpdatePlayBtn();
+      });
+    } catch(e) {}
+  });
+}
+
+function musStop() {
+  try { if (currentAudioSrc) currentAudioSrc.stop(); } catch(e) {}
+  try { if (currentAudioCtx) currentAudioCtx.close(); } catch(e) {}
+  currentAudioSrc = null; currentAudioCtx = null; currentGainNode = null;
+  musIsPlaying = false;
+  musUpdatePlayBtn();
+}
+
+function musTogglePlay() {
+  if (musIsPlaying) { musStop(); }
+  else { musPlayTrack(); }
+}
+
+function musSetVol(val) {
+  S.vol = val / 100;
+  $('mus-vol-val').textContent = Math.round(val) + '%';
+  if (currentGainNode) currentGainNode.gain.value = S.vol;
+  persist();
+}
+
+function musRemove() {
+  musStop();
+  musStopPreview();
+  S.music = null;
+  persist();
+  musUpdateSelBar();
+  renderMusLib();
+}
+
+function musSelectTrack(key, name, artist) {
+  musStop();
+  musStopPreview();
+  S.music = { type: 'upload', key, name, artist };
+  persist();
+  musUpdateSelBar();
+  renderMusLib();
+  renderMusCustom();
+  showToast('🎵 ' + name + ' ausgewählt!');
+}
+
+function musUpdateSelBar() {
+  const empty  = $('sel-bar-empty');
+  const active = $('sel-bar-active');
+  if (!S.music) {
+    empty.style.display  = '';
+    active.style.display = 'none';
+    return;
+  }
+  empty.style.display  = 'none';
+  active.style.display = '';
+  $('sel-track-name').textContent   = S.music.name || S.music.key;
+  $('sel-track-artist').textContent = S.music.artist || '';
+  const slider = $('mus-vol-slider');
+  if (slider) {
+    slider.value = Math.round(S.vol * 100);
+    $('mus-vol-val').textContent = Math.round(S.vol * 100) + '%';
+  }
+  musUpdatePlayBtn();
+}
+
+function musUpdatePlayBtn() {
+  const btn = $('sel-play-btn');
+  if (!btn) return;
+  btn.textContent = musIsPlaying ? '⏹ Stopp' : '▶ Play';
+}
+
+// ── Preview ──────────────────────────────────
+function musPreview(key, btnEl) {
+  if (previewKey === key) {
+    musStopPreview();
+    return;
+  }
+  musStopPreview();
+  idbGetMusic(key, buffer => {
+    if (!buffer) return;
+    try {
+      prevAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      prevAudioCtx.decodeAudioData(buffer.slice(0), decoded => {
+        prevAudioSrc = prevAudioCtx.createBufferSource();
+        prevAudioSrc.buffer = decoded;
+        prevAudioSrc.loop = false;
+        prevAudioSrc.connect(prevAudioCtx.destination);
+        prevAudioSrc.start();
+        previewKey = key;
+        prevAudioSrc.onended = () => { previewKey = null; musRefreshPreviewBtns(); };
+        musRefreshPreviewBtns();
+      });
+    } catch(e) {}
+  });
+}
+
+function musStopPreview() {
+  try { if (prevAudioSrc) prevAudioSrc.stop(); } catch(e) {}
+  try { if (prevAudioCtx) prevAudioCtx.close(); } catch(e) {}
+  prevAudioSrc = null; prevAudioCtx = null; previewKey = null;
+  musRefreshPreviewBtns();
+}
+
+function musRefreshPreviewBtns() {
+  document.querySelectorAll('.mus-prev-btn').forEach(btn => {
+    const k = btn.dataset.key;
+    btn.textContent = (k === previewKey) ? '⏹ Stopp' : '▶ Vorschau';
+    btn.style.color = (k === previewKey) ? 'var(--red)' : '';
+    btn.style.borderColor = (k === previewKey) ? 'rgba(239,68,68,.4)' : '';
+  });
+}
+
+// ── Library render ────────────────────────────
+function renderMusLib() {
+  const list = $('mus-lib-list');
+  if (!list) return;
+  list.innerHTML = '';
+  let pending = MUSIC_LIB.length;
+  MUSIC_LIB.forEach(track => {
+    idbHasMusic(track.key, has => {
+      const isSelected = S.music && S.music.key === track.key;
+      const card = document.createElement('div');
+      card.style.cssText = `background:var(--surface);border:1px solid ${isSelected ? 'var(--yellow)' : 'var(--border)'};border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap`;
+      card.innerHTML = `
+        <div style="font-size:22px">🎵</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--text)">${track.name}</div>
+          <div style="font-size:12px;color:var(--muted)">${track.artist} · ${track.genre}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          ${has ? `
+            <button class="mus-prev-btn btn-outline" data-key="${track.key}" onclick="musPreview('${track.key}',this)" style="font-size:12px;padding:6px 12px">▶ Vorschau</button>
+            <button class="btn-outline" onclick="musSelectTrack('${track.key}','${track.name}','${track.artist}')"
+              style="font-size:12px;padding:6px 12px;${isSelected?'border-color:var(--yellow);color:var(--yellow)':''}">
+              ${isSelected ? '✅ Ausgewählt' : '✅ Auswählen'}
+            </button>
+          ` : `
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 12px;font-size:12px;color:var(--muted);font-family:'Fredoka One',cursive">
+              📂 ${track.key}.mp3 hochladen
+              <input type="file" accept="audio/mp3,audio/mpeg,audio/wav,audio/ogg" style="display:none" onchange="musUploadLib('${track.key}','${track.name}','${track.artist}',this)"/>
+            </label>
+          `}
+        </div>
+      `;
+      list.appendChild(card);
+      pending--;
+      if (pending === 0) musRefreshPreviewBtns();
+    });
+  });
+}
+
+function musUploadLib(key, name, artist, inputEl) {
+  const file = inputEl.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    idbSaveMusic(key, e.target.result, () => {
+      showToast('✅ ' + name + ' gespeichert!');
+      renderMusLib();
+    });
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── Custom uploads ────────────────────────────
+function musDragOver(e) {
+  e.preventDefault();
+  $('mus-drop-zone').style.borderColor = 'var(--yellow)';
+  $('mus-drop-zone').style.background  = 'rgba(251,191,36,.05)';
+}
+function musDragLeave() {
+  $('mus-drop-zone').style.borderColor = 'var(--border)';
+  $('mus-drop-zone').style.background  = '';
+}
+function musDrop(e) {
+  e.preventDefault();
+  musDragLeave();
+  musUploadFiles(e.dataTransfer.files);
+}
+
+function musUploadFiles(files) {
+  if (!files || !files.length) return;
+  Array.from(files).forEach(file => {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['mp3','mpeg','wav','ogg'].includes(ext) && !file.type.startsWith('audio/')) return;
+    const baseName = file.name.replace(/\.[^.]+$/, '');
+    const key = 'custom_' + baseName.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const reader = new FileReader();
+    reader.onload = e => {
+      idbSaveMusic(key, e.target.result, () => {
+        showToast('✅ ' + baseName + ' gespeichert!');
+        renderMusCustom();
+      });
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function renderMusCustom() {
+  const list  = $('mus-custom-list');
+  const empty = $('mus-custom-empty');
+  if (!list) return;
+  idbListMusicKeys(keys => {
+    const customKeys = keys.filter(k => k.startsWith('custom_'));
+    list.innerHTML = '';
+    if (customKeys.length === 0) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+    customKeys.forEach(key => {
+      const name = key.replace('custom_', '').replace(/_/g, ' ');
+      const isSelected = S.music && S.music.key === key;
+      // Get duration
+      idbGetMusic(key, buf => {
+        let durStr = '';
+        if (buf) {
+          try {
+            const tmpCtx = new (window.AudioContext || window.webkitAudioContext)();
+            tmpCtx.decodeAudioData(buf.slice(0), decoded => {
+              const s = Math.floor(decoded.duration);
+              durStr = `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+              updateCustomCard(key, name, isSelected, durStr);
+              tmpCtx.close();
+            });
+          } catch(e) { updateCustomCard(key, name, isSelected, ''); }
+        } else {
+          updateCustomCard(key, name, isSelected, '');
+        }
+      });
+    });
+  });
+}
+
+function updateCustomCard(key, name, isSelected, durStr) {
+  const list = $('mus-custom-list');
+  if (!list) return;
+  // Remove existing card for this key if present
+  const existing = list.querySelector(`[data-custom-key="${key}"]`);
+  if (existing) existing.remove();
+
+  const card = document.createElement('div');
+  card.dataset.customKey = key;
+  card.style.cssText = `background:var(--surface);border:1px solid ${isSelected?'var(--yellow)':'var(--border)'};border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap`;
+  card.innerHTML = `
+    <div style="font-size:22px">🎵</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+      <div style="font-size:12px;color:var(--muted)">${durStr ? '⏱ ' + durStr : 'Eigener Track'}</div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="mus-prev-btn btn-outline" data-key="${key}" onclick="musPreview('${key}',this)" style="font-size:12px;padding:6px 12px">▶ Vorschau</button>
+      <button class="btn-outline" onclick="musSelectTrack('${key}','${name}','')"
+        style="font-size:12px;padding:6px 12px;${isSelected?'border-color:var(--yellow);color:var(--yellow)':''}">
+        ${isSelected ? '✅ Ausgewählt' : '✅ Auswählen'}
+      </button>
+      <button class="btn-red" onclick="musDeleteCustom('${key}')" style="font-size:12px;padding:6px 10px">🗑</button>
+    </div>
+  `;
+  list.appendChild(card);
+  musRefreshPreviewBtns();
+}
+
+function musDeleteCustom(key) {
+  if (S.music && S.music.key === key) {
+    musStop();
+    S.music = null;
+    persist();
+    musUpdateSelBar();
+  }
+  if (previewKey === key) musStopPreview();
+  idbDeleteMusic(key, () => {
+    renderMusCustom();
+    showToast('🗑 Track gelöscht');
+  });
+}
+
+function initMusicTab() {
+  // Restore slider
+  const slider = $('mus-vol-slider');
+  if (slider) {
+    slider.value = Math.round(S.vol * 100);
+    $('mus-vol-val').textContent = Math.round(S.vol * 100) + '%';
+  }
+  musUpdateSelBar();
+  renderMusLib();
+  renderMusCustom();
+  // Reload when tab is clicked
+  document.querySelector('[data-page="pg-mus"]').addEventListener('click', () => {
+    musUpdateSelBar();
+    renderMusLib();
+    renderMusCustom();
+  });
+}
+
+/* ═══════════════════════════════════════════════
    INIT APP
    ═══════════════════════════════════════════════ */
 function initApp() {
@@ -3540,6 +3967,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCamTab();
   initEditor();
   initIntro();
+  initMusicTab();
 });
 </script>
 </body>
