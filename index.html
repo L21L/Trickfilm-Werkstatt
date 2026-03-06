@@ -371,7 +371,8 @@ textarea.field-input{min-height:80px;line-height:1.5}
    EDITOR TAB
    ═══════════════════════════ */
 #pg-edit{display:none;flex-direction:column;overflow:hidden;
-  padding-top:var(--topbar-h);padding-bottom:var(--nav-h)}
+  padding-top:var(--topbar-h);padding-bottom:var(--nav-h);
+  height:100%;}
 #pg-edit.active{display:flex}
 
 /* Preview */
@@ -637,7 +638,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
   border: none;
   font-size: 24px;
   cursor: pointer;
-  z-index: 9000;
+  z-index: 500;
   box-shadow: 0 4px 20px rgba(251,191,36,0.4);
   animation: bubbleFloat 3s ease-in-out infinite;
   display: flex;
@@ -670,7 +671,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
   border: 1px solid #21262d;
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  z-index: 9001;
+  z-index: 501;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -802,14 +803,16 @@ textarea.field-input{min-height:80px;line-height:1.5}
    ═══════════════════════════ */
 #badge-toast {
   position: fixed; top: 60px; left: 50%;
-  transform: translateX(-50%) translateY(-80px);
+  transform: translateX(-50%) translateY(-120px);
   background: linear-gradient(135deg, #1a1506, #0d1117);
   border: 1px solid #fbbf24; border-radius: 20px;
   padding: 10px 20px; color: #fbbf24; font-size: 0.85rem; font-weight: 700;
   z-index: 10002; white-space: nowrap;
-  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none;
+  opacity: 0; visibility: hidden;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease, visibility 0s linear 0.4s;
+  pointer-events: none;
 }
-#badge-toast.show { transform: translateX(-50%) translateY(0); }
+#badge-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; visibility: visible; transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease, visibility 0s linear 0s; }
 #badge-panel {
   position: fixed; inset: 0; background: rgba(0,0,0,0.85);
   z-index: 10000; display: none; align-items: center; justify-content: center;
@@ -1428,7 +1431,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
       <div>
         <div class="sec-title">📚 Bibliothek</div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
-          Lade die Tracks einmalig hoch – danach sind sie dauerhaft gespeichert.
+          Klicke auf „Laden" um einen Track zu laden – danach kannst du ihn direkt auswählen und abspielen.
         </p>
         <div id="mus-lib-list" style="display:flex;flex-direction:column;gap:10px"></div>
       </div>
@@ -4068,9 +4071,9 @@ function initEditor() {
    MUSIK TAB
    ═══════════════════════════════════════════════ */
 const MUSIC_LIB = [
-  { key: 'musicfox_friendship_forever', name: 'Friendship Forever', artist: 'Musicfox', genre: '🎵 Pop' },
-  { key: 'musicfox_dancing_street',     name: 'Dancing Street',     artist: 'Musicfox', genre: '🎵 Pop' },
-  { key: 'musicfox_shopping_street',    name: 'Shopping Street',    artist: 'Musicfox', genre: '🎵 Pop' },
+  { key: 'musicfox_friendship_forever', name: 'Friendship Forever', artist: 'Musicfox', genre: '🎵 Pop',   file: 'musicfox_friendship_forever.mp3' },
+  { key: 'musicfox_dancing_street',     name: 'Dancing Street',     artist: 'Musicfox', genre: '🎵 Pop',   file: 'musicfox_dancing_street.mp3'     },
+  { key: 'musicfox_shopping_street',    name: 'Shopping Street',    artist: 'Musicfox', genre: '🎵 Pop',   file: 'musicfox_shopping_street.mp3'    },
 ];
 
 let currentAudioCtx  = null;
@@ -4224,6 +4227,7 @@ function renderMusLib() {
     idbHasMusic(track.key, has => {
       const isSelected = S.music && S.music.key === track.key;
       const card = document.createElement('div');
+      card.id = 'mus-lib-card-' + track.key;
       card.style.cssText = `background:var(--surface);border:1px solid ${isSelected ? 'var(--yellow)' : 'var(--border)'};border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap`;
       card.innerHTML = `
         <div style="font-size:22px">🎵</div>
@@ -4231,7 +4235,7 @@ function renderMusLib() {
           <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--text)">${track.name}</div>
           <div style="font-size:12px;color:var(--muted)">${track.artist} · ${track.genre}</div>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <div id="mus-lib-btns-${track.key}" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
           ${has ? `
             <button class="mus-prev-btn btn-outline" data-key="${track.key}" onclick="musPreview('${track.key}',this)" style="font-size:12px;padding:6px 12px">▶ Vorschau</button>
             <button class="btn-outline" onclick="musSelectTrack('${track.key}','${track.name}','${track.artist}')"
@@ -4239,10 +4243,10 @@ function renderMusLib() {
               ${isSelected ? '✅ Ausgewählt' : '✅ Auswählen'}
             </button>
           ` : `
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 12px;font-size:12px;color:var(--muted);font-family:'Fredoka One',cursive">
-              📂 ${track.key}.mp3 hochladen
-              <input type="file" accept="audio/mp3,audio/mpeg,audio/wav,audio/ogg" style="display:none" onchange="musUploadLib('${track.key}','${track.name}','${track.artist}',this)"/>
-            </label>
+            <button class="btn-outline" onclick="musLoadFromRepo('${track.key}','${track.name}','${track.artist}','${track.file}',this)"
+              style="font-size:12px;padding:6px 12px;border-color:rgba(45,212,191,.4);color:var(--teal)">
+              ⬇️ Laden
+            </button>
           `}
         </div>
       `;
@@ -4251,6 +4255,26 @@ function renderMusLib() {
       if (pending === 0) musRefreshPreviewBtns();
     });
   });
+}
+
+function musLoadFromRepo(key, name, artist, file, btnEl) {
+  if (btnEl) { btnEl.textContent = '⏳ Lädt…'; btnEl.disabled = true; }
+  fetch(file)
+    .then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.arrayBuffer();
+    })
+    .then(buffer => {
+      idbSaveMusic(key, buffer, () => {
+        showToast('✅ ' + name + ' geladen!');
+        renderMusLib();
+      });
+    })
+    .catch(err => {
+      console.error('Musik laden fehlgeschlagen:', err);
+      if (btnEl) { btnEl.textContent = '❌ Fehler – nochmal?'; btnEl.disabled = false; }
+      showToast('❌ ' + name + ' konnte nicht geladen werden');
+    });
 }
 
 function musUploadLib(key, name, artist, inputEl) {
