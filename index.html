@@ -164,10 +164,10 @@ textarea.field-input{min-height:80px;line-height:1.5}
 .story-field{background:var(--surface);border:1px solid var(--border);
   border-radius:var(--r);padding:14px}
 .story-field-icon{font-size:20px;margin-bottom:6px}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:var(--green);color:#fff;font-family:'Fredoka One',cursive;
-  font-size:14px;padding:10px 20px;border-radius:99px;z-index:9999;
-  opacity:0;transition:all .3s;pointer-events:none}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--s2);border:1px solid var(--border);color:var(--text);font-family:'Fredoka One',cursive;
+  font-size:13px;padding:9px 18px;border-radius:20px;z-index:9999;
+  opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ── Figures ── */
@@ -622,6 +622,268 @@ textarea.field-input{min-height:80px;line-height:1.5}
 .strip-thumb:hover .strip-del{opacity:1}
 .strip-num{position:absolute;bottom:1px;left:2px;font-size:9px;color:rgba(255,255,255,.8);
   font-family:'Fredoka One',cursive;line-height:1}
+
+/* ═══════════════════════════
+   KAMERA-KARL AI ASSISTANT
+   ═══════════════════════════ */
+#ai-bubble {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 9000;
+  box-shadow: 0 4px 20px rgba(251,191,36,0.4);
+  animation: bubbleFloat 3s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@keyframes bubbleFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+#ai-bubble-badge {
+  position: absolute;
+  top: -2px; right: -2px;
+  width: 16px; height: 16px;
+  background: #ef4444;
+  border-radius: 50%;
+  font-size: 10px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#ai-panel {
+  position: fixed;
+  bottom: 140px;
+  right: 12px;
+  width: min(380px, calc(100vw - 24px));
+  height: min(520px, calc(100vh - 200px));
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  z-index: 9001;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#ai-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #1a1f2e, #0d1117);
+  border-bottom: 1px solid #21262d;
+  flex-shrink: 0;
+}
+#ai-avatar {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+#ai-name { font-family: 'Fredoka One', cursive; color: #fbbf24; font-size: 1rem; }
+#ai-status { font-size: 0.7rem; color: #8b949e; }
+#ai-close { margin-left:auto; background:none; border:none; color:#8b949e; font-size:1.2rem; cursor:pointer; padding:4px 8px; }
+#ai-close:hover { color: #e6edf3; }
+#ai-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#ai-messages::-webkit-scrollbar { width: 3px; }
+#ai-messages::-webkit-scrollbar-thumb { background: #21262d; border-radius: 2px; }
+#ai-key-box {
+  margin: 8px 12px;
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 12px;
+  padding: 12px;
+  flex-shrink: 0;
+}
+#ai-key-box label { font-size: 0.75rem; color: #8b949e; display: block; margin-bottom: 6px; font-family: 'Fredoka One', cursive; }
+#ai-key-row { display: flex; gap: 6px; margin-bottom: 6px; }
+#ai-key-input {
+  flex: 1;
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #e6edf3;
+  font-size: 0.78rem;
+  outline: none;
+}
+#ai-key-input:focus { border-color: #fbbf24; }
+#ai-key-save {
+  background: #fbbf24;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: #000;
+  white-space: nowrap;
+}
+#ai-key-status { font-size: 0.72rem; }
+#ai-key-link { font-size: 0.68rem; color: #8b949e; margin-top: 4px; display: block; }
+#ai-key-link a { color: #fbbf24; text-decoration: none; }
+#ai-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  border-top: 1px solid #21262d;
+  flex-shrink: 0;
+}
+#ai-input-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid #21262d;
+  flex-shrink: 0;
+}
+#ai-input {
+  flex: 1;
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 20px;
+  padding: 8px 14px;
+  color: #e6edf3;
+  font-size: 0.85rem;
+  outline: none;
+}
+#ai-input:focus { border-color: #fbbf24; }
+#ai-send {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #fbbf24;
+  border: none;
+  color: #000;
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .15s;
+}
+#ai-send:hover { transform: scale(1.1); }
+.ai-msg { max-width: 85%; padding: 9px 13px; border-radius: 14px; font-size: 0.82rem; line-height: 1.4; word-break: break-word; }
+.ai-msg.bot { background: #161b22; color: #e6edf3; align-self: flex-start; border-bottom-left-radius: 4px; }
+.ai-msg.user { background: #fbbf24; color: #000; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 700; }
+.ai-msg.thinking { color: #8b949e; font-style: italic; }
+.ai-chip {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 14px;
+  padding: 5px 10px;
+  font-size: 0.72rem;
+  color: #e6edf3;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color .2s, color .2s;
+}
+.ai-chip:hover { border-color: #fbbf24; color: #fbbf24; }
+
+/* ═══════════════════════════
+   BADGE SYSTEM
+   ═══════════════════════════ */
+#badge-toast {
+  position: fixed; top: 60px; left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  background: linear-gradient(135deg, #1a1506, #0d1117);
+  border: 1px solid #fbbf24; border-radius: 20px;
+  padding: 10px 20px; color: #fbbf24; font-size: 0.85rem; font-weight: 700;
+  z-index: 10002; white-space: nowrap;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none;
+}
+#badge-toast.show { transform: translateX(-50%) translateY(0); }
+#badge-panel {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  z-index: 10000; display: none; align-items: center; justify-content: center;
+}
+.badge-box {
+  background: #0d1117; border: 1px solid #21262d; border-radius: 20px;
+  padding: 20px; width: min(380px, calc(100vw - 32px)); max-height: 80vh; overflow-y: auto;
+}
+.badge-box::-webkit-scrollbar{width:3px}.badge-box::-webkit-scrollbar-thumb{background:#21262d;border-radius:2px}
+.badge-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px; font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: #fbbf24;
+}
+.badge-header button{background:none;border:none;color:#8b949e;font-size:1.3rem;cursor:pointer;padding:4px 8px}
+.badge-header button:hover{color:#e6edf3}
+#badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.badge-item {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  background: #161b22; border: 1px solid #21262d; border-radius: 12px;
+  padding: 12px 8px; opacity: 0.4; transition: all 0.3s;
+}
+.badge-item.earned {
+  opacity: 1; border-color: #fbbf24;
+  background: linear-gradient(135deg, #1a1506, #161b22);
+  box-shadow: 0 0 12px rgba(251,191,36,0.2);
+}
+.badge-icon{font-size:2rem;margin-bottom:4px;line-height:1}
+.badge-name{font-size:0.65rem;font-weight:800;color:#e6edf3;margin-bottom:2px;font-family:'Fredoka One',cursive}
+.badge-desc{font-size:0.55rem;color:#8b949e;line-height:1.3}
+#badge-btn,#help-btn,#save-btn {
+  background:none;border:none;font-size:1.2rem;cursor:pointer;
+  padding:5px 4px;border-radius:8px;transition:background .2s;flex-shrink:0;
+}
+#badge-btn:hover,#help-btn:hover,#save-btn:hover{background:rgba(255,255,255,.08)}
+
+/* ═══════════════════════════
+   HELP MODAL
+   ═══════════════════════════ */
+#help-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  z-index: 10000; display: none; align-items: center; justify-content: center;
+}
+.help-box {
+  background: #0d1117; border: 1px solid #21262d; border-radius: 20px;
+  width: min(420px, calc(100vw - 32px)); max-height: 85vh;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.help-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px; font-family: 'Fredoka One', cursive; font-size: 1.2rem;
+  color: #fbbf24; border-bottom: 1px solid #21262d; flex-shrink: 0;
+}
+.help-header button{background:none;border:none;color:#8b949e;font-size:1.3rem;cursor:pointer}
+.help-header button:hover{color:#e6edf3}
+.help-tabs{display:flex;border-bottom:1px solid #21262d;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.help-tabs::-webkit-scrollbar{display:none}
+.help-tab {
+  padding:10px 16px;background:none;border:none;color:#8b949e;font-size:0.78rem;
+  cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;
+  font-family:'Fredoka One',cursive;transition:color .2s;
+}
+.help-tab.active{color:#fbbf24;border-bottom-color:#fbbf24}
+.help-tab:hover:not(.active){color:#e6edf3}
+#help-body{padding:16px 20px;overflow-y:auto;color:#e6edf3;font-size:0.85rem;line-height:1.6}
+#help-body::-webkit-scrollbar{width:3px}
+#help-body::-webkit-scrollbar-thumb{background:#21262d;border-radius:2px}
+#help-body h3{color:#fbbf24;font-family:'Fredoka One',cursive;font-size:1rem;margin-bottom:12px}
+#help-body h4{color:#2dd4bf;margin:12px 0 6px;font-size:0.85rem}
+#help-body ul,#help-body ol{padding-left:20px}
+#help-body li{margin-bottom:6px}
+#help-body dt{color:#fbbf24;font-weight:800;margin-top:10px}
+#help-body dd{color:#8b949e;margin-left:16px;margin-bottom:4px}
+#help-body strong{color:#fbbf24}
+#help-body p{margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -696,9 +958,12 @@ textarea.field-input{min-height:80px;line-height:1.5}
 
 <!-- TOAST -->
 <div id="toast" class="toast"></div>
+<!-- BADGE TOAST -->
+<div id="badge-toast"></div>
 
 <!-- TOPBAR -->
 <header class="topbar" role="banner">
+  <button onclick="showHelp()" id="help-btn" title="Hilfe">❓</button>
   <div class="logo-inline">
     <span class="inline-icon">🎬</span>
     <div class="inline-text">
@@ -708,6 +973,8 @@ textarea.field-input{min-height:80px;line-height:1.5}
     </div>
   </div>
   <span class="topbar-title" id="topbar-title">Mein Film</span>
+  <button onclick="exportProject()" id="save-btn" title="Projekt speichern">💾</button>
+  <button onclick="showBadges()" id="badge-btn" title="Abzeichen anzeigen">🏆</button>
 </header>
 
 <!-- PAGES -->
@@ -1191,11 +1458,185 @@ textarea.field-input{min-height:80px;line-height:1.5}
 
   <!-- EXPORT -->
   <section id="pg-exp" class="page" aria-label="Export">
-    <div class="placeholder-card">
-      <div class="ph-icon">🎬</div>
-      <h1 class="ph-title">Export</h1>
-      <p class="ph-sub">Wird in Schritt 6 gebaut</p>
-      <div class="ph-badge">Kommt bald</div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:14px">
+
+      <!-- ══ PROJEKT SPEICHERN & LADEN ══ -->
+      <div id="project-io" style="background:var(--surface);border:2px solid rgba(251,191,36,.35);border-radius:var(--r);padding:16px">
+        <div class="sec-title" style="margin-bottom:12px">💾 Projekt speichern &amp; laden</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <button class="btn-primary" onclick="exportProject()" style="font-size:13px;padding:10px 10px;display:flex;align-items:center;justify-content:center;gap:6px">
+            💾 Exportieren (.json)
+          </button>
+          <button class="btn-outline" onclick="importProject()" style="font-size:13px;padding:10px 10px;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--teal);border-color:var(--teal)">
+            📂 Importieren (.json)
+          </button>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);padding-top:10px">
+          <div>📦 Enthält: alle Fotos, Gruppen, Voiceover, Musik, Storyboard, Figuren, Geschichte</div>
+          <div id="project-size-hint" style="margin-top:4px;color:var(--yellow);font-family:'Fredoka One',cursive;font-size:13px"></div>
+        </div>
+      </div>
+
+      <!-- ══ ZUSAMMENFASSUNG ══ -->
+      <div id="exp-summary" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+        <div class="sec-title" style="margin-bottom:10px">📋 Was wird exportiert?</div>
+        <div id="exp-sum-lines" style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--text)">
+          <div>Lade…</div>
+        </div>
+      </div>
+
+      <!-- ══ SAFARI WARNUNG ══ -->
+      <div id="safari-notice" style="display:none;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.4);border-radius:var(--r);padding:12px;font-size:13px;color:var(--yellow)">
+        ⚠️ WebM/MP4 werden von deinem Browser nicht unterstützt. Nutze Chrome oder Firefox, oder exportiere als ZIP.
+      </div>
+
+      <!-- ══ EINSTELLUNGEN ══ -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+        <div class="sec-title" style="margin-bottom:12px">⚙️ Einstellungen</div>
+
+        <!-- Auflösung -->
+        <div style="margin-bottom:14px">
+          <label class="field-label">AUFLÖSUNG</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="quality-btns"></div>
+        </div>
+
+        <!-- Format -->
+        <div style="margin-bottom:14px">
+          <label class="field-label">FORMAT</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="format-btns"></div>
+        </div>
+
+        <!-- FPS -->
+        <div style="margin-bottom:14px">
+          <label class="field-label">GESCHWINDIGKEIT (FPS)</label>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="range" id="exp-fps-slider" min="4" max="24" step="1" value="8"
+              oninput="S.fps=+this.value;$('exp-fps-val').textContent=this.value+' fps';persist();updExpSum()"
+              style="flex:1;accent-color:var(--yellow)"/>
+            <span id="exp-fps-val" style="font-family:'Fredoka One',cursive;color:var(--yellow);min-width:50px">8 fps</span>
+          </div>
+        </div>
+
+        <!-- Fade -->
+        <div style="margin-bottom:14px">
+          <label class="field-label">ÜBERGÄNGE</label>
+          <div style="display:flex;gap:12px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);cursor:pointer">
+              <input type="checkbox" id="exp-fadein" onchange="fadeIn=this.checked" style="accent-color:var(--yellow)"/> Einblenden
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);cursor:pointer">
+              <input type="checkbox" id="exp-fadeout" onchange="fadeOut=this.checked" style="accent-color:var(--yellow)"/> Ausblenden
+            </label>
+          </div>
+        </div>
+
+        <!-- Helligkeit / Kontrast -->
+        <div style="margin-bottom:4px">
+          <label class="field-label">HELLIGKEIT</label>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <input type="range" id="exp-bri" min="-50" max="50" value="0"
+              oninput="brightnessVal=+this.value;$('exp-bri-val').textContent=this.value"
+              style="flex:1;accent-color:var(--yellow)"/>
+            <span id="exp-bri-val" style="font-family:'Fredoka One',cursive;color:var(--yellow);min-width:30px;text-align:right">0</span>
+          </div>
+          <label class="field-label">KONTRAST</label>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="range" id="exp-con" min="-50" max="50" value="0"
+              oninput="contrastVal=+this.value;$('exp-con-val').textContent=this.value"
+              style="flex:1;accent-color:var(--yellow)"/>
+            <span id="exp-con-val" style="font-family:'Fredoka One',cursive;color:var(--yellow);min-width:30px;text-align:right">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ UNTERTITEL ══ -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="sec-title" style="margin-bottom:0">💬 Untertitel</div>
+          <button class="btn-outline" onclick="openSubModal()" style="font-size:12px;padding:6px 12px">+ Hinzufügen</button>
+        </div>
+        <div id="sub-list" style="display:flex;flex-direction:column;gap:8px">
+          <div id="sub-empty" style="font-size:13px;color:var(--muted);text-align:center;padding:8px 0">Keine Untertitel</div>
+        </div>
+      </div>
+
+      <!-- ══ EXPORT BUTTONS ══ -->
+      <div>
+        <div class="sec-title" style="margin-bottom:12px">🎬 Exportieren</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button class="exp-btn" onclick="startExport('webm')" style="background:linear-gradient(135deg,rgba(45,212,191,.2),rgba(45,212,191,.05));border:1px solid rgba(45,212,191,.4);color:var(--teal);border-radius:var(--r);padding:14px 10px;font-family:'Fredoka One',cursive;font-size:14px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
+            🎬 Als WebM
+            <span style="font-size:10px;color:var(--muted);font-family:inherit">Chrome/Firefox</span>
+          </button>
+          <button class="exp-btn" onclick="startExport('mp4')" style="background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(168,85,247,.05));border:1px solid rgba(168,85,247,.4);color:var(--purple);border-radius:var(--r);padding:14px 10px;font-family:'Fredoka One',cursive;font-size:14px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
+            🎥 Als MP4
+            <span style="font-size:10px;color:var(--muted);font-family:inherit">via FFmpeg</span>
+          </button>
+          <button class="exp-btn" onclick="startExport('gif')" style="background:linear-gradient(135deg,rgba(251,191,36,.2),rgba(251,191,36,.05));border:1px solid rgba(251,191,36,.4);color:var(--yellow);border-radius:var(--r);padding:14px 10px;font-family:'Fredoka One',cursive;font-size:14px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
+            🎨 Als GIF
+            <span style="font-size:10px;color:var(--muted);font-family:inherit">320×240px</span>
+          </button>
+          <button class="exp-btn" onclick="startExport('zip')" style="background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(34,197,94,.05));border:1px solid rgba(34,197,94,.4);color:var(--green);border-radius:var(--r);padding:14px 10px;font-family:'Fredoka One',cursive;font-size:14px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
+            🖼 Als ZIP
+            <span style="font-size:10px;color:var(--muted);font-family:inherit">Einzelbilder</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ══ FORTSCHRITT ══ -->
+      <div id="ep-wrap" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px">
+        <div id="ep-st" style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--text);margin-bottom:10px">Bereit</div>
+        <div style="height:12px;background:var(--s2);border-radius:99px;overflow:hidden;margin-bottom:8px">
+          <div id="ep-fill" style="height:100%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:99px;width:0%;transition:width .2s"></div>
+        </div>
+        <div id="ep-pct" style="font-family:'Fredoka One',cursive;font-size:13px;color:var(--yellow);text-align:right;margin-bottom:10px">0%</div>
+        <button id="ep-abort" onclick="exportAborted=true;setExpStatus('⛔ Abgebrochen')" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red);font-family:'Fredoka One',cursive;font-size:13px;padding:8px 16px;border-radius:var(--r-sm);display:none">
+          ✕ Abbrechen
+        </button>
+      </div>
+
+      <!-- ══ ERGEBNIS ══ -->
+      <div id="exp-result" style="display:none;background:var(--surface);border:1px solid rgba(34,197,94,.3);border-radius:var(--r);padding:16px;text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">✅</div>
+        <a id="ex-link" href="#" download style="display:none;font-family:'Fredoka One',cursive;font-size:14px;color:var(--teal);text-decoration:none;word-break:break-all"></a>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Falls der Download nicht startet, klicke den Link oben.</div>
+      </div>
+
+    </div>
+
+    <!-- UNTERTITEL MODAL -->
+    <div id="sub-modal" style="display:none;position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,.85);align-items:center;justify-content:center;padding:20px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;width:100%;max-width:380px;max-height:90vh;overflow-y:auto">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--yellow)">💬 Untertitel</div>
+          <button onclick="closeSubModal()" style="color:var(--muted);font-size:20px">✕</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <label class="field-label">TEXT</label>
+            <input id="sub-text" class="field-input" placeholder="Es war einmal…" style="width:100%"/>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <label class="field-label">AB FRAME</label>
+              <input id="sub-frame" type="number" class="field-input" value="0" min="0"/>
+            </div>
+            <div>
+              <label class="field-label">DAUER (Sek)</label>
+              <input id="sub-dur" type="number" class="field-input" value="2" min="1" max="10" step="0.5"/>
+            </div>
+          </div>
+          <div>
+            <label class="field-label">POSITION</label>
+            <div style="display:flex;gap:8px">
+              <button class="sub-pos-btn btn-outline" data-pos="top" onclick="setSubPos('top')">Oben</button>
+              <button class="sub-pos-btn btn-outline" data-pos="middle" onclick="setSubPos('middle')">Mitte</button>
+              <button class="sub-pos-btn btn-outline active" data-pos="bottom" onclick="setSubPos('bottom')" style="border-color:var(--yellow);color:var(--yellow)">Unten</button>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="saveSubtitle()" style="width:100%">✅ Speichern</button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1396,6 +1837,7 @@ function scheduleSave() {
       localStorage.setItem('tfw-state', JSON.stringify({
         fps: S.fps, quality: S.quality, format: S.format,
         vol: S.vol, music: S.music,
+        subtitles: S.subtitles,
         project: S.project,
         groups: S.groups
       }));
@@ -1421,6 +1863,7 @@ function loadState() {
     if (saved.fps)     S.fps     = saved.fps;
     if (saved.quality) S.quality = saved.quality;
     if (saved.groups)  S.groups  = saved.groups;
+    if (saved.subtitles) S.subtitles = saved.subtitles;
     if (saved.vol  != null) S.vol   = saved.vol;
     if (saved.music != null) S.music = saved.music;
   } catch(e){}
@@ -1441,11 +1884,12 @@ function migrateShots() {
 /* ═══════════════════════════════════════════════
    TOAST
    ═══════════════════════════════════════════════ */
-function showToast(msg) {
+function showToast(msg, duration) {
   const t = $('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), duration || 2500);
 }
 
 /* ═══════════════════════════════════════════════
@@ -1500,6 +1944,7 @@ function initStory() {
     S.project.about = aboutEl.value;
     $('topbar-title').textContent = S.project.title || 'Mein Film';
     scheduleSave();
+    try { checkBadge('erster-titel'); checkBadge('storyteller'); } catch(e) {}
   }
   [titleEl,begEl,tenEl,endEl,aboutEl].forEach(el => el.addEventListener('input', sync));
 
@@ -1561,6 +2006,7 @@ function initFigures() {
       S.project.figures.push({name:t.n, role:t.r, drawing:null});
       scheduleSave(); renderFigures();
       showToast(`${t.e} ${t.n} hinzugefügt!`);
+      try { checkBadge('casting'); } catch(e) {}
     });
     tmplEl.appendChild(chip);
   });
@@ -1585,6 +2031,7 @@ function initFigures() {
     $('fig-name-input').value = '';
     $('fig-role-input').value = '';
     showToast(`🎭 ${name} hinzugefügt!`);
+    try { checkBadge('casting'); } catch(e) {}
   });
 
   renderFigures();
@@ -1698,6 +2145,7 @@ function initWeekplan() {
     input.addEventListener('input', () => {
       S.project.weekplan[+input.dataset.week].task = input.value;
       scheduleSave();
+      try { checkBadge('wochenplaner'); } catch(e) {}
     });
   });
   tbody.querySelectorAll('[data-week-done]').forEach(cb => {
@@ -1737,6 +2185,7 @@ function initProgress() {
       $(`prog-bar-${i}`).style.width = v + '%';
       $(`prog-pct-${i}`).textContent = v + '%';
       scheduleSave();
+      try { checkBadge('vollender'); } catch(e) {}
     });
   });
 }
@@ -1987,6 +2436,7 @@ function initDrawModal() {
     } else {
       S.project.scenes[index].drawing = dataUrl;
       renderScenes();
+      try { checkBadge('storyboarder'); } catch(e) {}
     }
     scheduleSave();
     $('draw-modal').classList.add('hidden');
@@ -2088,6 +2538,7 @@ function renderObStep() {
 function closeOnboarding() {
   $('onboarding').classList.add('hidden');
   localStorage.setItem('tfw-onboard-done','1');
+  try { checkAllBadges(); } catch(e) {}
   initApp();
 }
 function checkOnboarding() {
@@ -2569,6 +3020,7 @@ function addShot(dataUrl) {
   updateShotCount();
   renderFrames();
   if (onionOn) drawOnion();
+  try { checkBadge('fotograf'); checkBadge('regisseur'); } catch(e) {}
 }
 
 /* ── Undo / Clear ───────────────────────────── */
@@ -3092,6 +3544,7 @@ function createGroup() {
   persist();
   renderFrames(); renderGroupBar();
   showToast(`📁 Gruppe '${name}' erstellt (${frameIds.length} Frames)`);
+  try { checkBadge('gruppenmeister'); } catch(e) {}
 }
 
 function dissolveGroup() {
@@ -3405,6 +3858,7 @@ function saveVoiceover() {
     renderFrames(); renderGroupBar();
     closeVoModal();
     showToast('🎙 Voiceover gespeichert!');
+    try { checkBadge('sprecher'); } catch(e) {}
   };
   reader.readAsDataURL(voBlob);
 }
@@ -3690,6 +4144,7 @@ function musSelectTrack(key, name, artist) {
   renderMusLib();
   renderMusCustom();
   showToast('🎵 ' + name + ' ausgewählt!');
+  try { checkBadge('musikant'); } catch(e) {}
 }
 
 function musUpdateSelBar() {
@@ -3943,6 +4398,779 @@ function initMusicTab() {
 }
 
 /* ═══════════════════════════════════════════════
+   EXPORT TAB
+   ═══════════════════════════════════════════════ */
+
+// ── Globals ─────────────────────────────────────
+S.subtitles = S.subtitles || [];
+let exportRunning = false;
+let exportAborted = false;
+let subEditIdx    = -1;
+let subPosCurrent = 'bottom';
+
+const QM = {
+  '360p':  { w: 640,  h: 360  },
+  '480p':  { w: 854,  h: 480  },
+  '720p':  { w: 1280, h: 720  },
+  '1080p': { w: 1920, h: 1080 },
+};
+
+// ── Helpers ─────────────────────────────────────
+function setExpStatus(msg) {
+  const el = $('ep-st');
+  if (el) el.textContent = msg;
+}
+function setExpProgress(val) {
+  const fill = $('ep-fill');
+  const pct  = $('ep-pct');
+  if (fill) fill.style.width = (val * 100).toFixed(1) + '%';
+  if (pct)  pct.textContent  = Math.round(val * 100) + '%';
+}
+async function expWait(ms) { return new Promise(r => setTimeout(r, ms)); }
+async function loadScript(url) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = url; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+async function canvasToBlob(canvas, type, q) {
+  return new Promise(res => canvas.toBlob(res, type, q));
+}
+function offerDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a   = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+  const link = $('ex-link');
+  if (link) {
+    link.href = url;
+    link.textContent = '⬇️ ' + filename + ' nochmal herunterladen';
+    link.style.display = 'block';
+  }
+  const res = $('exp-result');
+  if (res) res.style.display = 'block';
+  setExpStatus('✅ Fertig! Datei wird heruntergeladen.');
+}
+
+function drawSubtitles(ctx, frameIdx, w, h) {
+  const frameTime = frameIdx / S.fps;
+  (S.subtitles || []).forEach(sub => {
+    const start = sub.frame / S.fps;
+    if (frameTime < start || frameTime > start + sub.duration) return;
+    const y = sub.position === 'top' ? h * 0.12 : sub.position === 'middle' ? h * 0.5 : h * 0.88;
+    ctx.save();
+    const fs = Math.round(w * 0.045);
+    ctx.font = `bold ${fs}px sans-serif`;
+    ctx.textAlign = 'center';
+    const tw = ctx.measureText(sub.text).width;
+    ctx.fillStyle = 'rgba(0,0,0,0.72)';
+    ctx.fillRect(w / 2 - tw / 2 - 10, y - fs - 4, tw + 20, fs + 12);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(sub.text, w / 2, y);
+    ctx.restore();
+  });
+}
+function applyFade(ctx, frameIdx, w, h) {
+  const total = S.shots.length;
+  let alpha = 0;
+  if (fadeIn  && frameIdx < 3)          alpha = 1 - frameIdx / 3;
+  if (fadeOut && frameIdx > total - 4)  alpha = (frameIdx - (total - 4)) / 3;
+  if (alpha > 0) {
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, Math.max(0, alpha));
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+  }
+}
+async function drawShotOnCanvas(ctx, shot, w, h) {
+  return new Promise(res => {
+    const img = new Image();
+    img.onload = () => {
+      const bri = 1 + brightnessVal / 100;
+      const con = 1 + contrastVal / 100;
+      ctx.filter = `brightness(${bri}) contrast(${con})`;
+      ctx.drawImage(img, 0, 0, w, h);
+      ctx.filter = 'none';
+      res();
+    };
+    img.onerror = () => { ctx.fillStyle = '#222'; ctx.fillRect(0, 0, w, h); res(); };
+    img.src = shot.data || shot;
+  });
+}
+async function loadMusicBuffer() {
+  return new Promise(res => idbGetMusic(S.music.key, res));
+}
+
+// ── IDB full-dump helpers ────────────────────────
+async function loadAllShotsFromIdb() {
+  return new Promise(res => {
+    idbOpen(db => {
+      if (!db) { res([]); return; }
+      const req = db.transaction('shots').objectStore('shots').getAll();
+      req.onsuccess = e => res(e.target.result || []);
+      req.onerror = () => res([]);
+    });
+  });
+}
+async function loadAllMusicFromIdb() {
+  return new Promise(res => {
+    idbOpen(db => {
+      if (!db) { res([]); return; }
+      const req = db.transaction('music').objectStore('music').getAll();
+      req.onsuccess = e => {
+        const tracks = (e.target.result || []).map(t => ({
+          key:  t.key,
+          data: arrayBufferToBase64(t.data)
+        }));
+        res(tracks);
+      };
+      req.onerror = () => res([]);
+    });
+  });
+}
+function arrayBufferToBase64(buffer) {
+  if (!buffer) return '';
+  const bytes  = new Uint8Array(buffer);
+  let binary   = '';
+  const chunk  = 8192;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return 'data:audio/mpeg;base64,' + btoa(binary);
+}
+function base64ToArrayBuffer(base64) {
+  const b64    = (base64.includes(',') ? base64.split(',')[1] : base64);
+  const binary = atob(b64);
+  const bytes  = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+// ── Export Summary ───────────────────────────────
+function updExpSum() {
+  const cnt   = S.shots.length;
+  const dur   = cnt > 0 ? (cnt / S.fps).toFixed(1) : '0';
+  const grps  = S.groups.length;
+  const voGrp = S.groups.filter(g => g.voData).length;
+  const mus   = S.music ? S.music.name || 'Musik' : 'Keine Musik';
+  const lines = [
+    `🎞  <strong>${cnt} Frames</strong>   ·   <strong>${S.fps} fps</strong>   ·   <strong>${dur} Sek</strong>`,
+    S.music ? `🎵  ${mus}` : `🔇  Keine Musik`,
+    `📁  ${grps} Gruppen${voGrp > 0 ? `  ·  ${voGrp} mit Voiceover` : ''}`,
+    `🖼  <strong>${S.quality}</strong>  ·  <strong>${(S.format||'webm').toUpperCase()}</strong>`,
+  ];
+  const el = $('exp-sum-lines');
+  if (el) el.innerHTML = lines.map(l => `<div style="padding:2px 0">${l}</div>`).join('');
+  estimateProjectSize();
+
+  // Sync sliders
+  const fpsSl = $('exp-fps-slider');
+  if (fpsSl) { fpsSl.value = S.fps; $('exp-fps-val').textContent = S.fps + ' fps'; }
+
+  // Sync quality & format buttons
+  renderQualityBtns();
+  renderFormatBtns();
+}
+
+function estimateProjectSize() {
+  const shotsMB = (S.shots.length * 50) / 1024;
+  const hint = $('project-size-hint');
+  if (hint) hint.textContent = `📦 Projektgröße: ca. ${shotsMB.toFixed(1)} MB (${S.shots.length} Fotos)`;
+}
+
+function renderQualityBtns() {
+  const el = $('quality-btns');
+  if (!el) return;
+  el.innerHTML = '';
+  ['360p','480p','720p','1080p'].forEach(q => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-outline';
+    btn.textContent = q;
+    if (S.quality === q) btn.style.cssText = 'border-color:var(--yellow);color:var(--yellow)';
+    btn.style.fontFamily = "'Fredoka One',cursive";
+    btn.onclick = () => { S.quality = q; persist(); renderQualityBtns(); updExpSum(); };
+    el.appendChild(btn);
+  });
+}
+function renderFormatBtns() {
+  const el = $('format-btns');
+  if (!el) return;
+  el.innerHTML = '';
+  [['webm','🎬 WebM'],['mp4','🎥 MP4'],['gif','🎨 GIF'],['zip','🖼 ZIP']].forEach(([f,label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-outline';
+    btn.textContent = label;
+    if ((S.format || 'webm') === f) btn.style.cssText = 'border-color:var(--yellow);color:var(--yellow)';
+    btn.style.fontFamily = "'Fredoka One',cursive";
+    btn.onclick = () => { S.format = f; persist(); renderFormatBtns(); };
+    el.appendChild(btn);
+  });
+}
+
+// ── Subtitle UI ──────────────────────────────────
+let subModalOpen = false;
+function openSubModal(idx) {
+  subEditIdx = (idx !== undefined) ? idx : -1;
+  subPosCurrent = 'bottom';
+  if (subEditIdx >= 0) {
+    const s = S.subtitles[subEditIdx];
+    $('sub-text').value  = s.text;
+    $('sub-frame').value = s.frame;
+    $('sub-dur').value   = s.duration;
+    subPosCurrent        = s.position;
+  } else {
+    $('sub-text').value  = '';
+    $('sub-frame').value = 0;
+    $('sub-dur').value   = 2;
+  }
+  renderSubPosBtns();
+  const m = $('sub-modal');
+  m.style.display = 'flex';
+}
+function closeSubModal() {
+  $('sub-modal').style.display = 'none';
+}
+function setSubPos(pos) {
+  subPosCurrent = pos;
+  renderSubPosBtns();
+}
+function renderSubPosBtns() {
+  document.querySelectorAll('.sub-pos-btn').forEach(btn => {
+    const active = btn.dataset.pos === subPosCurrent;
+    btn.style.borderColor = active ? 'var(--yellow)' : '';
+    btn.style.color       = active ? 'var(--yellow)' : '';
+  });
+}
+function saveSubtitle() {
+  const text = $('sub-text').value.trim();
+  if (!text) return;
+  const sub = {
+    text:     text,
+    frame:    +$('sub-frame').value || 0,
+    duration: +$('sub-dur').value   || 2,
+    position: subPosCurrent
+  };
+  if (subEditIdx >= 0) S.subtitles[subEditIdx] = sub;
+  else S.subtitles.push(sub);
+  persist();
+  closeSubModal();
+  renderSubList();
+}
+function renderSubList() {
+  const list  = $('sub-list');
+  const empty = $('sub-empty');
+  if (!list) return;
+  list.querySelectorAll('.sub-item').forEach(e => e.remove());
+  if (!S.subtitles || S.subtitles.length === 0) {
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  S.subtitles.forEach((sub, i) => {
+    const d = document.createElement('div');
+    d.className = 'sub-item';
+    d.style.cssText = 'background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;display:flex;align-items:center;gap:8px';
+    d.innerHTML = `
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub.text}</div>
+        <div style="font-size:11px;color:var(--muted)">Frame ${sub.frame} · ${sub.duration}s · ${sub.position}</div>
+      </div>
+      <button class="btn-outline" onclick="openSubModal(${i})" style="font-size:11px;padding:4px 8px">✏️</button>
+      <button class="btn-red" onclick="deleteSubtitle(${i})" style="font-size:11px;padding:4px 8px">🗑</button>
+    `;
+    list.appendChild(d);
+  });
+}
+function deleteSubtitle(i) {
+  S.subtitles.splice(i, 1);
+  persist();
+  renderSubList();
+}
+
+// ── Export dispatcher ────────────────────────────
+function startExport(fmt) {
+  if (S.shots.length === 0) { showToast('⚠️ Keine Fotos zum Exportieren!'); return; }
+  exportAborted = false;
+  S.format = fmt;
+  persist();
+  $('ep-wrap').style.display = 'block';
+  $('ep-abort').style.display = 'inline-block';
+  $('exp-result').style.display = 'none';
+  setExpProgress(0);
+  if (fmt === 'webm') doWebM();
+  else if (fmt === 'mp4') doMP4();
+  else if (fmt === 'gif') doGif();
+  else if (fmt === 'zip') doZip();
+}
+
+// ── WebM ─────────────────────────────────────────
+async function doWebM() {
+  if (!window.MediaRecorder) {
+    $('safari-notice').style.display = 'block';
+    setExpStatus('❌ WebM nicht unterstützt — nutze Chrome/Firefox oder ZIP');
+    return;
+  }
+  setExpStatus('🎬 Exportiere WebM…');
+  const { w, h } = QM[S.quality];
+  const canvas   = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx    = canvas.getContext('2d');
+  const stream = canvas.captureStream(S.fps);
+
+  if (S.music) {
+    try {
+      const buf = await loadMusicBuffer();
+      if (buf) {
+        const actx = new (window.AudioContext || window.webkitAudioContext)();
+        const dest = actx.createMediaStreamDestination();
+        actx.decodeAudioData(buf.slice(0), decoded => {
+          const src = actx.createBufferSource();
+          src.buffer = decoded; src.loop = true;
+          const gainNode = actx.createGain();
+          gainNode.gain.value = S.vol || 0.8;
+          src.connect(gainNode); gainNode.connect(dest);
+          src.start();
+        });
+        dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+      }
+    } catch(e) {}
+  }
+
+  const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+    ? 'video/webm;codecs=vp9' : 'video/webm';
+  let recorder;
+  try {
+    recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 2500000 });
+  } catch(e) {
+    recorder = new MediaRecorder(stream);
+  }
+  const chunks = [];
+  recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    const fn   = (S.project.title || 'mein-trickfilm').replace(/[^a-z0-9äöü]/gi, '_') + '.webm';
+    offerDownload(blob, fn);
+    $('ep-abort').style.display = 'none';
+  };
+
+  recorder.start();
+  for (let i = 0; i < S.shots.length; i++) {
+    if (exportAborted) { recorder.stop(); return; }
+    await drawShotOnCanvas(ctx, S.shots[i], w, h);
+    drawSubtitles(ctx, i, w, h);
+    applyFade(ctx, i, w, h);
+    setExpProgress(i / S.shots.length);
+    setExpStatus(`🎬 Frame ${i + 1} von ${S.shots.length}`);
+    await expWait(1000 / S.fps);
+  }
+  recorder.stop();
+  setExpProgress(1);
+}
+
+// ── MP4 via FFmpeg ───────────────────────────────
+const FFMPEG_URL = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.js';
+async function doMP4() {
+  setExpStatus('🎥 Lade FFmpeg…');
+  try {
+    if (!window.FFmpeg) await loadScript(FFMPEG_URL);
+    const { FFmpeg } = window.FFmpeg;
+    const ffmpeg = new FFmpeg();
+    ffmpeg.on('log', ({ message }) => { if (message) setExpStatus('🎥 ' + message.slice(0, 60)); });
+    await ffmpeg.load();
+    const { w, h } = QM[S.quality];
+    const canvas   = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+
+    for (let i = 0; i < S.shots.length; i++) {
+      if (exportAborted) return;
+      await drawShotOnCanvas(ctx, S.shots[i], w, h);
+      drawSubtitles(ctx, i, w, h);
+      applyFade(ctx, i, w, h);
+      const blob = await canvasToBlob(canvas, 'image/png');
+      await ffmpeg.writeFile(`frame${String(i).padStart(4, '0')}.png`, new Uint8Array(await blob.arrayBuffer()));
+      setExpProgress(i / S.shots.length * 0.6);
+      setExpStatus(`🎥 Frame ${i + 1} von ${S.shots.length}`);
+    }
+
+    let audioArgs = [];
+    if (S.music) {
+      try {
+        const buf = await loadMusicBuffer();
+        if (buf) {
+          await ffmpeg.writeFile('music.mp3', new Uint8Array(buf));
+          audioArgs = ['-i', 'music.mp3', '-shortest'];
+        }
+      } catch(e) {}
+    }
+
+    setExpStatus('🎥 Rendere MP4…');
+    setExpProgress(0.7);
+    await ffmpeg.exec([
+      '-framerate', String(S.fps), '-i', 'frame%04d.png',
+      ...audioArgs,
+      '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '23', 'output.mp4'
+    ]);
+    const data = await ffmpeg.readFile('output.mp4');
+    const fn   = (S.project.title || 'mein-trickfilm').replace(/[^a-z0-9äöü]/gi, '_') + '.mp4';
+    offerDownload(new Blob([data.buffer], { type: 'video/mp4' }), fn);
+    setExpProgress(1);
+    $('ep-abort').style.display = 'none';
+  } catch(e) {
+    setExpStatus('❌ FFmpeg-Fehler: ' + e.message);
+    console.error(e);
+  }
+}
+
+// ── GIF (inline encoder) ─────────────────────────
+async function doGif() {
+  setExpStatus('🎨 Erstelle GIF…');
+  const w = 320, h = 240;
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx    = canvas.getContext('2d');
+  const frames = [];
+  for (let i = 0; i < S.shots.length; i++) {
+    if (exportAborted) return;
+    await drawShotOnCanvas(ctx, S.shots[i], w, h);
+    drawSubtitles(ctx, i, w, h);
+    frames.push(ctx.getImageData(0, 0, w, h));
+    setExpProgress(i / S.shots.length * 0.7);
+    setExpStatus(`🎨 Frame ${i + 1} von ${S.shots.length}`);
+  }
+  setExpStatus('🎨 Codiere GIF…');
+  const delay = Math.round(100 / S.fps);
+  const gif   = encodeGif(frames, w, h, delay);
+  const fn    = (S.project.title || 'mein-trickfilm').replace(/[^a-z0-9äöü]/gi, '_') + '.gif';
+  offerDownload(new Blob([gif], { type: 'image/gif' }), fn);
+  setExpProgress(1);
+  $('ep-abort').style.display = 'none';
+}
+
+/* ── Minimal GIF encoder ─────────────────────────
+   Supports: palette quantisation (median-cut lite),
+   LZW compression, animation looping.             */
+function encodeGif(frames, w, h, delay) {
+  // Build a fixed 256-colour web-safe palette
+  const palette = buildPalette();
+  const palBytes = new Uint8Array(256 * 3);
+  palette.forEach((c, i) => { palBytes[i*3]=c[0]; palBytes[i*3+1]=c[1]; palBytes[i*3+2]=c[2]; });
+
+  const out = [];
+  // Header
+  out.push(...str('GIF89a'));
+  // Logical screen descriptor
+  out.push(w & 0xFF, w >> 8, h & 0xFF, h >> 8);
+  out.push(0xF7, 0x00, 0x00); // GCT flag, bg, aspect
+  // Global colour table
+  for (let i = 0; i < 256; i++) { out.push(palBytes[i*3], palBytes[i*3+1], palBytes[i*3+2]); }
+  // Netscape loop extension
+  out.push(0x21, 0xFF, 0x0B, ...str('NETSCAPE2.0'), 0x03, 0x01, 0x00, 0x00, 0x00);
+
+  frames.forEach(frame => {
+    const indices = quantise(frame.data, palette, w, h);
+    // Graphic control extension
+    out.push(0x21, 0xF9, 0x04, 0x00, delay & 0xFF, delay >> 8, 0x00, 0x00);
+    // Image descriptor
+    out.push(0x2C, 0x00, 0x00, 0x00, 0x00, w & 0xFF, w >> 8, h & 0xFF, h >> 8, 0x00);
+    // Image data (LZW)
+    const lzw = lzwEncode(indices, 8);
+    out.push(8);
+    for (let i = 0; i < lzw.length; i += 255) {
+      const block = lzw.slice(i, i + 255);
+      out.push(block.length, ...block);
+    }
+    out.push(0x00);
+  });
+  out.push(0x3B);
+  return new Uint8Array(out);
+}
+
+function str(s) { return Array.from(s).map(c => c.charCodeAt(0)); }
+
+function buildPalette() {
+  const p = [];
+  for (let r = 0; r < 256; r += 51)
+    for (let g = 0; g < 256; g += 51)
+      for (let b = 0; b < 256; b += 51) p.push([r, g, b]);
+  // Pad to 256
+  while (p.length < 256) p.push([0, 0, 0]);
+  return p.slice(0, 256);
+}
+
+function quantise(data, palette, w, h) {
+  const idx = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) {
+    const r = data[i*4], g = data[i*4+1], b = data[i*4+2];
+    let best = 0, bestD = Infinity;
+    // Quantise to nearest web-safe colour
+    const qr = Math.round(r / 51) * 51;
+    const qg = Math.round(g / 51) * 51;
+    const qb = Math.round(b / 51) * 51;
+    best = (qr/51) * 36 + (qg/51) * 6 + (qb/51);
+    idx[i] = Math.min(best, 215);
+  }
+  return idx;
+}
+
+function lzwEncode(indices, minCodeSize) {
+  const clear = 1 << minCodeSize;
+  const eoi   = clear + 1;
+  let table   = new Map();
+  const reset = () => {
+    table = new Map();
+    for (let i = 0; i < clear; i++) table.set(String(i), i);
+    return clear + 2;
+  };
+  let nextCode = reset();
+  const out = [];
+  let bitBuf = 0, bitLen = 0, codeSize = minCodeSize + 1;
+  function emit(code) {
+    bitBuf |= code << bitLen; bitLen += codeSize;
+    while (bitLen >= 8) { out.push(bitBuf & 0xFF); bitBuf >>= 8; bitLen -= 8; }
+  }
+  emit(clear);
+  let str2 = String(indices[0]);
+  for (let i = 1; i < indices.length; i++) {
+    const next = str2 + ',' + indices[i];
+    if (table.has(next)) { str2 = next; }
+    else {
+      emit(table.get(str2));
+      if (nextCode < 4096) { table.set(next, nextCode++); }
+      else { emit(clear); nextCode = reset(); codeSize = minCodeSize + 1; }
+      if (nextCode > (1 << codeSize)) codeSize++;
+      str2 = String(indices[i]);
+    }
+  }
+  emit(table.get(str2));
+  emit(eoi);
+  if (bitLen > 0) out.push(bitBuf & 0xFF);
+  return out;
+}
+
+// ── ZIP ──────────────────────────────────────────
+async function doZip() {
+  setExpStatus('🖼 Erstelle ZIP…');
+  if (!window.JSZip) {
+    try { await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'); }
+    catch(e) { setExpStatus('❌ JSZip konnte nicht geladen werden'); return; }
+  }
+  const zip    = new JSZip();
+  const { w, h } = QM[S.quality];
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx    = canvas.getContext('2d');
+
+  for (let i = 0; i < S.shots.length; i++) {
+    if (exportAborted) return;
+    await drawShotOnCanvas(ctx, S.shots[i], w, h);
+    drawSubtitles(ctx, i, w, h);
+    const blob = await canvasToBlob(canvas, 'image/jpeg', 0.9);
+    zip.file(`frame_${String(i + 1).padStart(4, '0')}.jpg`, await blob.arrayBuffer());
+    setExpProgress(i / S.shots.length);
+    setExpStatus(`🖼 Frame ${i + 1} von ${S.shots.length}`);
+  }
+  const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+  const fn = (S.project.title || 'trickfilm').replace(/[^a-z0-9äöü]/gi, '_') + '-frames.zip';
+  offerDownload(zipBlob, fn);
+  setExpProgress(1);
+  $('ep-abort').style.display = 'none';
+}
+
+// ── Projekt exportieren ──────────────────────────
+async function exportProject() {
+  if (S.shots.length === 0 && S.groups.length === 0) {
+    showToast('⚠️ Noch keine Daten zum Exportieren!');
+    return;
+  }
+  $('ep-wrap').style.display = 'block';
+  $('ep-abort').style.display = 'none';
+  setExpStatus('💾 Projekt wird exportiert…');
+  setExpProgress(0);
+
+  try {
+    setExpStatus('💾 Lade Fotos aus Datenbank…');
+    const shots = await loadAllShotsFromIdb();
+    setExpProgress(0.3);
+
+    setExpStatus('💾 Lade Musik aus Datenbank…');
+    const musicTracks = await loadAllMusicFromIdb();
+    setExpProgress(0.6);
+
+    const projectExport = {
+      version:    1,
+      exportedAt: new Date().toISOString(),
+      appName:    'Meine Trickfilm Werkstatt',
+      state: {
+        fps:       S.fps,
+        quality:   S.quality,
+        format:    S.format,
+        vol:       S.vol,
+        music:     S.music,
+        subtitles: S.subtitles,
+        project:   S.project,
+        groups:    S.groups,
+      },
+      shots:       shots,
+      musicTracks: musicTracks
+    };
+
+    setExpProgress(0.8);
+    const json    = JSON.stringify(projectExport);
+    const sizeMB  = (new Blob([json]).size / 1024 / 1024).toFixed(1);
+
+    if (parseFloat(sizeMB) > 50) {
+      const ok = confirm(`⚠️ Dieses Projekt ist sehr groß (${sizeMB} MB). Der Export kann einige Sekunden dauern.\n\nTrotzdem fortfahren?`);
+      if (!ok) { setExpStatus('Abgebrochen.'); return; }
+    }
+
+    const blob = new Blob([json], { type: 'application/json' });
+    const fn   = (S.project.title || 'mein-film').replace(/[^a-z0-9äöü]/gi, '_') + '_projekt.json';
+    offerDownload(blob, fn);
+    setExpProgress(1);
+    setExpStatus(`✅ Projekt exportiert! (${sizeMB} MB)`);
+    showToast('💾 Projekt gespeichert!');
+    try { S.project.exported = true; persist(); checkBadge('exporteur'); } catch(e) {}
+  } catch(e) {
+    setExpStatus('❌ Fehler: ' + e.message);
+    console.error(e);
+  }
+}
+
+// ── Projekt importieren ──────────────────────────
+function importProject() {
+  const input     = document.createElement('input');
+  input.type      = 'file';
+  input.accept    = '.json,application/json';
+  input.onchange  = async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    $('ep-wrap').style.display = 'block';
+    $('ep-abort').style.display = 'none';
+    setExpStatus('📂 Datei wird gelesen…');
+    setExpProgress(0);
+
+    let data;
+    try {
+      const text = await file.text();
+      data = JSON.parse(text);
+    } catch(err) {
+      setExpStatus('❌ Ungültige Datei – kein gültiges JSON');
+      return;
+    }
+
+    if (!data.version || !data.state || !data.shots) {
+      setExpStatus('❌ Datei ist kein Trickfilm-Werkstatt-Projekt');
+      return;
+    }
+
+    const ok = confirm(
+      `Projekt „${data.state.project?.title || 'Unbekannt'}" laden?\n\n` +
+      `${data.shots.length} Fotos  ·  Exportiert am ${new Date(data.exportedAt).toLocaleDateString('de')}\n\n` +
+      `⚠️ Das aktuelle Projekt wird überschrieben!`
+    );
+    if (!ok) { setExpStatus('Abgebrochen.'); return; }
+
+    setExpStatus('📂 Stelle Status wieder her…');
+    Object.assign(S, data.state);
+    S.subtitles = S.subtitles || [];
+    setExpProgress(0.2);
+
+    setExpStatus('📂 Lade Fotos…');
+    await new Promise(res => {
+      idbOpen(db => {
+        if (!db) { res(); return; }
+        const tx    = db.transaction('shots', 'readwrite');
+        const store = tx.objectStore('shots');
+        store.clear();
+        data.shots.forEach(shot => store.put(shot));
+        tx.oncomplete = res;
+        tx.onerror    = res;
+      });
+    });
+    setExpProgress(0.6);
+
+    if (data.musicTracks && data.musicTracks.length > 0) {
+      setExpStatus('📂 Lade Musik…');
+      await new Promise(res => {
+        idbOpen(db => {
+          if (!db) { res(); return; }
+          const tx    = db.transaction('music', 'readwrite');
+          const store = tx.objectStore('music');
+          data.musicTracks.forEach(track => {
+            try {
+              const buffer = base64ToArrayBuffer(track.data);
+              store.put({ key: track.key, data: buffer });
+            } catch(err) {}
+          });
+          tx.oncomplete = res;
+          tx.onerror    = res;
+        });
+      });
+    }
+    setExpProgress(0.8);
+
+    // Re-initialise app from loaded state
+    persist();
+    loadState();
+
+    // Reload shots into S.shots
+    idbLoadShots(shots => {
+      S.shots = shots;
+      migrateShots();
+      renderStrip();
+      updateShotCount();
+      renderFrames();
+    });
+
+    // Refresh other views
+    try { renderFigs();   } catch(e) {}
+    try { renderScenes(); } catch(e) {}
+    try { renderSubList(); } catch(e) {}
+    try { updExpSum();    } catch(e) {}
+
+    // Update topbar
+    $('topbar-title').textContent = S.project.title || 'Mein Film';
+
+    setExpProgress(1);
+    setExpStatus('✅ Projekt erfolgreich geladen!');
+    showToast('📂 Projekt „' + (S.project.title || 'Unbekannt') + '" geladen!');
+  };
+  input.click();
+}
+
+// ── Init Export Tab ──────────────────────────────
+function initExportTab() {
+  // Safari check
+  if (!window.MediaRecorder) {
+    const n = $('safari-notice');
+    if (n) n.style.display = 'block';
+  }
+
+  // Load saved slider values
+  const briSl = $('exp-bri');
+  const conSl = $('exp-con');
+  if (briSl) { briSl.value = brightnessVal; $('exp-bri-val').textContent = brightnessVal; }
+  if (conSl) { conSl.value = contrastVal;   $('exp-con-val').textContent = contrastVal; }
+  const fi = $('exp-fadein');
+  const fo = $('exp-fadeout');
+  if (fi) fi.checked = fadeIn;
+  if (fo) fo.checked = fadeOut;
+
+  updExpSum();
+  renderSubList();
+
+  // Refresh when tab is clicked
+  document.querySelector('[data-page="pg-exp"]').addEventListener('click', () => {
+    updExpSum();
+    renderSubList();
+  });
+}
+
+/* ═══════════════════════════════════════════════
    INIT APP
    ═══════════════════════════════════════════════ */
 function initApp() {
@@ -3955,6 +5183,7 @@ function initApp() {
    ═══════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
+  try { syncBadges(); } catch(e) {}
   initNav();
   initPlanSubTabs();
   initStory();
@@ -3968,7 +5197,800 @@ document.addEventListener('DOMContentLoaded', () => {
   initEditor();
   initIntro();
   initMusicTab();
+  initExportTab();
+  initKameraKarl();
+  try { checkAllBadges(); } catch(e) {}
 });
+</script>
+
+<!-- ══════════════════════════════════════
+     BADGE PANEL
+══════════════════════════════════════ -->
+<div id="badge-panel" role="dialog" aria-label="Abzeichen">
+  <div class="badge-box">
+    <div class="badge-header">
+      <span>🏆 Meine Abzeichen</span>
+      <button onclick="closeBadges()">✕</button>
+    </div>
+    <div id="badge-grid"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     HELP MODAL
+══════════════════════════════════════ -->
+<div id="help-modal" role="dialog" aria-label="Hilfe">
+  <div class="help-box">
+    <div class="help-header">
+      <span>❓ Hilfe &amp; Tipps</span>
+      <button onclick="closeHelp()">✕</button>
+    </div>
+    <div class="help-tabs">
+      <button class="help-tab active" onclick="showHelpSection('stopmotion',this)">🎬 Was ist Stop-Motion?</button>
+      <button class="help-tab" onclick="showHelpSection('tipps',this)">💡 Tipps &amp; Tricks</button>
+      <button class="help-tab" onclick="showHelpSection('glossar',this)">📚 Glossar</button>
+    </div>
+    <div id="help-body"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     KAMERA-KARL AI CHAT BUBBLE & PANEL
+══════════════════════════════════════ -->
+<button id="ai-bubble" onclick="aiToggle()" aria-label="Kamera-Karl öffnen">
+  <span id="ai-bubble-icon">🎬</span>
+  <span id="ai-bubble-badge" style="display:none">!</span>
+</button>
+
+<div id="ai-panel" style="display:none" role="dialog" aria-label="Kamera-Karl Chat">
+  <div id="ai-header">
+    <div id="ai-avatar">🎬</div>
+    <div>
+      <div id="ai-name">Kamera-Karl</div>
+      <div id="ai-status">Dein Film-Assistent</div>
+    </div>
+    <button id="ai-close" onclick="aiToggle()" aria-label="Schließen">✕</button>
+  </div>
+  <div id="ai-messages"></div>
+  <div id="ai-key-box" style="display:none">
+    <label>🔑 Anthropic API-Key</label>
+    <div id="ai-key-row">
+      <input id="ai-key-input" type="password" placeholder="sk-ant-…"/>
+      <button id="ai-key-save" onclick="saveAiKey(document.getElementById('ai-key-input').value)">💾 Speichern</button>
+    </div>
+    <div id="ai-key-status"></div>
+    <span id="ai-key-link">Wo bekomme ich einen Key? → <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a></span>
+  </div>
+  <div id="ai-suggestions"></div>
+  <div id="ai-input-row">
+    <input id="ai-input" type="text" placeholder="Frag Kamera-Karl…" autocomplete="off"/>
+    <button id="ai-send" onclick="aiSend()" aria-label="Senden">➤</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   KAMERA-KARL – KI-ASSISTENT
+   ═══════════════════════════════════════════════ */
+
+let aiKey      = localStorage.getItem('tfw-ai-key') || '';
+let aiHistory  = [];
+let aiThinking = false;
+let aiOpen     = false;
+let aiGreeted  = false;
+
+const AI_CHIPS = {
+  'pg-plan': [
+    '💡 Gib mir eine Filmidee',
+    '🎭 Welche Figuren brauche ich?',
+    '📋 Wie plane ich mein Storyboard?',
+    '✍️ Hilf mir mit der Geschichte',
+  ],
+  'pg-cam': [
+    '📷 Wie viele Fotos brauche ich?',
+    '🧅 Was ist Zwiebelhaut?',
+    '💡 Tipps für gute Beleuchtung',
+    '🎬 Was ist der 12-Bilder-Trick?',
+  ],
+  'pg-edit': [
+    '🎞️ Welche FPS sind gut für Kinder?',
+    '✂️ Wie schneide ich richtig?',
+    '🎨 Tipps für Übergänge',
+    '📁 Wann soll ich Gruppen nutzen?',
+  ],
+  'pg-mus': [
+    '🎵 Welche Musik passt zu meinem Film?',
+    '🔊 Wie laut soll die Musik sein?',
+    '🎙 Tipps für Voiceover',
+  ],
+  'pg-exp': [
+    '🎬 WebM oder MP4 – was ist besser?',
+    '📦 Was ist der Unterschied zu GIF?',
+    '💾 Wie sichere ich mein Projekt?',
+  ],
+};
+
+const AI_SYSTEM = `Du bist Kamera-Karl, ein freundlicher und begeisterter Filmassistent für Kinder zwischen 8 und 14 Jahren. Du hilfst ihnen dabei, ihren ersten Stop-Motion-Film zu erstellen.
+
+Deine Persönlichkeit:
+- Enthusiastisch und ermutigend – du feierst jeden Fortschritt
+- Einfache, klare Sprache – keine Fremdwörter ohne Erklärung
+- Kurze Antworten (max. 3-4 Sätze) – Kinder wollen keine langen Texte
+- Du verwendest manchmal passende Emojis 🎬
+- Du gibst immer konkrete, umsetzbare Tipps
+- Du kennst den aktuellen Projektstand des Kindes
+
+Dein Wissensgebiet:
+- Stop-Motion-Technik (12 Bilder pro Sekunde als Standard, Zwiebelhaut, Belichtung)
+- Storytelling für Kinder (Anfang/Mitte/Ende, Spannung aufbauen)
+- Figurenbau und Requisiten (Knete, Lego, Papier)
+- Kameratipps (Stativ, Beleuchtung, Bildausschnitt)
+- Schnitt und Musik
+- Ermutigung und Kreativität
+
+Antworte immer auf Deutsch. Wenn du etwas nicht weißt, sag es ehrlich.`;
+
+function getProjectContext() {
+  const activeTab = document.querySelector('.page.active')?.id || 'unbekannt';
+  const music = (typeof S !== 'undefined' && S.music) ? S.music.name : 'keine';
+  const title = (typeof S !== 'undefined') ? S.project.title : '';
+  return `
+Aktueller Projektstand:
+- Filmtitel: "${title}"
+- Geschichte: "${(typeof S !== 'undefined' && S.project.about) || 'noch nicht ausgefüllt'}"
+- Anfang: "${(typeof S !== 'undefined' && S.project.beg) || '-'}"
+- Mitte: "${(typeof S !== 'undefined' && S.project.ten) || '-'}"
+- Ende: "${(typeof S !== 'undefined' && S.project.end) || '-'}"
+- Figuren: ${(typeof S !== 'undefined') ? S.project.figures.length : 0}
+- Storyboard-Szenen: ${(typeof S !== 'undefined') ? S.project.scenes.length : 0}
+- Aufgenommene Fotos: ${(typeof S !== 'undefined') ? S.shots.length : 0}
+- FPS: ${(typeof S !== 'undefined') ? S.fps : 12}
+- Gewählte Musik: ${music}
+- Aktiver Tab: ${activeTab}
+`.trim();
+}
+
+function saveAiKey(val) {
+  aiKey = val.trim();
+  localStorage.setItem('tfw-ai-key', aiKey);
+  showAiKeyStatus();
+  if (aiKey) document.getElementById('ai-key-box').style.display = 'none';
+}
+
+function showAiKeyStatus() {
+  const el = document.getElementById('ai-key-status');
+  if (!el) return;
+  if (aiKey) {
+    el.textContent = '✅ API-Key gespeichert';
+    el.style.color = '#22c55e';
+  } else {
+    el.textContent = '⚠️ Kein API-Key – Kamera-Karl kann nicht antworten';
+    el.style.color = '#f59e0b';
+  }
+}
+
+function aiToggle() {
+  aiOpen = !aiOpen;
+  const panel = document.getElementById('ai-panel');
+  panel.style.display = aiOpen ? 'flex' : 'none';
+  if (aiOpen) {
+    if (!aiGreeted) { aiGreet(); aiGreeted = true; }
+    if (!aiKey) {
+      document.getElementById('ai-key-box').style.display = 'block';
+      showAiKeyStatus();
+    }
+    renderAiChips();
+    setTimeout(() => document.getElementById('ai-input').focus(), 100);
+  }
+}
+
+function aiGreet() {
+  const title = (typeof S !== 'undefined') ? S.project.title : 'deinen Film';
+  const greetings = [
+    `Hey! 👋 Ich bin Kamera-Karl, dein Film-Assistent! Dein Projekt „${title}" sieht schon super aus. Wie kann ich dir helfen?`,
+    `Hi! 🎬 Ich bin Kamera-Karl! Ich helfe dir, deinen Stop-Motion-Film zu einem Meisterwerk zu machen. Was möchtest du wissen?`,
+    `Hallo! ✨ Kamera-Karl hier! Ich bin bereit, dir bei „${title}" zu helfen. Frag mich alles über Stop-Motion!`,
+  ];
+  const msg = greetings[Math.floor(Math.random() * greetings.length)];
+  aiAddMsg('bot', msg);
+  aiHistory.push({ role: 'assistant', content: msg });
+}
+
+async function aiSend() {
+  const input = document.getElementById('ai-input');
+  const msg = input.value.trim();
+  if (!msg || aiThinking) return;
+  input.value = '';
+
+  if (!aiKey) {
+    aiAddMsg('bot', '🔑 Ich brauche noch einen Anthropic API-Key um antworten zu können. Gib ihn oben im Schlüsselfeld ein – den bekommst du kostenlos auf console.anthropic.com!');
+    document.getElementById('ai-key-box').style.display = 'block';
+    showAiKeyStatus();
+    return;
+  }
+
+  aiAddMsg('user', msg);
+  aiHistory.push({ role: 'user', content: msg });
+  aiShowThinking();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': aiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 400,
+        system: AI_SYSTEM + '\n\n' + getProjectContext(),
+        messages: aiHistory.slice(-20)
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'HTTP ' + response.status);
+    }
+
+    const data = await response.json();
+    const reply = data.content[0].text;
+
+    aiHideThinking();
+    aiAddMsg('bot', reply);
+    aiHistory.push({ role: 'assistant', content: reply });
+    if (aiHistory.length > 20) aiHistory = aiHistory.slice(-20);
+    renderAiChips();
+
+  } catch(err) {
+    aiHideThinking();
+    const errMsg = err.message || 'Verbindungsfehler';
+    if (errMsg.includes('401') || errMsg.toLowerCase().includes('api key')) {
+      aiAddMsg('bot', '🔑 Der API-Key scheint nicht zu stimmen. Überprüfe ihn bitte – du findest ihn auf console.anthropic.com.');
+      document.getElementById('ai-key-box').style.display = 'block';
+    } else {
+      aiAddMsg('bot', '⚠️ ' + errMsg + ' – bitte prüfe deine Verbindung oder den API-Key.');
+    }
+  }
+}
+
+function aiAddMsg(role, text) {
+  const el = document.getElementById('ai-messages');
+  const div = document.createElement('div');
+  div.className = 'ai-msg ' + role;
+  div.textContent = text;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function aiShowThinking() {
+  aiThinking = true;
+  const el = document.getElementById('ai-messages');
+  const div = document.createElement('div');
+  div.className = 'ai-msg bot thinking';
+  div.id = 'ai-thinking';
+  div.textContent = '● ● ●';
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function aiHideThinking() {
+  aiThinking = false;
+  const el = document.getElementById('ai-thinking');
+  if (el) el.remove();
+}
+
+function renderAiChips() {
+  const activeTab = document.querySelector('.page.active')?.id || 'pg-plan';
+  const chips = AI_CHIPS[activeTab] || AI_CHIPS['pg-plan'];
+  const el = document.getElementById('ai-suggestions');
+  el.innerHTML = '';
+  chips.forEach(chip => {
+    const btn = document.createElement('button');
+    btn.className = 'ai-chip';
+    btn.textContent = chip;
+    btn.onclick = () => {
+      document.getElementById('ai-input').value = chip;
+      aiSend();
+    };
+    el.appendChild(btn);
+  });
+}
+
+function initKameraKarl() {
+  if (aiKey) {
+    const inp = document.getElementById('ai-key-input');
+    if (inp) inp.value = aiKey;
+  }
+  document.getElementById('ai-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); aiSend(); }
+  });
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => { if (aiOpen) renderAiChips(); });
+  });
+}
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════
+   ABZEICHEN-SYSTEM
+   ═══════════════════════════════════════════════ */
+
+// ── Globals ──────────────────────────────────────
+let earnedBadges = {};
+(function(){
+  try {
+    const saved = localStorage.getItem('tfw-badges');
+    if (saved) earnedBadges = JSON.parse(saved);
+  } catch(e) { earnedBadges = {}; }
+})();
+
+function syncBadges() {
+  try {
+    const saved = localStorage.getItem('tfw-badges');
+    earnedBadges = saved ? JSON.parse(saved) : {};
+    // Rückwärtskompatibilität
+    if (S.project.badges) {
+      Object.assign(earnedBadges, S.project.badges);
+      localStorage.setItem('tfw-badges', JSON.stringify(earnedBadges));
+    }
+  } catch(e) { earnedBadges = {}; }
+}
+
+// ── Badge Definitionen ───────────────────────────
+const BADGES = [
+  {
+    id: 'erster-titel',
+    icon: '🎬',
+    name: 'Erster Titel',
+    desc: 'Gib deinem Film einen Titel',
+    check: () => !!(S.project.title && S.project.title.length > 2 && S.project.title !== 'Mein Film')
+  },
+  {
+    id: 'storyteller',
+    icon: '📖',
+    name: 'Storyteller',
+    desc: 'Fülle Anfang, Mitte und Ende aus',
+    check: () => !!(S.project.beg && S.project.ten && S.project.end)
+  },
+  {
+    id: 'casting',
+    icon: '🎭',
+    name: 'Casting-Direktor',
+    desc: 'Erstelle mindestens 3 Figuren',
+    check: () => (S.project.figures || []).length >= 3
+  },
+  {
+    id: 'storyboarder',
+    icon: '🎨',
+    name: 'Storyboarder',
+    desc: 'Zeichne mindestens 3 Szenen',
+    check: () => (S.project.scenes || []).filter(s => s.drawing).length >= 3
+  },
+  {
+    id: 'fotograf',
+    icon: '📷',
+    name: 'Fotograf',
+    desc: 'Nimm mindestens 10 Fotos auf',
+    check: () => S.shots.length >= 10
+  },
+  {
+    id: 'regisseur',
+    icon: '🎥',
+    name: 'Regisseur',
+    desc: 'Nimm mindestens 50 Fotos auf',
+    check: () => S.shots.length >= 50
+  },
+  {
+    id: 'gruppenmeister',
+    icon: '📁',
+    name: 'Gruppenmeister',
+    desc: 'Erstelle mindestens 3 Gruppen im Editor',
+    check: () => (S.groups || []).length >= 3
+  },
+  {
+    id: 'sprecher',
+    icon: '🎙',
+    name: 'Sprecher·in',
+    desc: 'Nimm ein Voiceover auf',
+    check: () => (S.groups || []).some(g => g.voiceover)
+  },
+  {
+    id: 'musikant',
+    icon: '🎵',
+    name: 'Musikant',
+    desc: 'Wähle einen Musik-Track',
+    check: () => !!S.music
+  },
+  {
+    id: 'wochenplaner',
+    icon: '📅',
+    name: 'Wochenplaner',
+    desc: 'Fülle den Wochenplan aus',
+    check: () => {
+      const wp = S.project.weekplan || [];
+      return (Array.isArray(wp) ? wp : Object.values(wp)).some(v => {
+        const task = v && (v.task || v);
+        return task && typeof task === 'string' && task.trim().length > 0;
+      });
+    }
+  },
+  {
+    id: 'exporteur',
+    icon: '🏆',
+    name: 'Regisseur-Cut',
+    desc: 'Exportiere deinen Film',
+    check: () => !!S.project.exported
+  },
+  {
+    id: 'vollender',
+    icon: '⭐',
+    name: 'Vollendung',
+    desc: 'Bringe alle Fortschrittsbalken auf 100%',
+    check: () => {
+      const p = S.project.progress || [];
+      return p.length > 0 && p.every(v => v === 100);
+    }
+  },
+];
+
+// ── Badge Funktionen ─────────────────────────────
+function checkBadge(id) {
+  if (earnedBadges[id]) return;
+  const badge = BADGES.find(b => b.id === id);
+  if (!badge) return;
+  try { if (!badge.check()) return; } catch(e) { return; }
+  earnedBadges[id] = Date.now();
+  try { localStorage.setItem('tfw-badges', JSON.stringify(earnedBadges)); } catch(e) {}
+  S.project.badges = earnedBadges;
+  try { persist(); } catch(e) {}
+  showBadgeToast(badge);
+}
+
+function checkAllBadges() {
+  BADGES.forEach(b => { try { checkBadge(b.id); } catch(e) {} });
+}
+
+function showBadgeToast(badge) {
+  const el = document.getElementById('badge-toast');
+  if (!el) return;
+  el.innerHTML = badge.icon + ' <strong>' + badge.name + '</strong> freigeschaltet! 🎉';
+  el.classList.add('show');
+  clearTimeout(showBadgeToast._t);
+  showBadgeToast._t = setTimeout(() => el.classList.remove('show'), 3500);
+  // Sound effect
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    [523, 659, 784, 1047].forEach((freq, i) => {
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      osc.connect(gain); gain.connect(ac.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.15, ac.currentTime + i * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + i * 0.1 + 0.3);
+      osc.start(ac.currentTime + i * 0.1);
+      osc.stop(ac.currentTime + i * 0.1 + 0.3);
+    });
+  } catch(e) {}
+}
+
+function showBadges() {
+  const panel = document.getElementById('badge-panel');
+  const grid  = document.getElementById('badge-grid');
+  if (!panel || !grid) return;
+  // Reload from storage
+  try {
+    const saved = localStorage.getItem('tfw-badges');
+    if (saved) earnedBadges = JSON.parse(saved);
+  } catch(e) {}
+  try { checkAllBadges(); } catch(e) {}
+  grid.innerHTML = '';
+  BADGES.forEach(b => {
+    const earned = !!earnedBadges[b.id];
+    const div = document.createElement('div');
+    div.className = 'badge-item' + (earned ? ' earned' : '');
+    div.title = earned ? '✅ Verdient!' : '🔒 ' + b.desc;
+    div.innerHTML =
+      '<div class="badge-icon">' + b.icon + '</div>' +
+      '<div class="badge-name">' + b.name + '</div>' +
+      '<div class="badge-desc">' + (earned ? '✅ Verdient' : '🔒 ' + b.desc) + '</div>';
+    grid.appendChild(div);
+  });
+  panel.style.display = 'flex';
+}
+
+function closeBadges() {
+  const panel = document.getElementById('badge-panel');
+  if (panel) panel.style.display = 'none';
+}
+
+// Close badge panel on backdrop click
+document.getElementById('badge-panel').addEventListener('click', function(e) {
+  if (e.target === this) closeBadges();
+});
+
+/* ═══════════════════════════════════════════════
+   HILFE-SYSTEM
+   ═══════════════════════════════════════════════ */
+const HELP = {
+  stopmotion: {
+    title: '🎬 Was ist Stop-Motion?',
+    content: `
+      <p>Stop-Motion ist eine Filmtechnik, bei der du viele einzelne Fotos machst und sie hintereinander abspielst – so entsteht die Illusion von Bewegung!</p>
+      <h4>🎬 So funktioniert's:</h4>
+      <ol>
+        <li>Stelle deine Figur oder dein Objekt auf</li>
+        <li>Mach ein Foto</li>
+        <li>Bewege die Figur ein kleines bisschen</li>
+        <li>Mach wieder ein Foto</li>
+        <li>Wiederhole das viele Male</li>
+        <li>Spiele alle Fotos schnell hintereinander ab</li>
+      </ol>
+      <h4>📐 Wie viele Fotos brauche ich?</h4>
+      <p>Für 1 Sekunde Film brauchst du <strong>8–12 Fotos</strong>. Das heißt: Für einen 10-Sekunden-Film brauchst du etwa 80–120 Fotos!</p>
+      <h4>🌟 Bekannte Beispiele</h4>
+      <p>Wallace & Gromit, Shaun das Schaf und Chicken Run wurden alle mit Stop-Motion gemacht. Auch LEGO-Filme nutzen oft diese Technik!</p>
+    `
+  },
+  tipps: {
+    title: '💡 Tipps & Tricks',
+    content: `
+      <h4>📷 Kamera-Tipps</h4>
+      <ul>
+        <li><strong>Stativ nutzen:</strong> Lege das Handy auf ein Buch oder nutze ein Stativ – die Kamera darf sich nicht bewegen!</li>
+        <li><strong>Gute Beleuchtung:</strong> Filme tagsüber am Fenster oder nutze eine Lampe. Keine Schatten auf der Figur!</li>
+        <li><strong>Zwiebelhaut:</strong> Die Zwiebelhaut-Funktion zeigt das letzte Foto durch – so siehst du, wie weit du bewegen sollst.</li>
+        <li><strong>Selbstauslöser:</strong> Nutze den Timer, damit die Kamera beim Auslösen nicht wackelt.</li>
+      </ul>
+      <h4>🎭 Figuren-Tipps</h4>
+      <ul>
+        <li><strong>Knete:</strong> Knete-Figuren lassen sich super bewegen und formen</li>
+        <li><strong>Lego:</strong> Lego-Figuren sind stabil und einfach zu positionieren</li>
+        <li><strong>Papier:</strong> Figuren mit Gelenken aus Musterbeutelklammern</li>
+        <li><strong>Kleine Schritte:</strong> Bewege die Figur nur 2–3mm pro Foto für flüssige Bewegung</li>
+      </ul>
+      <h4>✂️ Schnitt-Tipps</h4>
+      <ul>
+        <li><strong>8 fps</strong> = gute, flüssige Bewegung für Anfänger</li>
+        <li>Nutze <strong>Gruppen</strong> für verschiedene Szenen</li>
+        <li>Füge am Anfang und Ende eine schwarze <strong>Titelkarte</strong> ein</li>
+        <li>Musik macht deinen Film viel aufregender!</li>
+      </ul>
+    `
+  },
+  glossar: {
+    title: '📚 Glossar',
+    content: `
+      <dl>
+        <dt>🎬 Stop-Motion</dt>
+        <dd>Filmtechnik mit vielen Einzelfotos, die schnell hintereinander abgespielt werden</dd>
+        <dt>🧅 Zwiebelhaut</dt>
+        <dd>Das letzte Foto wird durchsichtig über das Kamerabild gelegt – hilft beim präzisen Bewegen der Figur</dd>
+        <dt>🎞️ FPS (Frames per Second)</dt>
+        <dd>Bilder pro Sekunde. 8 fps = 8 Fotos ergeben 1 Sekunde Film</dd>
+        <dt>📁 Gruppe</dt>
+        <dd>Mehrere Frames die zusammengehören, z.B. eine Szene. Kann ein Voiceover bekommen</dd>
+        <dt>🎙 Voiceover</dt>
+        <dd>Gesprochener Kommentar, der synchron zu einer Gruppe von Frames abgespielt wird</dd>
+        <dt>🟢 Grünscreen</dt>
+        <dd>Grüner Hintergrund der durch ein anderes Bild ersetzt wird – wie im echten Kino!</dd>
+        <dt>🎨 Titelkarte</dt>
+        <dd>Ein selbst erstelltes Bild mit Text, z.B. für Anfangs- oder Abspann-Titel</dd>
+        <dt>📤 WebM / MP4</dt>
+        <dd>Videoformate zum Speichern und Teilen deines fertigen Films</dd>
+        <dt>🏆 Abzeichen</dt>
+        <dd>Belohnungen die du für Fortschritte in der App verdienst – sammel alle 12!</dd>
+      </dl>
+    `
+  }
+};
+
+function showHelp() {
+  document.getElementById('help-modal').style.display = 'flex';
+  // Activate first tab
+  const tabs = document.querySelectorAll('.help-tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  if (tabs[0]) tabs[0].classList.add('active');
+  _renderHelpSection('stopmotion');
+}
+
+function closeHelp() {
+  document.getElementById('help-modal').style.display = 'none';
+}
+
+function showHelpSection(key, btn) {
+  _renderHelpSection(key);
+  document.querySelectorAll('.help-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function _renderHelpSection(key) {
+  const section = HELP[key];
+  if (!section) return;
+  document.getElementById('help-body').innerHTML =
+    '<h3>' + section.title + '</h3>' + section.content;
+}
+
+// Close help modal on backdrop click
+document.getElementById('help-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeHelp();
+});
+
+/* ═══════════════════════════════════════════════
+   BADGE HOOKS — an relevanten Stellen einhängen
+   ═══════════════════════════════════════════════ */
+
+// ── Story changes ──
+(function() {
+  const orig_initStory = window.initStory;
+  // Patch: after initStory sets up sync(), add badge checks
+  // We hook after DOMContentLoaded when initStory has run
+  // by monkey-patching the scheduleSave to also checkBadge
+})();
+
+// Instead of monkey-patching, we use MutationObserver + direct patches below:
+
+// ── Patch addShot ──────────────────────────────
+const _origAddShot = window.addShot;
+if (typeof addShot !== 'undefined') {
+  // Can't reassign let/const, use wrapper approach on prototype
+}
+// We patch via post-init hook in initBadgeHooks()
+
+function initBadgeHooks() {
+  // ── Story fields ──
+  ['story-title','story-beg','story-ten','story-end','story-about'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      try { checkBadge('erster-titel'); checkBadge('storyteller'); } catch(e) {}
+    });
+  });
+
+  // ── Wochenplan ──
+  document.querySelectorAll('[data-week]').forEach(el => {
+    el.addEventListener('input', () => { try { checkBadge('wochenplaner'); } catch(e) {} });
+  });
+
+  // ── Progress sliders ──
+  document.querySelectorAll('[data-prog]').forEach(slider => {
+    slider.addEventListener('input', () => { try { checkBadge('vollender'); } catch(e) {} });
+  });
+
+  // ── Run initial check ──
+  syncBadges();
+  setTimeout(() => { try { checkAllBadges(); } catch(e) {} }, 500);
+}
+
+// ── Wrap key functions for badge checks ──────────
+// We do this after all functions are defined by hooking at end of DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function patchBadges() {
+  initBadgeHooks();
+
+  // Patch: figure added
+  const figConfirm = document.getElementById('fig-confirm-btn');
+  if (figConfirm) {
+    figConfirm.addEventListener('click', () => {
+      setTimeout(() => { try { checkBadge('casting'); } catch(e) {} }, 100);
+    });
+  }
+  document.querySelectorAll('#fig-templates .fig-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      setTimeout(() => { try { checkBadge('casting'); } catch(e) {} }, 100);
+    });
+  });
+
+}, { once: true });
+
+// Patch scene drawing saves (called from draw modal save)
+const _origDrawSave = document.getElementById('draw-save');
+// We intercept via custom event approach below
+
+// Override shoot button badge check
+document.addEventListener('DOMContentLoaded', () => {
+  const shootBtn = document.getElementById('shoot-btn');
+  if (shootBtn) {
+    shootBtn.addEventListener('click', () => {
+      setTimeout(() => {
+        try { checkBadge('fotograf'); checkBadge('regisseur'); } catch(e) {}
+      }, 300);
+    });
+  }
+
+  // File upload on cam page
+  const fileInput = document.getElementById('cam-file');
+  if (fileInput) {
+    fileInput.addEventListener('change', () => {
+      setTimeout(() => { try { checkBadge('fotograf'); checkBadge('regisseur'); } catch(e) {} }, 500);
+    });
+  }
+});
+
+/* ═══════════════════════════════════════════════
+   BADGE HOOKS — weitere Funktionen patchen
+   Direkte Patches auf bekannte Funktionsnamen
+   ═══════════════════════════════════════════════ */
+
+// Patch createGroup
+const _createGroup_orig = typeof createGroup !== 'undefined' ? createGroup : null;
+if (typeof window !== 'undefined') {
+  const _cg = window.createGroup;
+  if (_cg) {
+    window.createGroup = function() {
+      _cg.apply(this, arguments);
+      setTimeout(() => { try { checkBadge('gruppenmeister'); } catch(e) {} }, 100);
+    };
+  }
+}
+
+// Patch saveVoiceover
+const _sv = window.saveVoiceover;
+if (_sv) {
+  window.saveVoiceover = function() {
+    _sv.apply(this, arguments);
+    setTimeout(() => { try { checkBadge('sprecher'); } catch(e) {} }, 200);
+  };
+}
+
+// Patch musSelectTrack
+const _mst = window.musSelectTrack;
+if (_mst) {
+  window.musSelectTrack = function() {
+    _mst.apply(this, arguments);
+    setTimeout(() => { try { checkBadge('musikant'); } catch(e) {} }, 100);
+  };
+}
+
+// Patch exportProject for exporteur badge
+const _ep = window.exportProject;
+if (_ep) {
+  window.exportProject = async function() {
+    await _ep.apply(this, arguments);
+    try {
+      S.project.exported = true;
+      persist();
+      checkBadge('exporteur');
+    } catch(e) {}
+  };
+}
+
+// Patch draw-save button for storyboarder badge
+document.addEventListener('DOMContentLoaded', () => {
+  const drawSaveBtn = document.getElementById('draw-save');
+  if (drawSaveBtn) {
+    drawSaveBtn.addEventListener('click', () => {
+      setTimeout(() => { try { checkBadge('storyboarder'); } catch(e) {} }, 500);
+    });
+  }
+}, { once: true });
+
+/* ═══════════════════════════════════════════════
+   VERBESSERTER TOAST (mit clearTimeout)
+   ═══════════════════════════════════════════════ */
+// Override showToast with clearTimeout version
+window.showToast = function(msg, duration) {
+  duration = duration || 2500;
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => el.classList.remove('show'), duration);
+};
+
+/* ═══════════════════════════════════════════════
+   ONBOARDING VERBESSERUNG
+   ═══════════════════════════════════════════════ */
+// Patch closeOnboarding to also run checkAllBadges
+const _closeOb = window.closeOnboarding;
+if (_closeOb) {
+  window.closeOnboarding = function() {
+    _closeOb.apply(this, arguments);
+    setTimeout(() => { try { syncBadges(); checkAllBadges(); } catch(e) {} }, 300);
+  };
+}
 </script>
 </body>
 </html>
