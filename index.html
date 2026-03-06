@@ -421,10 +421,14 @@ textarea.field-input{min-height:80px;line-height:1.5}
 /* Frame card */
 .frm-card{position:relative;border-radius:var(--r-sm);overflow:hidden;
   border:2px solid transparent;transition:border-color .15s,transform .1s;
-  cursor:pointer;background:var(--s2);aspect-ratio:4/3;user-select:none}
+  cursor:pointer;background:var(--s2);aspect-ratio:4/3;
+  user-select:none;-webkit-user-select:none;
+  -webkit-touch-callout:none;touch-action:pan-y}
 .frm-card.selected{border-color:var(--yellow);box-shadow:0 0 0 1px rgba(251,191,36,.3)}
-.frm-card.drag-over{border-color:var(--teal);transform:scale(1.04)}
-.frm-card img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.frm-card.drag-over{border-color:var(--yellow);transform:scale(1.04);outline:2px solid var(--yellow)}
+.frm-card.drag-active{opacity:.3;transform:scale(.95);border-color:var(--muted)}
+.frm-card img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;
+  -webkit-user-drag:none;user-drag:none;-webkit-touch-callout:none}
 .frm-num{position:absolute;bottom:2px;left:3px;font-family:'Fredoka One',cursive;
   font-size:9px;color:rgba(255,255,255,.85);text-shadow:0 1px 2px rgba(0,0,0,.8);line-height:1}
 .frm-gbadge{position:absolute;top:3px;left:3px;width:10px;height:10px;
@@ -571,7 +575,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
   background:linear-gradient(135deg,#fbbf24,#f59e0b);
   font-size:28px;display:flex;align-items:center;justify-content:center;
   box-shadow:0 4px 20px rgba(251,191,36,.5);transition:transform .12s,box-shadow .12s;
-  flex-shrink:0}
+  flex-shrink:0;position:relative;overflow:visible}
 #shoot-btn:active{transform:scale(.88);box-shadow:0 2px 10px rgba(251,191,36,.3)}
 .cam-row2{display:flex;gap:8px;flex:1;justify-content:center}
 .cam-action-btn{background:var(--s2);border:1px solid var(--border);color:var(--text);
@@ -848,9 +852,130 @@ textarea.field-input{min-height:80px;line-height:1.5}
 }
 #badge-btn:hover,#help-btn:hover,#save-btn:hover{background:rgba(255,255,255,.08)}
 
-/* ═══════════════════════════
-   HELP MODAL
-   ═══════════════════════════ */
+/* ── Floating Help Button ── */
+#help-float-btn {
+  position: fixed;
+  bottom: 80px;
+  left: 16px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2dd4bf, #06d6a0);
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 500;
+  box-shadow: 0 4px 20px rgba(45,212,191,0.4);
+  animation: helpFloat 3.2s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .15s, box-shadow .15s;
+}
+#help-float-btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 6px 28px rgba(45,212,191,0.6);
+}
+#help-float-btn:active { transform: scale(.92); }
+@keyframes helpFloat {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  30%     { transform: translateY(-5px) rotate(-4deg); }
+  60%     { transform: translateY(-3px) rotate(3deg); }
+}
+
+/* ── Enhanced Intro Animations ── */
+@keyframes curtainUp{0%{transform:translateY(0)}100%{transform:translateY(-100%)}}
+@keyframes curtainDown{0%{transform:translateY(0)}100%{transform:translateY(100%)}}
+@keyframes introFlicker {
+  0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:.85} 94%{opacity:1} 97%{opacity:.9} 98%{opacity:1}
+}
+@keyframes logoBounce {
+  0%{transform:scale(.3) rotate(-8deg);opacity:0}
+  60%{transform:scale(1.12) rotate(2deg);opacity:1}
+  80%{transform:scale(.96) rotate(-1deg)}
+  100%{transform:scale(1) rotate(0deg);opacity:1}
+}
+@keyframes taglineSlide {
+  from{opacity:0;transform:translateY(18px) scale(.95)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes sparkle {
+  0%{transform:scale(0) rotate(0deg);opacity:0}
+  50%{transform:scale(1.3) rotate(180deg);opacity:1}
+  100%{transform:scale(0) rotate(360deg);opacity:0}
+}
+@keyframes navTabPop {
+  0%{transform:translateY(20px);opacity:0}
+  60%{transform:translateY(-4px);opacity:1}
+  100%{transform:translateY(0);opacity:1}
+}
+@keyframes cardReveal {
+  from{transform:translateY(12px) scale(.97);opacity:0}
+  to{transform:translateY(0) scale(1);opacity:1}
+}
+@keyframes shakeBtn {
+  0%,100%{transform:rotate(0deg)}
+  20%{transform:rotate(-6deg) scale(1.05)}
+  40%{transform:rotate(6deg) scale(1.05)}
+  60%{transform:rotate(-4deg)}
+  80%{transform:rotate(4deg)}
+}
+.shake-anim { animation: shakeBtn .5s ease; }
+@keyframes popIn {
+  from{transform:scale(0.5);opacity:0}
+  60%{transform:scale(1.15);opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+.pop-in { animation: popIn .35s cubic-bezier(.34,1.56,.64,1); }
+@keyframes slideDown {
+  from{transform:translateY(-14px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+.slide-down { animation: slideDown .3s ease; }
+@keyframes ripple {
+  from{transform:scale(0);opacity:.5}
+  to{transform:scale(3);opacity:0}
+}
+/* Shoot button pulse ring - fixed circular */
+#shoot-btn::after {
+  content:'';
+  position:absolute;
+  width:72px;height:72px;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(1);
+  border-radius:50%;
+  border:3px solid rgba(251,191,36,.6);
+  animation:shootRing 2s ease-out infinite;
+  pointer-events:none;
+}
+@keyframes shootRing {
+  0%  { transform:translate(-50%,-50%) scale(1);   opacity:.7; }
+  70% { transform:translate(-50%,-50%) scale(1.6); opacity:0; }
+  100%{ transform:translate(-50%,-50%) scale(1.6); opacity:0; }
+}
+/* Nav tab entry animation on load */
+.bottom-nav .nav-tab {
+  animation: navTabPop .4s ease both;
+}
+.bottom-nav .nav-tab:nth-child(1){animation-delay:.05s}
+.bottom-nav .nav-tab:nth-child(2){animation-delay:.1s}
+.bottom-nav .nav-tab:nth-child(3){animation-delay:.15s}
+.bottom-nav .nav-tab:nth-child(4){animation-delay:.2s}
+.bottom-nav .nav-tab:nth-child(5){animation-delay:.25s}
+/* Plan section card reveal */
+.plan-section.active .story-field,
+.plan-section.active .fig-card,
+.plan-section.active .scene-card,
+.plan-section.active .bg-card,
+.plan-section.active .progress-item {
+  animation: cardReveal .35s ease both;
+}
+/* Staggered card reveal */
+.plan-section.active .story-field:nth-child(1){animation-delay:.05s}
+.plan-section.active .story-field:nth-child(2){animation-delay:.1s}
+.plan-section.active .story-field:nth-child(3){animation-delay:.15s}
+.plan-section.active .story-field:nth-child(4){animation-delay:.2s}
+
 #help-modal {
   position: fixed; inset: 0; background: rgba(0,0,0,0.85);
   z-index: 10000; display: none; align-items: center; justify-content: center;
@@ -966,7 +1091,6 @@ textarea.field-input{min-height:80px;line-height:1.5}
 
 <!-- TOPBAR -->
 <header class="topbar" role="banner">
-  <button onclick="showHelp()" id="help-btn" title="Hilfe">❓</button>
   <div class="logo-inline">
     <span class="inline-icon">🎬</span>
     <div class="inline-text">
@@ -994,7 +1118,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
       <button class="plan-subtab" data-sub="sub-figures">🎭 Figuren</button>
       <button class="plan-subtab" data-sub="sub-storyboard">🎬 Storyboard</button>
       <button class="plan-subtab" data-sub="sub-bg">🌄 Hintergrund</button>
-      <button class="plan-subtab" data-sub="sub-week">📅 Wochenplan</button>
+      <button class="plan-subtab" data-sub="sub-week">🎬 Produktionsplan</button>
       <button class="plan-subtab" data-sub="sub-progress">📊 Fortschritt</button>
     </div>
 
@@ -1096,19 +1220,17 @@ textarea.field-input{min-height:80px;line-height:1.5}
       </label>
     </div>
 
-    <!-- ── TAB 5: Wochenplan ── -->
+    <!-- ── TAB 5: Produktionsplan ── -->
     <div id="sub-week" class="plan-section">
-      <div class="sec-title">📅 Mein Wochenplan</div>
-      <table class="week-table" id="week-table">
-        <thead>
-          <tr>
-            <th>Tag</th>
-            <th>Was mache ich?</th>
-            <th>✓</th>
-          </tr>
-        </thead>
-        <tbody id="week-tbody"></tbody>
-      </table>
+      <div class="sec-title">🎬 Mein Produktionsplan</div>
+
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn-primary sm" id="prod-add-phase-btn" onclick="prodAddPhase()">+ Phase hinzufügen</button>
+        <button class="btn-outline" onclick="prodAddTask()" style="font-size:13px;padding:8px 14px">+ Aufgabe</button>
+        <button class="btn-outline" onclick="prodReset()" style="font-size:13px;padding:8px 14px;color:var(--muted)">🔄 Reset</button>
+      </div>
+
+      <div id="prod-plan-container"></div>
     </div>
 
     <!-- ── TAB 6: Fortschritt ── -->
@@ -1175,6 +1297,10 @@ textarea.field-input{min-height:80px;line-height:1.5}
         <input type="color" id="gs-custom" value="#00ff00" title="Eigene Farbe"
           style="width:28px;height:28px;border:none;border-radius:50%;cursor:pointer;padding:0"
           onchange="setGsColorHex(this.value)"/>
+        <button id="gs-eyedropper" onclick="startGsEyedropper()"
+          style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--yellow);
+          border-radius:6px;padding:4px 10px;font-size:12px;font-family:'Fredoka One',cursive;cursor:pointer"
+          title="Farbe aus Kamerabild aufnehmen">💉 Pick</button>
       </div>
       <div class="gs-row">
         <span class="gs-label">Toleranz:</span>
@@ -1902,6 +2028,7 @@ function goPage(pageId) {
   $all('.page').forEach(p => p.classList.remove('active'));
   const t = $(pageId); if (t) t.classList.add('active');
   $all('.nav-tab').forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
+  playSwoosh();
 }
 function initNav() {
   $all('.nav-tab').forEach(b => b.addEventListener('click', () => goPage(b.dataset.page)));
@@ -1918,6 +2045,7 @@ function initPlanSubTabs() {
       btn.classList.add('active');
       const target = $(btn.dataset.sub);
       if (target) target.classList.add('active');
+      try { playSwoosh(); } catch(e) {}
     });
   });
 }
@@ -1982,6 +2110,7 @@ function renderFigures() {
       <div class="fig-name">${fig.name||'Figur'}</div>
       <div class="fig-role">${fig.role||''}</div>
       <button class="btn-outline" style="font-size:12px;padding:6px 10px" data-draw-fig="${i}">✏️ Zeichnen</button>
+      <button class="btn-outline" style="font-size:12px;padding:6px 10px;border-color:rgba(45,212,191,.4);color:var(--teal)" data-fig-bg="${i}">🌄 Hintergrund</button>
     `;
     grid.appendChild(card);
   });
@@ -1996,10 +2125,94 @@ function renderFigures() {
   grid.querySelectorAll('[data-draw-fig]').forEach(btn => {
     btn.addEventListener('click', () => openDraw('figure', +btn.dataset.drawFig));
   });
+  grid.querySelectorAll('[data-fig-bg]').forEach(btn => {
+    btn.addEventListener('click', () => openBgPickerForFigure(+btn.dataset.figBg));
+  });
+}
+
+/* ── Background Picker für Szenen & Figuren ── */
+function openBgPickerModal(onSelect) {
+  const old = document.getElementById('bg-picker-modal');
+  if (old) old.remove();
+  const modal = document.createElement('div');
+  modal.id = 'bg-picker-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:20px';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#0d1117;border:1px solid #21262d;border-radius:20px;padding:20px;width:min(380px,calc(100vw - 32px));max-height:80vh;overflow-y:auto';
+  const header = document.createElement('div');
+  header.style.cssText = "font-family:'Fredoka One',cursive;font-size:1.1rem;color:#fbbf24;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center";
+  header.innerHTML = '🌄 Hintergrund wählen';
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.style.cssText = 'background:none;border:none;color:#8b949e;font-size:1.2rem;cursor:pointer';
+  closeBtn.onclick = () => modal.remove();
+  header.appendChild(closeBtn);
+  box.appendChild(header);
+  const grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px';
+  BG_LIB.forEach((bg) => {
+    const card = document.createElement('div');
+    card.style.cssText = 'cursor:pointer;border-radius:6px;overflow:hidden;border:2px solid transparent;transition:all .15s';
+    card.innerHTML = bg.svg;
+    const svgEl = card.querySelector('svg');
+    if (svgEl) svgEl.style.cssText = 'width:100%;display:block;height:60px';
+    const lbl = document.createElement('div');
+    lbl.style.cssText = "font-family:'Fredoka One',cursive;font-size:10px;color:#8b949e;text-align:center;padding:3px;background:#0d1117";
+    lbl.textContent = bg.name;
+    card.appendChild(lbl);
+    card.addEventListener('mouseenter', () => card.style.borderColor = '#fbbf24');
+    card.addEventListener('mouseleave', () => card.style.borderColor = 'transparent');
+    card.addEventListener('click', () => {
+      const blob = new Blob([bg.svg], {type:'image/svg+xml'});
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        const cv = document.createElement('canvas'); cv.width=400; cv.height=300;
+        cv.getContext('2d').drawImage(img,0,0,400,300);
+        URL.revokeObjectURL(url);
+        onSelect(cv.toDataURL('image/jpeg',.9), bg.name);
+        modal.remove();
+      };
+      img.src = url;
+    });
+    grid.appendChild(card);
+  });
+  box.appendChild(grid);
+  const uploadLabel = document.createElement('label');
+  uploadLabel.style.cssText = 'display:flex;flex-direction:column;align-items:center;border:2px dashed #21262d;border-radius:10px;padding:16px;cursor:pointer;color:#8b949e;font-size:13px;gap:4px;font-family:inherit';
+  uploadLabel.innerHTML = '📁 Eigenes Bild hochladen';
+  const fileInput = document.createElement('input');
+  fileInput.type='file'; fileInput.accept='image/*'; fileInput.style.display='none';
+  fileInput.addEventListener('change', e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => { onSelect(ev.target.result, file.name); modal.remove(); };
+    reader.readAsDataURL(file);
+  });
+  uploadLabel.appendChild(fileInput);
+  box.appendChild(uploadLabel);
+  modal.appendChild(box);
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+function openBgPickerForScene(i) {
+  openBgPickerModal((dataUrl, name) => {
+    S.project.scenes[i].drawing = dataUrl;
+    scheduleSave(); renderScenes();
+    showToast('🌄 ' + name + ' als Hintergrund gesetzt!');
+    try { playSuccess(); } catch(e) {}
+  });
+}
+function openBgPickerForFigure(i) {
+  openBgPickerModal((dataUrl, name) => {
+    S.project.figures[i].drawing = dataUrl;
+    scheduleSave(); renderFigures();
+    showToast('🌄 ' + name + ' als Hintergrund gesetzt!');
+    try { playSuccess(); } catch(e) {}
+  });
 }
 
 function initFigures() {
-  // Templates
   const tmplEl = $('fig-templates');
   FIG_TEMPLATES.forEach(t => {
     const chip = document.createElement('button');
@@ -2009,6 +2222,7 @@ function initFigures() {
       S.project.figures.push({name:t.n, role:t.r, drawing:null});
       scheduleSave(); renderFigures();
       showToast(`${t.e} ${t.n} hinzugefügt!`);
+      playPop();
       try { checkBadge('casting'); } catch(e) {}
     });
     tmplEl.appendChild(chip);
@@ -2059,6 +2273,7 @@ function renderScenes() {
       </div>
       <div class="scene-actions">
         <button class="scene-draw-btn" data-draw-scene="${i}">✏️ Zeichnen</button>
+        <button class="scene-draw-btn" style="background:rgba(45,212,191,.12);border-color:rgba(45,212,191,.3);color:var(--teal)" data-scene-bg="${i}">🌄 Hintergrund</button>
       </div>
       <textarea class="scene-notes" placeholder="Notizen…" data-scene-notes="${i}">${sc.notes||''}</textarea>
     `;
@@ -2086,6 +2301,9 @@ function renderScenes() {
   grid.querySelectorAll('[data-draw-scene]').forEach(btn => {
     btn.addEventListener('click', () => openDraw('scene', +btn.dataset.drawScene));
   });
+  grid.querySelectorAll('[data-scene-bg]').forEach(btn => {
+    btn.addEventListener('click', () => openBgPickerForScene(+btn.dataset.sceneBg));
+  });
 }
 
 function initStoryboard() {
@@ -2093,6 +2311,7 @@ function initStoryboard() {
     S.project.scenes.push({title:'', drawing:null, notes:''});
     scheduleSave(); renderScenes();
     showToast('🎬 Szene hinzugefügt!');
+    playPop();
   });
   renderScenes();
 }
@@ -2131,32 +2350,154 @@ function initBackgrounds() {
 }
 
 /* ═══════════════════════════════════════════════
-   WEEKPLAN
+   PRODUKTIONSPLAN (ersetzt Wochenplan)
    ═══════════════════════════════════════════════ */
-function initWeekplan() {
-  const tbody = $('week-tbody');
-  S.project.weekplan.forEach((entry, i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><span class="week-day-label">${entry.day}</span></td>
-      <td><input class="week-task-input" type="text" placeholder="Was planst du?" value="${entry.task||''}" data-week="${i}"/></td>
-      <td><input type="checkbox" class="week-check" data-week-done="${i}" ${entry.done?'checked':''}></td>
+const PROD_DEFAULT = [
+  { id:'ph1', name:'📖 Planung', color:'#a855f7', tasks:[
+    {id:'t1',text:'Geschichte schreiben',done:false,date:''},
+    {id:'t2',text:'Figuren entwerfen',done:false,date:''},
+    {id:'t3',text:'Storyboard zeichnen',done:false,date:''},
+  ]},
+  { id:'ph2', name:'📷 Aufnahme', color:'#fbbf24', tasks:[
+    {id:'t4',text:'Set aufbauen & Hintergrund vorbereiten',done:false,date:''},
+    {id:'t5',text:'Fotos aufnehmen (Szene 1)',done:false,date:''},
+    {id:'t6',text:'Fotos aufnehmen (Szene 2)',done:false,date:''},
+  ]},
+  { id:'ph3', name:'✂️ Schnitt & Ton', color:'#2dd4bf', tasks:[
+    {id:'t7',text:'Frames sortieren & Gruppen erstellen',done:false,date:''},
+    {id:'t8',text:'Musik auswählen',done:false,date:''},
+    {id:'t9',text:'Voiceover aufnehmen',done:false,date:''},
+  ]},
+  { id:'ph4', name:'🎬 Export', color:'#22c55e', tasks:[
+    {id:'t10',text:'Film exportieren',done:false,date:''},
+    {id:'t11',text:'Film zeigen & feiern! 🎉',done:false,date:''},
+  ]},
+];
+function prodGetPlan() {
+  if (!S.project.prodplan) {
+    S.project.prodplan = JSON.parse(JSON.stringify(PROD_DEFAULT));
+  }
+  return S.project.prodplan;
+}
+function prodReset() {
+  if (!confirm('Produktionsplan zurücksetzen? Alle Änderungen gehen verloren!')) return;
+  S.project.prodplan = JSON.parse(JSON.stringify(PROD_DEFAULT));
+  scheduleSave();
+  renderProdPlan();
+  showToast('🔄 Produktionsplan zurückgesetzt');
+}
+function prodAddPhase() {
+  const name = prompt('Name der Phase (z.B. 🎨 Nachbearbeitung):');
+  if (!name) return;
+  const colors = ['#a855f7','#fbbf24','#2dd4bf','#22c55e','#ef4444','#3b82f6'];
+  const plan = prodGetPlan();
+  plan.push({ id:'ph_'+Date.now(), name, color: colors[plan.length % colors.length], tasks:[] });
+  scheduleSave(); renderProdPlan(); playPop();
+}
+function prodAddTask(phaseId) {
+  const plan = prodGetPlan();
+  let ph;
+  if (phaseId) {
+    ph = plan.find(p => p.id === phaseId);
+  } else {
+    if (plan.length === 0) { showToast('Erstelle zuerst eine Phase!'); return; }
+    ph = plan[0];
+  }
+  if (!ph) return;
+  ph.tasks.push({ id:'t_'+Date.now(), text:'Neue Aufgabe', done:false, date:'' });
+  scheduleSave(); renderProdPlan(); playClick();
+}
+function prodDelTask(phaseId, taskId) {
+  const ph = prodGetPlan().find(p => p.id === phaseId);
+  if (!ph) return;
+  ph.tasks = ph.tasks.filter(t => t.id !== taskId);
+  scheduleSave(); renderProdPlan();
+}
+function prodDelPhase(phaseId) {
+  if (!confirm('Phase löschen?')) return;
+  S.project.prodplan = prodGetPlan().filter(p => p.id !== phaseId);
+  scheduleSave(); renderProdPlan();
+}
+function renderProdPlan() {
+  const container = document.getElementById('prod-plan-container');
+  if (!container) return;
+  const plan = prodGetPlan();
+  container.innerHTML = '';
+  plan.forEach(phase => {
+    const done = phase.tasks.filter(t=>t.done).length;
+    const total = phase.tasks.length;
+    const pct = total > 0 ? Math.round(done/total*100) : 0;
+    const sec = document.createElement('div');
+    sec.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden';
+    sec.innerHTML = `
+      <div style="padding:12px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)">
+        <div style="width:10px;height:10px;border-radius:50%;background:${phase.color};flex-shrink:0"></div>
+        <input class="prod-phase-name" value="${phase.name}" data-phase="${phase.id}"
+          style="flex:1;background:none;border:none;outline:none;font-family:'Fredoka One',cursive;font-size:16px;color:var(--text)"/>
+        <span style="font-size:12px;color:var(--muted);font-family:'Fredoka One',cursive">${done}/${total}</span>
+        <div style="width:60px;height:6px;background:var(--s2);border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${phase.color};border-radius:99px;transition:width .3s"></div>
+        </div>
+        <button onclick="prodAddTask('${phase.id}')" style="background:none;border:none;color:var(--teal);font-size:18px;cursor:pointer;padding:2px 4px" title="Aufgabe hinzufügen">+</button>
+        <button onclick="prodDelPhase('${phase.id}')" style="background:none;border:none;color:var(--red);font-size:14px;cursor:pointer;padding:2px 4px" title="Phase löschen">🗑</button>
+      </div>
+      <div class="prod-tasks" data-phase="${phase.id}" style="padding:6px 8px">
+        ${phase.tasks.length === 0 ? '<div style="color:var(--muted);font-size:13px;padding:8px;text-align:center">Keine Aufgaben – klicke + um eine hinzuzufügen</div>' : ''}
+      </div>
     `;
-    tbody.appendChild(tr);
-  });
-  tbody.querySelectorAll('[data-week]').forEach(input => {
-    input.addEventListener('input', () => {
-      S.project.weekplan[+input.dataset.week].task = input.value;
-      scheduleSave();
-      try { checkBadge('wochenplaner'); } catch(e) {}
+    const tasksEl = sec.querySelector('.prod-tasks');
+    phase.tasks.forEach(task => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 6px;border-radius:6px;transition:background .15s';
+      row.innerHTML = `
+        <input type="checkbox" ${task.done?'checked':''} data-phase="${phase.id}" data-task="${task.id}"
+          style="width:18px;height:18px;accent-color:${phase.color};cursor:pointer;flex-shrink:0"/>
+        <input class="prod-task-text" value="${task.text}" data-phase="${phase.id}" data-task="${task.id}"
+          style="flex:1;background:none;border:none;outline:none;font-size:14px;color:${task.done?'var(--muted)':'var(--text)'};${task.done?'text-decoration:line-through':''}"/>
+        <input type="date" value="${task.date||''}" data-phase="${phase.id}" data-task="${task.id}" class="prod-task-date"
+          style="background:var(--s2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;padding:3px 6px;width:120px"/>
+        <button onclick="prodDelTask('${phase.id}','${task.id}')"
+          style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:2px;flex-shrink:0">✕</button>
+      `;
+      row.addEventListener('mouseenter', () => row.style.background='var(--s2)');
+      row.addEventListener('mouseleave', () => row.style.background='');
+      tasksEl.appendChild(row);
     });
-  });
-  tbody.querySelectorAll('[data-week-done]').forEach(cb => {
-    cb.addEventListener('change', () => {
-      S.project.weekplan[+cb.dataset.weekDone].done = cb.checked;
-      scheduleSave();
+    // Phase name edit
+    sec.querySelector('.prod-phase-name').addEventListener('input', e => {
+      const ph = prodGetPlan().find(p => p.id === e.target.dataset.phase);
+      if (ph) { ph.name = e.target.value; scheduleSave(); }
     });
+    // Task checkboxes
+    sec.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const ph = prodGetPlan().find(p => p.id === cb.dataset.phase);
+        const tk = ph && ph.tasks.find(t => t.id === cb.dataset.task);
+        if (tk) { tk.done = cb.checked; scheduleSave(); renderProdPlan(); playClick(); }
+      });
+    });
+    // Task text edit
+    sec.querySelectorAll('.prod-task-text').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const ph = prodGetPlan().find(p => p.id === inp.dataset.phase);
+        const tk = ph && ph.tasks.find(t => t.id === inp.dataset.task);
+        if (tk) { tk.text = inp.value; scheduleSave(); }
+      });
+    });
+    // Task date edit
+    sec.querySelectorAll('.prod-task-date').forEach(inp => {
+      inp.addEventListener('change', () => {
+        const ph = prodGetPlan().find(p => p.id === inp.dataset.phase);
+        const tk = ph && ph.tasks.find(t => t.id === inp.dataset.task);
+        if (tk) { tk.date = inp.value; scheduleSave(); }
+      });
+    });
+    container.appendChild(sec);
   });
+}
+function initWeekplan() {
+  // Compatibility: migrate old weekplan to prodplan if needed
+  renderProdPlan();
 }
 
 /* ═══════════════════════════════════════════════
@@ -2444,6 +2785,7 @@ function initDrawModal() {
     scheduleSave();
     $('draw-modal').classList.add('hidden');
     showToast('💾 Gespeichert!');
+    playSuccess();
   });
 
   // Draw events (pointer API for touch+mouse)
@@ -2506,15 +2848,14 @@ function closeIntro() {
   el.style.opacity = '0';
   setTimeout(() => {
     el.classList.add('hidden');
-    localStorage.setItem('tfw-intro-seen', '1');
     checkOnboarding();
   }, 400);
 }
 function initIntro() {
-  if (localStorage.getItem('tfw-intro-seen')) {
-    $('intro').classList.add('hidden'); initApp(); return;
-  }
+  // Always play intro on every page load
   const el = $('intro');
+  el.classList.remove('hidden');
+  el.style.opacity = '1';
   // Double rAF ensures browser has painted before animation starts
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('play')));
   $('intro-skip').addEventListener('click', closeIntro);
@@ -2663,6 +3004,64 @@ function playBeep(freq=800, dur=0.06) {
     gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
     osc.start(); osc.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+function playSwoosh() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.15, audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/d.length,2) * 0.3;
+    const src = audioCtx.createBufferSource();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass'; filter.frequency.value = 1200;
+    src.buffer = buf;
+    src.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+    gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    src.start();
+  } catch(e) {}
+}
+function playPop() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime+0.1);
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.12);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime+0.12);
+  } catch(e) {}
+}
+function playSuccess() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    [[523,0],[659,0.07],[784,0.14],[1047,0.21]].forEach(([f,t]) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle'; osc.frequency.value = f;
+      gain.gain.setValueAtTime(0.18, audioCtx.currentTime+t);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+t+0.15);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime+t);
+      osc.stop(audioCtx.currentTime+t+0.15);
+    });
+  } catch(e) {}
+}
+function playClick() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square'; osc.frequency.value = 1200;
+    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.03);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime+0.03);
   } catch(e) {}
 }
 
@@ -2869,6 +3268,28 @@ function setGsColorHex(hex) {
   $all('.gs-preset').forEach(el => el.classList.remove('active'));
 }
 function pickGsBg() { $('gs-bg-input').click(); }
+function startGsEyedropper() {
+  // Pick color from center of video frame
+  const vid = $('cam-vid');
+  const cv = document.createElement('canvas');
+  cv.width = vid.videoWidth || 320;
+  cv.height = vid.videoHeight || 240;
+  const ctx = cv.getContext('2d');
+  ctx.drawImage(vid, 0, 0);
+  // Sample center area (5x5 pixel average for robustness)
+  const cx = Math.floor(cv.width/2), cy = Math.floor(cv.height/2);
+  const d = ctx.getImageData(cx-2, cy-2, 5, 5).data;
+  let r=0,g=0,b=0;
+  for (let i=0;i<d.length;i+=4){r+=d[i];g+=d[i+1];b+=d[i+2];}
+  r=Math.round(r/25); g=Math.round(g/25); b=Math.round(b/25);
+  gsColor = {r,g,b};
+  // Update color picker UI
+  const hex = '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+  $('gs-custom').value = hex;
+  $all('.gs-preset').forEach(el => el.classList.remove('active'));
+  showToast(`💉 Farbe aufgenommen: ${hex}`);
+  playClick();
+}
 function loadGsBg(input) {
   const file = input.files[0]; if (!file) return;
   const reader = new FileReader();
@@ -2927,16 +3348,54 @@ function startGsLoop() {
     const {sx, sy, sw, sh} = coverFit(vW, vH, dstW, dstH);
     tc.drawImage(vid, sx, sy, sw, sh, 0, 0, dstW, dstH);
 
-    // Chroma key
+    // Chroma key — improved HSV-based algorithm with edge feathering
     const imgData = tc.getImageData(0, 0, dstW, dstH);
     const data    = imgData.data;
     const {r:kr, g:kg, b:kb} = gsColor;
-    const thresh  = gsThreshold * 2.55;
+    const thresh  = gsThreshold / 100;
+
+    // Convert key color to HSV for perceptual matching
+    function rgbToHsv(r,g,b) {
+      r/=255; g/=255; b/=255;
+      const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+      let h=0,s=max===0?0:d/max,v=max;
+      if(d!==0){
+        if(max===r) h=((g-b)/d+6)%6;
+        else if(max===g) h=(b-r)/d+2;
+        else h=(r-g)/d+4;
+        h/=6;
+      }
+      return {h,s,v};
+    }
+    const kHsv = rgbToHsv(kr,kg,kb);
+    const tolerance = thresh * 1.4;
+    const softEdge = thresh * 0.25;
+
     for (let i = 0; i < data.length; i += 4) {
-      const dr = Math.abs(data[i]-kr);
-      const dg = Math.abs(data[i+1]-kg);
-      const db = Math.abs(data[i+2]-kb);
-      if (dr < thresh && dg < thresh && db < thresh) data[i+3] = 0;
+      const pHsv = rgbToHsv(data[i], data[i+1], data[i+2]);
+      // Hue distance (circular)
+      const dh = Math.min(Math.abs(pHsv.h - kHsv.h), 1 - Math.abs(pHsv.h - kHsv.h));
+      const ds = Math.abs(pHsv.s - kHsv.s);
+      const dv = Math.abs(pHsv.v - kHsv.v);
+      // Weighted match: hue is most important, then saturation
+      const match = dh * 2.0 + ds * 0.6 + dv * 0.3;
+      if (match < tolerance) {
+        if (match < tolerance - softEdge) {
+          data[i+3] = 0; // fully transparent
+        } else {
+          // Soft edge: linear falloff
+          const alpha = Math.round(((match - (tolerance - softEdge)) / softEdge) * 200);
+          data[i+3] = Math.min(data[i+3], alpha);
+        }
+        // Spill suppression: reduce green/blue tinge on semi-transparent pixels
+        if (data[i+3] > 0 && data[i+3] < 220) {
+          if (kr < 50 && kg > 150) { // green screen
+            data[i+1] = Math.round(data[i+1] * 0.6);
+          } else if (kb > 150) { // blue screen
+            data[i+2] = Math.round(data[i+2] * 0.6);
+          }
+        }
+      }
     }
     tc.putImageData(imgData, 0, 0);
 
@@ -3023,6 +3482,10 @@ function addShot(dataUrl) {
   updateShotCount();
   renderFrames();
   if (onionOn) drawOnion();
+  // Animate strip thumb
+  const thumbs = document.querySelectorAll('.strip-thumb');
+  const last = thumbs[thumbs.length-1];
+  if (last) last.classList.add('pop-in');
   try { checkBadge('fotograf'); checkBadge('regisseur'); } catch(e) {}
 }
 
@@ -3377,51 +3840,105 @@ function renderFrames() {
       ${hasVo ? '<span class="frm-vo">🎙</span>' : ''}
       <div class="frm-sel-overlay">✓</div>
     `;
-    // Click → toggle select, double → fullscreen
+    // Long-press + drag reorder (touch & mouse)
     let lastTap = 0;
+    let pressTimer = null;
+    let isDraggingCard = false;
+    let dragGhost = null;
+    let dragStartIdx = -1;
+    let dragCurrentIdx = -1;
+
+    // Suppress browser context menu on the card (long-press triggers it on mobile/desktop)
+    card.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
+    // Prevent image drag (browser default for <img>)
+    const cardImg = card.querySelector('img');
+    if (cardImg) {
+      cardImg.addEventListener('dragstart', e => e.preventDefault());
+      cardImg.addEventListener('contextmenu', e => e.preventDefault());
+    }
+
     card.addEventListener('pointerdown', e => {
       const now = Date.now();
-      if (now - lastTap < 350) { openFrmModal(shot.data); return; }
+      // Double tap = fullscreen
+      if (now - lastTap < 350) { clearTimeout(pressTimer); openFrmModal(shot.data); return; }
       lastTap = now;
-    });
+      card.setPointerCapture(e.pointerId);
+      pressTimer = setTimeout(() => {
+        isDraggingCard = true;
+        dragStartIdx = i;
+        dragCurrentIdx = i;
+        card.classList.add('drag-active');
+        // Create ghost
+        dragGhost = card.cloneNode(true);
+        dragGhost.style.cssText = `position:fixed;z-index:9999;pointer-events:none;opacity:.85;
+          width:${card.offsetWidth}px;height:${card.offsetHeight}px;
+          transform:scale(1.06) rotate(2deg);box-shadow:0 12px 40px rgba(0,0,0,.5);
+          border:2px solid var(--yellow);border-radius:var(--r);overflow:hidden`;
+        const rect = card.getBoundingClientRect();
+        dragGhost.style.left = rect.left + 'px';
+        dragGhost.style.top  = rect.top  + 'px';
+        document.body.appendChild(dragGhost);
+        navigator.vibrate && navigator.vibrate(40);
+        playClick();
+      }, 400);
+    }, {passive: true});
+
+    card.addEventListener('pointermove', e => {
+      // If pointer moves significantly before drag activates, cancel the press timer
+      if (!isDraggingCard) {
+        clearTimeout(pressTimer);
+        return;
+      }
+      e.preventDefault();
+      if (!dragGhost) return;
+      dragGhost.style.left = (e.clientX - card.offsetWidth/2)  + 'px';
+      dragGhost.style.top  = (e.clientY - card.offsetHeight/2) + 'px';
+      // Find target card under pointer
+      dragGhost.style.pointerEvents = 'none';
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      dragGhost.style.pointerEvents = '';
+      const targetCard = el && el.closest('.frm-card');
+      if (targetCard && targetCard !== card) {
+        const tIdx = +targetCard.dataset.idx;
+        if (tIdx !== dragCurrentIdx) {
+          dragCurrentIdx = tIdx;
+          document.querySelectorAll('.frm-card').forEach(c => c.classList.remove('drag-over'));
+          targetCard.classList.add('drag-over');
+        }
+      }
+    }, {passive: false});
+
+    const endDrag = e => {
+      clearTimeout(pressTimer);
+      if (!isDraggingCard) return;
+      isDraggingCard = false;
+      card.classList.remove('drag-active');
+      if (dragGhost) { dragGhost.remove(); dragGhost = null; }
+      document.querySelectorAll('.frm-card').forEach(c => c.classList.remove('drag-over'));
+      if (dragCurrentIdx >= 0 && dragCurrentIdx !== dragStartIdx) {
+        // Perform reorder
+        const moved = S.shots.splice(dragStartIdx, 1)[0];
+        S.shots.splice(dragCurrentIdx, 0, moved);
+        idbSaveShots(S.shots);
+        renderFrames();
+        renderStrip();
+        showToast('↕ Neu sortiert!');
+        playPop();
+      }
+      dragStartIdx = -1; dragCurrentIdx = -1;
+    };
+    card.addEventListener('pointerup',    endDrag);
+    card.addEventListener('pointerleave', endDrag);
+    card.addEventListener('pointercancel', endDrag);
+
+    // Click to select (only if not drag)
     card.addEventListener('click', () => {
+      if (isDraggingCard) return;
       if (selFrames.has(shot.id)) selFrames.delete(shot.id);
       else selFrames.add(shot.id);
       card.classList.toggle('selected', selFrames.has(shot.id));
       card.querySelector('.frm-sel-overlay').style.display = selFrames.has(shot.id) ? 'flex' : 'none';
     });
-    // Drag & drop
-    card.draggable = true;
-    card.addEventListener('dragstart', e => { dragSrc = i; card.style.opacity='.4'; e.dataTransfer.effectAllowed='move'; });
-    card.addEventListener('dragend',   ()  => { card.style.opacity='1'; });
-    card.addEventListener('dragover',  e => { e.preventDefault(); card.classList.add('drag-over'); });
-    card.addEventListener('dragleave', ()  => card.classList.remove('drag-over'));
-    card.addEventListener('drop',      e => {
-      e.preventDefault(); card.classList.remove('drag-over');
-      if (dragSrc === null || dragSrc === i) return;
-      const moved = S.shots.splice(dragSrc, 1)[0];
-      S.shots.splice(i, 0, moved);
-      dragSrc = null;
-      idbSaveShots(S.shots);
-      renderFrames(); renderStrip();
-    });
-    // Touch drag
-    let touchDragIdx = null;
-    card.addEventListener('touchstart', e => { touchDragIdx = i; }, {passive:true});
-    card.addEventListener('touchend', e => {
-      if (touchDragIdx === null) return;
-      const touch = e.changedTouches[0];
-      const el = document.elementFromPoint(touch.clientX, touch.clientY);
-      const target = el && el.closest('.frm-card');
-      if (target && target !== card) {
-        const ti = +target.dataset.idx;
-        const moved = S.shots.splice(touchDragIdx, 1)[0];
-        S.shots.splice(ti, 0, moved);
-        idbSaveShots(S.shots);
-        renderFrames(); renderStrip();
-      }
-      touchDragIdx = null;
-    }, {passive:true});
 
     grid.appendChild(card);
   });
@@ -4793,59 +5310,136 @@ async function doWebM() {
   setExpProgress(1);
 }
 
-// ── MP4 via FFmpeg ───────────────────────────────
+// ── MP4 via FFmpeg oder MediaRecorder-Fallback ───
 const FFMPEG_URL = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.js';
 async function doMP4() {
-  setExpStatus('🎥 Lade FFmpeg…');
+  setExpStatus('🎥 Starte MP4-Export…');
+
+  // Try modern MP4 recording via MediaRecorder first (no FFmpeg needed)
+  const mp4Mime = ['video/mp4;codecs=avc1','video/mp4','video/mp4;codecs=h264'].find(m => {
+    try { return MediaRecorder.isTypeSupported(m); } catch(e) { return false; }
+  });
+
+  if (mp4Mime) {
+    // Native MP4 via MediaRecorder (Chrome 130+, Edge, some mobile)
+    await doMP4Native(mp4Mime);
+    return;
+  }
+
+  // Fallback: try FFmpeg WASM
+  setExpStatus('🎥 Lade FFmpeg (kann etwas dauern)…');
   try {
     if (!window.FFmpeg) await loadScript(FFMPEG_URL);
-    const { FFmpeg } = window.FFmpeg;
-    const ffmpeg = new FFmpeg();
-    ffmpeg.on('log', ({ message }) => { if (message) setExpStatus('🎥 ' + message.slice(0, 60)); });
-    await ffmpeg.load();
-    const { w, h } = QM[S.quality];
-    const canvas   = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    const ctx = canvas.getContext('2d');
-
-    for (let i = 0; i < S.shots.length; i++) {
-      if (exportAborted) return;
-      await drawShotOnCanvas(ctx, S.shots[i], w, h);
-      drawSubtitles(ctx, i, w, h);
-      applyFade(ctx, i, w, h);
-      const blob = await canvasToBlob(canvas, 'image/png');
-      await ffmpeg.writeFile(`frame${String(i).padStart(4, '0')}.png`, new Uint8Array(await blob.arrayBuffer()));
-      setExpProgress(i / S.shots.length * 0.6);
-      setExpStatus(`🎥 Frame ${i + 1} von ${S.shots.length}`);
-    }
-
-    let audioArgs = [];
-    if (S.music) {
-      try {
-        const buf = await loadMusicBuffer();
-        if (buf) {
-          await ffmpeg.writeFile('music.mp3', new Uint8Array(buf));
-          audioArgs = ['-i', 'music.mp3', '-shortest'];
-        }
-      } catch(e) {}
-    }
-
-    setExpStatus('🎥 Rendere MP4…');
-    setExpProgress(0.7);
-    await ffmpeg.exec([
-      '-framerate', String(S.fps), '-i', 'frame%04d.png',
-      ...audioArgs,
-      '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '23', 'output.mp4'
-    ]);
-    const data = await ffmpeg.readFile('output.mp4');
-    const fn   = (S.project.title || 'mein-trickfilm').replace(/[^a-z0-9äöü]/gi, '_') + '.mp4';
-    offerDownload(new Blob([data.buffer], { type: 'video/mp4' }), fn);
-    setExpProgress(1);
-    $('ep-abort').style.display = 'none';
+    // Check FFmpeg loaded correctly
+    if (!window.FFmpeg || !window.FFmpeg.FFmpeg) throw new Error('FFmpeg nicht geladen');
+    await doMP4FFmpeg();
   } catch(e) {
-    setExpStatus('❌ FFmpeg-Fehler: ' + e.message);
-    console.error(e);
+    // Last fallback: export as WebM and inform user
+    setExpStatus('ℹ️ MP4 nicht verfügbar – exportiere als WebM (kompatibel mit Chrome/VLC)…');
+    await doWebM();
+    setExpStatus('✅ Als WebM exportiert (MP4 in diesem Browser nicht unterstützt). Tipp: Nutze Chrome 130+ für MP4.');
   }
+}
+
+async function doMP4Native(mimeType) {
+  setExpStatus('🎥 Exportiere MP4…');
+  const { w, h } = QM[S.quality];
+  const canvas   = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx    = canvas.getContext('2d');
+  const stream = canvas.captureStream(S.fps);
+
+  if (S.music) {
+    try {
+      const buf = await loadMusicBuffer();
+      if (buf) {
+        const actx = new (window.AudioContext || window.webkitAudioContext)();
+        const dest = actx.createMediaStreamDestination();
+        actx.decodeAudioData(buf.slice(0), decoded => {
+          const src = actx.createBufferSource();
+          src.buffer = decoded; src.loop = true;
+          const gainNode = actx.createGain();
+          gainNode.gain.value = S.vol || 0.8;
+          src.connect(gainNode); gainNode.connect(dest); src.start();
+        });
+        dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+      }
+    } catch(e) {}
+  }
+
+  let recorder;
+  try {
+    recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 3000000 });
+  } catch(e) {
+    recorder = new MediaRecorder(stream);
+  }
+  const chunks = [];
+  recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: mimeType });
+    const fn   = (S.project.title || 'mein-trickfilm').replace(/[^a-z0-9äöü]/gi, '_') + '.mp4';
+    offerDownload(blob, fn);
+    $('ep-abort').style.display = 'none';
+  };
+
+  recorder.start();
+  for (let i = 0; i < S.shots.length; i++) {
+    if (exportAborted) { recorder.stop(); return; }
+    await drawShotOnCanvas(ctx, S.shots[i], w, h);
+    drawSubtitles(ctx, i, w, h);
+    applyFade(ctx, i, w, h);
+    setExpProgress(i / S.shots.length);
+    setExpStatus(`🎥 Frame ${i + 1} von ${S.shots.length}`);
+    await expWait(1000 / S.fps);
+  }
+  recorder.stop();
+  setExpProgress(1);
+}
+
+async function doMP4FFmpeg() {
+  const { FFmpeg } = window.FFmpeg;
+  const ffmpeg = new FFmpeg();
+  ffmpeg.on('log', ({ message }) => { if (message) setExpStatus('🎥 ' + message.slice(0, 60)); });
+  await ffmpeg.load();
+  const { w, h } = QM[S.quality];
+  const canvas   = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+
+  for (let i = 0; i < S.shots.length; i++) {
+    if (exportAborted) return;
+    await drawShotOnCanvas(ctx, S.shots[i], w, h);
+    drawSubtitles(ctx, i, w, h);
+    applyFade(ctx, i, w, h);
+    const blob = await canvasToBlob(canvas, 'image/png');
+    await ffmpeg.writeFile(`frame${String(i).padStart(4, '0')}.png`, new Uint8Array(await blob.arrayBuffer()));
+    setExpProgress(i / S.shots.length * 0.6);
+    setExpStatus(`🎥 Frame ${i + 1} von ${S.shots.length}`);
+  }
+
+  let audioArgs = [];
+  if (S.music) {
+    try {
+      const buf = await loadMusicBuffer();
+      if (buf) {
+        await ffmpeg.writeFile('music.mp3', new Uint8Array(buf));
+        audioArgs = ['-i', 'music.mp3', '-shortest'];
+      }
+    } catch(e) {}
+  }
+
+  setExpStatus('🎥 Rendere MP4…');
+  setExpProgress(0.7);
+  await ffmpeg.exec([
+    '-framerate', String(S.fps), '-i', 'frame%04d.png',
+    ...audioArgs,
+    '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '23', 'output.mp4'
+  ]);
+  const data = await ffmpeg.readFile('output.mp4');
+  const fn   = (S.project.title || 'mein-trickfilm').replace(/[^a-z0-9äöü]/gi, '_') + '.mp4';
+  offerDownload(new Blob([data.buffer], { type: 'video/mp4' }), fn);
+  setExpProgress(1);
+  $('ep-abort').style.display = 'none';
 }
 
 // ── GIF (inline encoder) ─────────────────────────
@@ -5265,6 +5859,8 @@ document.addEventListener('DOMContentLoaded', () => {
   <span id="ai-bubble-icon">🎬</span>
   <span id="ai-bubble-badge" style="display:none">!</span>
 </button>
+
+<button id="help-float-btn" onclick="showHelp()" aria-label="Hilfe öffnen" title="Hilfe & Tipps">❓</button>
 
 <div id="ai-panel" style="display:none" role="dialog" aria-label="Kamera-Karl Chat">
   <div id="ai-header">
