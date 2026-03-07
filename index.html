@@ -3797,13 +3797,12 @@ function startGsLoop() {
   function loop() {
     if (!gsOn) return;
 
-    // Use the video element's actual rendered rect — this matches what the user sees
-    const rect = vid.getBoundingClientRect();
-    const dstW = Math.round(rect.width);
-    const dstH = Math.round(rect.height);
+    // Use the cam-box size for canvas pixels (matches CSS display size exactly)
+    const box = document.getElementById('cam-box');
+    const dstW = Math.round(box.clientWidth);
+    const dstH = Math.round(box.clientHeight);
     if (!dstW || !dstH) { gsRafId = requestAnimationFrame(loop); return; }
 
-    // Only resize internal pixel dimensions when they change (CSS handles display size)
     if (gsCv.width !== dstW || gsCv.height !== dstH) {
       gsCv.width  = dstW;
       gsCv.height = dstH;
@@ -3954,17 +3953,17 @@ function doSnap() {
       return {sx, sy, sw, sh};
     }
 
-    // Hintergrund zeichnen
+    // Hintergrund zeichnen — immer auf dstW/dstH (Ausgabegröße), nicht Videoauflösung
     if (gsBgImage) {
       const {sx, sy, sw, sh} = coverFit(
         gsBgImage.naturalWidth || gsBgImage.width,
         gsBgImage.naturalHeight || gsBgImage.height,
-        vW, vH
+        dstW, dstH
       );
-      ctx.drawImage(gsBgImage, sx, sy, sw, sh, 0, 0, vW, vH);
+      ctx.drawImage(gsBgImage, sx, sy, sw, sh, 0, 0, dstW, dstH);
     } else {
       ctx.fillStyle = '#1a1a2e';
-      ctx.fillRect(0, 0, vW, vH);
+      ctx.fillRect(0, 0, dstW, dstH);
     }
 
     // Videobild auf Offscreen-Canvas mit Cover-Crop
@@ -6340,108 +6339,8 @@ function initApp() {
 /* ═══════════════════════════════════════════════
    BOOTSTRAP
    ═══════════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
-  loadState();
-  try { syncBadges(); } catch(e) {}
-  initNav();
-  initPlanSubTabs();
-  initStory();
-  initFigures();
-  initStoryboard();
-  initBackgrounds();
-  initWeekplan();
-  initProgress();
-  initDrawModal();
-  initCamTab();
-  initRetouchModal();
-  initEditor();
-  initIntro();
-  initMusicTab();
-  initExportTab();
-  initKameraKarl();
-  try { checkAllBadges(); } catch(e) {}
-});
-</script>
 
-<!-- ══════════════════════════════════════
-     BADGE PANEL
-══════════════════════════════════════ -->
-<div id="badge-panel" role="dialog" aria-label="Abzeichen">
-  <div class="badge-box">
-    <div class="badge-header">
-      <span>🏆 Meine Abzeichen</span>
-      <button onclick="closeBadges()">✕</button>
-    </div>
-    <div id="badge-grid"></div>
-  </div>
-</div>
 
-<!-- ══════════════════════════════════════
-     TAB INTRO OVERLAY
-══════════════════════════════════════ -->
-<div id="tab-intro-overlay" class="hidden">
-  <div id="tab-intro-box">
-    <div id="tab-intro-header">
-      <div id="tab-intro-icon"></div>
-      <div id="tab-intro-title"></div>
-    </div>
-    <div id="tab-intro-body"></div>
-    <div id="tab-intro-footer">
-      <label id="tab-intro-no-more">
-        <input type="checkbox" id="tab-intro-disable"/> Nicht mehr anzeigen
-      </label>
-      <button class="btn-primary sm" id="tab-intro-ok">Verstanden 👍</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════
-     HELP MODAL
-══════════════════════════════════════ -->
-<div id="help-modal" role="dialog" aria-label="Hilfe">
-  <div class="help-box">
-    <div class="help-header">
-      <span>❓ Hilfe &amp; Tipps</span>
-      <button onclick="closeHelp()">✕</button>
-    </div>
-    <div class="help-tabs">
-      <button class="help-tab active" onclick="showHelpSection('stopmotion',this)">🎬 Was ist Stop-Motion?</button>
-      <button class="help-tab" onclick="showHelpSection('tipps',this)">💡 Tipps &amp; Tricks</button>
-      <button class="help-tab" onclick="showHelpSection('glossar',this)">📚 Glossar</button>
-    </div>
-    <div id="help-body"></div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════
-     KAMERA-KARL AI CHAT BUBBLE & PANEL
-══════════════════════════════════════ -->
-<button id="ai-bubble" onclick="aiToggle()" aria-label="Kamera-Karl öffnen">
-  <span id="ai-bubble-icon">🎬</span>
-  <span id="ai-bubble-badge" style="display:none">!</span>
-</button>
-
-<button id="help-float-btn" onclick="showHelp()" aria-label="Hilfe öffnen" title="Hilfe & Tipps">❓</button>
-
-<div id="ai-panel" style="display:none" role="dialog" aria-label="Kamera-Karl Chat">
-  <div id="ai-header">
-    <div id="ai-avatar">🎬</div>
-    <div>
-      <div id="ai-name">Kamera-Karl</div>
-      <div id="ai-status">Dein Film-Assistent</div>
-    </div>
-    <button id="ai-close" onclick="aiToggle()" aria-label="Schließen">✕</button>
-  </div>
-  <div id="ai-messages"></div>
-
-  <div id="ai-suggestions"></div>
-  <div id="ai-input-row">
-    <input id="ai-input" type="text" placeholder="Frag Kamera-Karl…" autocomplete="off"/>
-    <button id="ai-send" onclick="aiSend()" aria-label="Senden">➤</button>
-  </div>
-</div>
-
-<script>
 /* ═══════════════════════════════════════════════
    KAMERA-KARL – KI-ASSISTENT
    ═══════════════════════════════════════════════ */
@@ -6587,90 +6486,79 @@ const KARL_KB = [
     a: '🎬 Ich kenne mich aus mit: Fototipps 📷, Beleuchtung 💡, Storyboard 🎬, Figuren 🎭, Musik 🎵, Schnitt ✂️, Export 📤 und allem rund um Stop-Motion! Frag mich einfach drauflos!' },
 ];
 
-// ── Alle Projektdaten sammeln ────────────────────────────────────
+// ── Projektdaten für Kamera-Karl sammeln ──────────────────────────
 function karlGetContext() {
-  if (typeof S === 'undefined') return {shots:0,figs:[],scenes:[],groups:[],subsCount:0,musicName:'keine',title:'',about:'',beg:'',ten:'',end:'',fps:8,quality:'480p',format:'webm',vol:80,progSummary:'',bgName:'kein Hintergrund'};
-  const p = S.project||{}, figs=p.figures||[], scenes=p.scenes||[], groups=S.groups||[], subs=S.subtitles||[], prog=p.progress||[];
+  if (typeof S === 'undefined') return {shots:0,figs:[],scenes:[],groups:[],subsCount:0,musicName:'keine',title:'',about:'',beg:'',ten:'',end:'',fps:8,quality:'480p',format:'webm',vol:80,progSummary:'',bgName:'kein Hintergrund',scenesSummary:'',groupsSummary:''};
+  const p=S.project||{}, figs=p.figures||[], scenes=p.scenes||[], groups=S.groups||[], subs=S.subtitles||[], prog=p.progress||[];
   const progLabels=['Geschichte','Figuren','Storyboard','Drehen','Schnitt','Export'];
   let musicName='keine';
-  if (S.music) musicName=S.music.name||S.music.key||'unbekannt';
-  const scenesSummary=scenes.map((s,i)=>`Szene ${i+1}: ${s.title||'(kein Titel)'} – ${s.notes||'keine Notizen'}`).join('; ')||'(keine)';
-  const groupsSummary=groups.map(g=>`${g.name||'Gruppe'} (${(g.frameIds||[]).length} Frames)`).join(', ')||'(keine)';
-  const progSummary=progLabels.map((l,i)=>`${l}: ${prog[i]||0}%`).join(', ');
-  const bgName=p.background==='custom'?'eigener Hintergrund':(p.background!=null?`Hintergrund ${p.background+1}`:'kein Hintergrund');
+  if(S.music) musicName=S.music.name||S.music.key||'unbekannt';
+  const scenesSummary=scenes.map((s,i)=>'Szene '+(i+1)+': '+(s.title||'kein Titel')+' - '+(s.notes||'keine Notizen')).join('; ')||'(keine)';
+  const groupsSummary=groups.map(g=>(g.name||'Gruppe')+' ('+(g.frameIds||[]).length+' Frames)').join(', ')||'(keine)';
+  const progSummary=progLabels.map((l,i)=>l+': '+(prog[i]||0)+'%').join(', ');
+  const bgName=p.background==='custom'?'eigener Hintergrund':(p.background!=null?'Hintergrund '+(p.background+1):'kein Hintergrund');
   return {title:p.title||'(kein Titel)',about:p.about||'',beg:p.beg||'',ten:p.ten||'',end:p.end||'',shots:S.shots.length,fps:S.fps||8,quality:S.quality||'480p',format:S.format||'webm',vol:Math.round((S.vol||0.8)*100),musicName,figs,scenes,scenesSummary,groups,groupsSummary,subsCount:subs.length,progSummary,bgName};
 }
 
 function karlOfflineAnswer(msg) {
   const m=msg.toLowerCase(), c=karlGetContext();
 
-  if (['geschichte','story','meine idee','was passiert','anfang','mitte','ende','handlung','plot','worum','erzähl','mein film','meine geschichte','hilf mir'].some(kw=>m.includes(kw))) {
-    if (!c.about&&!c.beg&&!c.ten&&!c.end) return '📖 Deine Geschichte ist noch leer! Geh zu Plan → Geschichte und füll die Felder aus. Dann helfe ich dir gerne weiter!';
-    let r=`📽️ Dein Film „${c.title}":
-`;
-    if (c.about) r+=`📝 Thema: ${c.about}
-`;
-    if (c.beg)   r+=`🌅 Anfang: ${c.beg}
-`;
-    if (c.ten)   r+=`⚡ Was passiert: ${c.ten}
-`;
-    if (c.end)   r+=`🌟 Ende: ${c.end}
-`;
-    if (!c.ten)  r+='
-💡 Was ist das Abenteuer? Das macht die Geschichte spannend!';
-    else if (!c.end) r+='
-💡 Das Ende fehlt noch – wie löst deine Figur das Problem?';
-    else r+='
-🎬 Klasse Geschichte! Starte jetzt das Storyboard.';
+  if(['geschichte','story','meine idee','was passiert','anfang','mitte','ende','handlung','plot','worum','erzahl','mein film','meine geschichte','hilf mir'].some(kw=>m.includes(kw))) {
+    if(!c.about&&!c.beg&&!c.ten&&!c.end) return '\u{1F4D6} Deine Geschichte ist noch leer! Geh zu Plan \u2192 Geschichte und f\u00fcll die Felder aus.';
+    let r='\u{1F3AC} Dein Film \u201E'+c.title+'\u201C:\n';
+    if(c.about) r+='\u{1F4DD} Thema: '+c.about+'\n';
+    if(c.beg)   r+='\u{1F305} Anfang: '+c.beg+'\n';
+    if(c.ten)   r+='\u26A1 Was passiert: '+c.ten+'\n';
+    if(c.end)   r+='\u{1F31F} Ende: '+c.end+'\n';
+    if(!c.ten)  r+='\n\u{1F4A1} Was ist das Abenteuer? Das macht die Geschichte spannend!';
+    else if(!c.end) r+='\n\u{1F4A1} Das Ende fehlt noch!';
+    else r+='\n\u{1F3AC} Klasse Geschichte! Starte jetzt das Storyboard.';
     return r.trim();
   }
 
-  if (['meine figur','meine figuren','welche figur','wer ist','charakter','figuren'].some(kw=>m.includes(kw))) {
-    if (c.figs.length===0) return '🎭 Noch keine Figuren! Geh zu Plan → Figuren und leg los.';
-    return `🎭 ${c.figs.length} Figur${c.figs.length===1?'':'en'}: ${c.figs.map(f=>`${f.emoji||'🎭'} ${f.name} (${f.role||'?'})`).join(', ')}. Kleine Schritte = flüssige Bewegung!`;
+  if(['meine figur','meine figuren','welche figur','wer ist','charakter','figuren'].some(kw=>m.includes(kw))) {
+    if(c.figs.length===0) return '\u{1F3AD} Noch keine Figuren! Geh zu Plan \u2192 Figuren.';
+    const names=c.figs.map(f=>(f.emoji||'\u{1F3AD}')+' '+f.name+' ('+(f.role||'?')+')').join(', ');
+    return '\u{1F3AD} '+c.figs.length+' Figur'+(c.figs.length===1?'':'en')+': '+names+'. Kleine Schritte = fl\u00fcssige Bewegung!';
   }
 
-  if (['storyboard','meine szenen','szenenplan'].some(kw=>m.includes(kw))) {
-    if (c.scenes.length===0) return '🎬 Kein Storyboard! Geh zu Plan → Storyboard und füge Szenen hinzu.';
-    return `🎬 ${c.scenes.length} Szene${c.scenes.length===1?'':'n'}: ${c.scenesSummary}`;
+  if(['storyboard','meine szenen','szenenplan'].some(kw=>m.includes(kw))) {
+    if(c.scenes.length===0) return '\u{1F3AC} Kein Storyboard! Geh zu Plan \u2192 Storyboard.';
+    return '\u{1F3AC} '+c.scenes.length+' Szene'+(c.scenes.length===1?'':'n')+': '+c.scenesSummary;
   }
 
-  if (['welche musik','meine musik','song','track','musiktab'].some(kw=>m.includes(kw))) {
-    const sel=c.musicName!=='keine'?`„${c.musicName}" (${c.vol}% Lautstärke)`:'noch keine';
-    return `🎵 Musik: ${sel}. Im Musik-Tab findest du kostenlose Musicfox-Tracks oder kannst eigene hochladen.`;
+  if(['welche musik','meine musik','song','track','musiktab'].some(kw=>m.includes(kw))) {
+    const sel=c.musicName!=='keine'?'\u201E'+c.musicName+'\u201C ('+c.vol+'% Lautst\u00e4rke)':'noch keine';
+    return '\u{1F3B5} Musik: '+sel+'. Im Musik-Tab findest du kostenlose Musicfox-Tracks.';
   }
 
-  if (['gruppe','gruppen','meine gruppen'].some(kw=>m.includes(kw))) {
-    if (c.groups.length===0) return '📁 Noch keine Gruppen! Markiere Frames im Editor → 📁 Gruppe erstellen.';
-    return `📁 ${c.groups.length} Gruppe${c.groups.length===1?'':'n'}: ${c.groupsSummary}.`;
+  if(['gruppe','gruppen','meine gruppen'].some(kw=>m.includes(kw))) {
+    if(c.groups.length===0) return '\u{1F4C1} Noch keine Gruppen! Markiere Frames \u2192 Gruppe erstellen.';
+    return '\u{1F4C1} '+c.groups.length+' Gruppe'+(c.groups.length===1?'':'n')+': '+c.groupsSummary;
   }
 
-  if (['export','format','qualität','auflösung'].some(kw=>m.includes(kw))) {
-    return `📤 Export: ${c.format.toUpperCase()}, ${c.quality}, ${c.fps} FPS. ${c.format==='webm'?'WebM ist klein und schnell.':'MP4 läuft überall.'} Im Export-Tab anpassbar!`;
+  if(['export','format','qualitat','auflosung'].some(kw=>m.includes(kw))) {
+    return '\u{1F4E4} Export: '+c.format.toUpperCase()+', '+c.quality+', '+c.fps+' FPS. Im Export-Tab anpassbar!';
   }
 
-  if (['untertitel','subtitle','text im film'].some(kw=>m.includes(kw))) {
-    return c.subsCount>0?`📝 ${c.subsCount} Untertitel vorhanden. Bearbeiten im Export-Tab.`:'📝 Noch keine Untertitel! Im Export-Tab hinzufügbar.';
+  if(['untertitel','subtitle','text im film'].some(kw=>m.includes(kw))) {
+    return c.subsCount>0?'\u{1F4DD} '+c.subsCount+' Untertitel vorhanden.':'\u{1F4DD} Noch keine Untertitel! Im Export-Tab hinzuf\u00fcgbar.';
   }
 
-  if (['wie weit','fortschritt','stand','status','wie viel','produktionsplan'].some(kw=>m.includes(kw))) {
-    return `📊 Stand „${c.title}":
-• 📷 ${c.shots} Fotos  • 🎭 ${c.figs.length} Figuren  • 🎬 ${c.scenes.length} Szenen
-• 📁 ${c.groups.length} Gruppen  • 🎵 ${c.musicName}  • 🌄 ${c.bgName}
-• 📈 ${c.progSummary}
-${c.shots<10?'💡 Fang mit Fotografieren an!':c.shots<30?'🎬 Gut – weiter so!':'🌟 Fast fertig!'}`.trim();
+  if(['wie weit','fortschritt','stand','status','wie viel','produktionsplan'].some(kw=>m.includes(kw))) {
+    return '\u{1F4CA} Stand \u201E'+c.title+'\u201C:\n\u2022 \u{1F4F7} '+c.shots+' Fotos  \u2022 \u{1F3AD} '+c.figs.length+' Figuren  \u2022 \u{1F3AC} '+c.scenes.length+' Szenen\n\u2022 \u{1F4C1} '+c.groups.length+' Gruppen  \u2022 \u{1F3B5} '+c.musicName+'  \u2022 \u{1F304} '+c.bgName+'\n\u2022 \u{1F4C8} '+c.progSummary+(c.shots<10?'\n\u{1F4A1} Fang mit Fotografieren an!':c.shots<30?'\n\u{1F3AC} Gut, weiter so!':'\n\u{1F31F} Fast fertig!');
   }
 
-  if (['hintergrund','kulisse','background'].some(kw=>m.includes(kw))) {
-    return `🌄 Aktuell: ${c.bgName}. In Plan → Hintergründe findest du viele Motive.`;
+  if(['hintergrund','kulisse','background'].some(kw=>m.includes(kw))) {
+    return '\u{1F304} Aktuell: '+c.bgName+'. In Plan \u2192 Hintergr\u00fcnde findest du viele Motive.';
   }
 
-  for (const entry of KARL_KB) {
-    if (entry.q.some(kw=>m.includes(kw))) return entry.a;
+  for(const entry of KARL_KB) {
+    if(entry.q.some(kw=>m.includes(kw))) return entry.a;
   }
 
-  if (c.shots===0) return '🎬 Noch keine Fotos! Geh zum 📷 Kamera-Tab – 20 Fotos reichen für eine erste Szene.';
-  return `🎬 ${c.shots} Fotos, ${c.figs.length} Figuren, ${c.scenes.length} Szenen. Frag mich nach: Geschichte, Figuren, Storyboard, Musik, Gruppen, Export oder Fortschritt!`;
+  if(c.shots===0) return '\u{1F3AC} Noch keine Fotos! Geh zum \u{1F4F7} Kamera-Tab \u2013 20 Fotos reichen f\u00fcr eine erste Szene.';
+  return '\u{1F3AC} '+c.shots+' Fotos, '+c.figs.length+' Figuren, '+c.scenes.length+' Szenen. Frag mich nach: Geschichte, Figuren, Storyboard, Musik, Gruppen oder Export!';
 }
 
 async function aiSend() {
@@ -6745,7 +6633,109 @@ function initKameraKarl() {
     tab.addEventListener('click', () => { if (aiOpen) renderAiChips(); });
   });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadState();
+  try { syncBadges(); } catch(e) {}
+  initNav();
+  initPlanSubTabs();
+  initStory();
+  initFigures();
+  initStoryboard();
+  initBackgrounds();
+  initWeekplan();
+  initProgress();
+  initDrawModal();
+  initCamTab();
+  initRetouchModal();
+  initEditor();
+  initIntro();
+  initMusicTab();
+  initExportTab();
+  initKameraKarl();
+  try { checkAllBadges(); } catch(e) {}
+});
 </script>
+
+<!-- ══════════════════════════════════════
+     BADGE PANEL
+══════════════════════════════════════ -->
+<div id="badge-panel" role="dialog" aria-label="Abzeichen">
+  <div class="badge-box">
+    <div class="badge-header">
+      <span>🏆 Meine Abzeichen</span>
+      <button onclick="closeBadges()">✕</button>
+    </div>
+    <div id="badge-grid"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB INTRO OVERLAY
+══════════════════════════════════════ -->
+<div id="tab-intro-overlay" class="hidden">
+  <div id="tab-intro-box">
+    <div id="tab-intro-header">
+      <div id="tab-intro-icon"></div>
+      <div id="tab-intro-title"></div>
+    </div>
+    <div id="tab-intro-body"></div>
+    <div id="tab-intro-footer">
+      <label id="tab-intro-no-more">
+        <input type="checkbox" id="tab-intro-disable"/> Nicht mehr anzeigen
+      </label>
+      <button class="btn-primary sm" id="tab-intro-ok">Verstanden 👍</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     HELP MODAL
+══════════════════════════════════════ -->
+<div id="help-modal" role="dialog" aria-label="Hilfe">
+  <div class="help-box">
+    <div class="help-header">
+      <span>❓ Hilfe &amp; Tipps</span>
+      <button onclick="closeHelp()">✕</button>
+    </div>
+    <div class="help-tabs">
+      <button class="help-tab active" onclick="showHelpSection('stopmotion',this)">🎬 Was ist Stop-Motion?</button>
+      <button class="help-tab" onclick="showHelpSection('tipps',this)">💡 Tipps &amp; Tricks</button>
+      <button class="help-tab" onclick="showHelpSection('glossar',this)">📚 Glossar</button>
+    </div>
+    <div id="help-body"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     KAMERA-KARL AI CHAT BUBBLE & PANEL
+══════════════════════════════════════ -->
+<button id="ai-bubble" onclick="aiToggle()" aria-label="Kamera-Karl öffnen">
+  <span id="ai-bubble-icon">🎬</span>
+  <span id="ai-bubble-badge" style="display:none">!</span>
+</button>
+
+<button id="help-float-btn" onclick="showHelp()" aria-label="Hilfe öffnen" title="Hilfe & Tipps">❓</button>
+
+<div id="ai-panel" style="display:none" role="dialog" aria-label="Kamera-Karl Chat">
+  <div id="ai-header">
+    <div id="ai-avatar">🎬</div>
+    <div>
+      <div id="ai-name">Kamera-Karl</div>
+      <div id="ai-status">Dein Film-Assistent</div>
+    </div>
+    <button id="ai-close" onclick="aiToggle()" aria-label="Schließen">✕</button>
+  </div>
+  <div id="ai-messages"></div>
+
+  <div id="ai-suggestions"></div>
+  <div id="ai-input-row">
+    <input id="ai-input" type="text" placeholder="Frag Kamera-Karl…" autocomplete="off"/>
+    <button id="ai-send" onclick="aiSend()" aria-label="Senden">➤</button>
+  </div>
+</div>
+
+
 
 <script>
 /* ═══════════════════════════════════════════════
@@ -7219,7 +7209,14 @@ function retouchComposite() {
   const ctx = Retouch.ctx;
   const w = Retouch.canvas.width, h = Retouch.canvas.height;
   ctx.clearRect(0, 0, w, h);
-  if (Retouch.bgCanvas) ctx.drawImage(Retouch.bgCanvas, 0, 0);
+  // Checkerboard so erased areas are visible
+  for (let y = 0; y < h; y += 14) {
+    for (let x = 0; x < w; x += 14) {
+      ctx.fillStyle = (((x / 14) + (y / 14)) % 2 === 0) ? '#ddd' : '#fff';
+      ctx.fillRect(x, y, 14, 14);
+    }
+  }
+  // Draw photo (with transparent holes from eraser)
   if (Retouch.fgCanvas) ctx.drawImage(Retouch.fgCanvas, 0, 0);
 }
 
@@ -7247,14 +7244,8 @@ function openRetouchModal(shotIndex) {
     canvas.height = Math.round(img.height * scale);
     const w = canvas.width, h = canvas.height;
 
-    // Background layer = the original shot baked in full
-    // (so erasing reveals whatever was behind the foreground in the shot)
-    const bgCv = document.createElement('canvas');
-    bgCv.width = w; bgCv.height = h;
-    bgCv.getContext('2d').drawImage(img, 0, 0, w, h);
-    Retouch.bgCanvas = bgCv;
-
-    // Foreground layer = same shot, destination-out erases pixels here
+    // fgCanvas = the photo (destination-out erases pixels to transparent)
+    Retouch.bgCanvas = null;
     const fgCv = document.createElement('canvas');
     fgCv.width = w; fgCv.height = h;
     fgCv.getContext('2d').drawImage(img, 0, 0, w, h);
@@ -7332,12 +7323,10 @@ function initRetouchModal() {
 
   // Save
   document.getElementById('retouch-save').addEventListener('click', () => {
-    const saveCv = document.createElement('canvas');
-    saveCv.width = Retouch.canvas.width; saveCv.height = Retouch.canvas.height;
-    const saveCtx = saveCv.getContext('2d');
-    if (Retouch.bgCanvas) saveCtx.drawImage(Retouch.bgCanvas, 0, 0);
-    if (Retouch.fgCanvas) saveCtx.drawImage(Retouch.fgCanvas, 0, 0);
-    const dataUrl = saveCv.toDataURL('image/jpeg', 0.92);
+    // Save fgCanvas as PNG to preserve transparency from erasing
+    const dataUrl = Retouch.fgCanvas
+      ? Retouch.fgCanvas.toDataURL('image/png')
+      : Retouch.canvas.toDataURL('image/png');
     S.shots[Retouch.shotIndex].data = dataUrl;
     idbSaveShots(S.shots);
     renderStrip();
@@ -7360,25 +7349,25 @@ function initRetouchModal() {
   }
 
   function retouchDraw(x, y) {
+    if (!Retouch.fgCanvas) return;
     const fgCtx = Retouch.fgCanvas.getContext('2d');
     const r = Retouch.size;
+    fgCtx.save();
+    fgCtx.beginPath();
+    fgCtx.arc(x, y, r, 0, Math.PI * 2);
     if (Retouch.tool === 'eraser') {
-      fgCtx.save();
       fgCtx.globalCompositeOperation = 'destination-out';
-      fgCtx.beginPath();
-      fgCtx.arc(x, y, r, 0, Math.PI * 2);
       fgCtx.fillStyle = 'rgba(0,0,0,1)';
-      fgCtx.fill();
-      fgCtx.restore();
     } else {
-      fgCtx.save();
       fgCtx.globalCompositeOperation = 'source-over';
-      fgCtx.beginPath();
-      fgCtx.arc(x, y, r, 0, Math.PI * 2);
       fgCtx.clip();
       fgCtx.drawImage(Retouch.origImage, 0, 0, Retouch.canvas.width, Retouch.canvas.height);
       fgCtx.restore();
+      retouchComposite();
+      return;
     }
+    fgCtx.fill();
+    fgCtx.restore();
     retouchComposite();
   }
 
