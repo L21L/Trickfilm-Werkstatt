@@ -734,7 +734,8 @@ textarea.field-input{min-height:80px;line-height:1.5}
 
 /* Camera Box */
 #cam-box{position:relative;width:100%;background:#000;overflow:hidden;flex-shrink:0;
-  max-height:55vw;aspect-ratio:4/3}
+  max-height:55vw;aspect-ratio:var(--cam-aspect, 4/3)}
+#cam-box.portrait{max-height:none;max-width:75vw;margin:0 auto;aspect-ratio:var(--cam-aspect, 3/4)}
 #cam-vid{width:100%;height:100%;object-fit:cover;display:block}
 #onion-cv,#gs-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 #cam-grid{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .2s;
@@ -1665,6 +1666,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
     <div class="cam-controls">
       <div class="cam-row1">
         <button class="cch" id="btn-swcam"   onclick="swCam()">🔄 Wechseln</button>
+        <button class="cch" id="btn-format"  onclick="togFormat()">📐 Querformat</button>
         <button class="cch" id="btn-grid"    onclick="togGrid()">⊞ Raster</button>
         <button class="cch" id="btn-onion"   onclick="togOnion()">🧅 Zwiebelhaut</button>
         <button class="cch" id="btn-timer"   onclick="togTimer()">⏱ Timer</button>
@@ -3551,6 +3553,7 @@ function checkOnboarding() {
    ═══════════════════════════════════════════════ */
 let camStream       = null;
 let camFacing       = 'environment';
+let camAspect       = '4/3'; // '4/3' = Querformat, '3/4' = Hochformat
 let onionOn         = false;
 let timerOn         = false;
 let tlActive        = false;
@@ -3758,6 +3761,29 @@ function showCamFallback(e) {
 function swCam() {
   camFacing = camFacing === 'environment' ? 'user' : 'environment';
   initCam();
+}
+
+/* ── Format Umschalten ──────────────────────── */
+function togFormat() {
+  const box = $('cam-box');
+  const btn = $('btn-format');
+  if (camAspect === '4/3') {
+    // Wechsel zu Hochformat
+    camAspect = '3/4';
+    box.classList.add('portrait');
+    box.style.setProperty('--cam-aspect', '3/4');
+    btn.textContent = '📐 Hochformat';
+    btn.classList.add('on');
+  } else {
+    // Wechsel zu Querformat
+    camAspect = '4/3';
+    box.classList.remove('portrait');
+    box.style.setProperty('--cam-aspect', '4/3');
+    btn.textContent = '📐 Querformat';
+    btn.classList.remove('on');
+  }
+  // Zwiebelhaut neu zeichnen
+  if (onionOn) drawOnion();
 }
 
 /* ── Raster ─────────────────────────────────── */
@@ -4111,6 +4137,25 @@ function doSnap() {
   const vW  = vid.videoWidth  || 640;
   const vH  = vid.videoHeight || 480;
 
+  // Zielformat aus aktuellem Seitenverhältnis des Viewfinders
+  const [arW, arH] = camAspect.split('/').map(Number);
+  const targetR = arW / arH;
+
+  // Zielauflösung: so groß wie möglich innerhalb der Videogröße, korrekt zugeschnitten
+  let dstW, dstH;
+  const videoR = vW / vH;
+  if (videoR > targetR) {
+    // Video breiter als Ziel → Breite beschränken
+    dstH = vH;
+    dstW = Math.round(dstH * targetR);
+  } else {
+    dstW = vW;
+    dstH = Math.round(dstW / targetR);
+  }
+  // Cropkoordinaten im Videobild (zentriert)
+  const cropX = Math.round((vW - dstW) / 2);
+  const cropY = Math.round((vH - dstH) / 2);
+
   function coverFitSnap(srcW, srcH, dstW, dstH) {
     const srcR = srcW / srcH, dstR = dstW / dstH;
     let sw, sh, sx = 0, sy = 0;
@@ -4121,14 +4166,13 @@ function doSnap() {
 
   if (gsOn) {
     // ── Greenscreen aktiv ──────────────────────────────────────
-    // Ausgabegröße = Videoauflösung (beste Qualität)
-    const dstW = vW, dstH = vH;
+    // Ausgabegröße = auf Viewfinder-Format zugeschnitten
 
-    // Offscreen-Canvas: Chroma-Key auf Videobild anwenden → transparente Pixel
+    // Offscreen-Canvas: Chroma-Key auf zugeschnittenem Videobild anwenden → transparente Pixel
     const tmp = document.createElement('canvas');
     tmp.width = dstW; tmp.height = dstH;
     const tc = tmp.getContext('2d');
-    tc.drawImage(vid, 0, 0, dstW, dstH);
+    tc.drawImage(vid, cropX, cropY, dstW, dstH, 0, 0, dstW, dstH);
 
     const imgData = tc.getImageData(0, 0, dstW, dstH);
     const data = imgData.data;
@@ -4193,7 +4237,7 @@ function doSnap() {
   } else {
     // ── Normalmodus ────────────────────────────────────────────
     const cv = document.createElement('canvas');
-    cv.width = vW; cv.height = vH;
+    cv.width = dstW; cv.height = dstH;
     const ctx = cv.getContext('2d');
 
     // Projekt-Hintergrund ins Foto rendern (falls gesetzt)
@@ -4213,19 +4257,20 @@ function doSnap() {
       if (bgImg) {
         if (isSvg) {
           // SVG: einfach auf die volle Canvas-Größe strecken (viewBox passt sich an)
-          ctx.drawImage(bgImg, 0, 0, vW, vH);
+          ctx.drawImage(bgImg, 0, 0, dstW, dstH);
         } else {
-          // Bild: cover-fit, damit nichts abgeschnitten wird
-          const srcW = bgImg.naturalWidth || vW;
-          const srcH = bgImg.naturalHeight || vH;
-          const srcR = srcW / srcH, dstR = vW / vH;
+          // Bild: cover-fit auf Zielformat
+          const srcW = bgImg.naturalWidth || dstW;
+          const srcH = bgImg.naturalHeight || dstH;
+          const srcR = srcW / srcH, dstR = dstW / dstH;
           let sx = 0, sy = 0, sw = srcW, sh = srcH;
           if (srcR > dstR) { sh = srcH; sw = sh * dstR; sx = (srcW - sw) / 2; }
           else              { sw = srcW; sh = sw / dstR; sy = (srcH - sh) / 2; }
-          ctx.drawImage(bgImg, sx, sy, sw, sh, 0, 0, vW, vH);
+          ctx.drawImage(bgImg, sx, sy, sw, sh, 0, 0, dstW, dstH);
         }
       }
-      ctx.drawImage(vid, 0, 0);
+      // Video auf Zielgröße zuschneiden (Mitte des Videobilds)
+      ctx.drawImage(vid, cropX, cropY, dstW, dstH, 0, 0, dstW, dstH);
       addShot(cv.toDataURL('image/jpeg', 0.88), false);
     }
 
@@ -4235,11 +4280,11 @@ function doSnap() {
       const idx = +bgSrc.replace('svg:', '');
       // SVG viewBox setzen damit Browser korrekte Größe kennt
       let svgStr = BG_LIB[idx].svg;
-      svgStr = svgStr.replace('<svg ', `<svg width="${vW}" height="${vH}" `);
+      svgStr = svgStr.replace('<svg ', `<svg width="${dstW}" height="${dstH}" `);
       const blob = new Blob([svgStr], {type: 'image/svg+xml'});
       const url  = URL.createObjectURL(blob);
       const img  = new Image();
-      img.width  = vW; img.height = vH;
+      img.width  = dstW; img.height = dstH;
       img.onload = () => { URL.revokeObjectURL(url); finishSnap(img, true); };
       img.onerror = () => { finishSnap(null); };
       img.src = url;
