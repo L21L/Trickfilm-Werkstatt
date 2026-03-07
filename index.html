@@ -3803,13 +3803,10 @@ function startGsLoop() {
     const dstH = Math.round(rect.height);
     if (!dstW || !dstH) { gsRafId = requestAnimationFrame(loop); return; }
 
-    // Only resize canvas when dimensions change (avoids flicker)
+    // Only resize internal pixel dimensions when they change (CSS handles display size)
     if (gsCv.width !== dstW || gsCv.height !== dstH) {
       gsCv.width  = dstW;
       gsCv.height = dstH;
-      // Position canvas exactly over the video element
-      gsCv.style.width  = dstW + 'px';
-      gsCv.style.height = dstH + 'px';
     }
 
     const ctx = gsCv.getContext('2d');
@@ -6592,38 +6589,6 @@ const KARL_KB = [
 
 // ── Alle Projektdaten sammeln ────────────────────────────────────
 function karlGetContext() {
-  if (typeof S === 'undefined') return {};
-  const p    = S.project || {};
-  const figs = p.figures  || [];
-  const scenes = p.scenes || [];
-  const groups = S.groups || [];
-  const subs   = S.subtitles || [];
-  const prog   = p.progress  || [];
-  const progLabels = ['Geschichte','Figuren','Storyboard','Drehen','Schnitt','Export'];
-  const plan   = p.prodplan  || [];
-  let musicName = 'keine';
-  if (S.music) musicName = S.music.name || S.music.key || 'unbekannt';
-  const scenesSummary = scenes.map((s,i) =>
-    `Szene ${i+1}: ${s.title||'(kein Titel)'} – ${s.notes||'(keine Notizen)'}`
-  ).join('; ') || '(keine Szenen)';
-  const groupsSummary = groups.map(g =>
-    `${g.name||'Gruppe'} (${(g.frameIds||[]).length} Frames)`
-  ).join(', ') || '(keine Gruppen)';
-  const progSummary = progLabels.map((l,i) => `${l}: ${prog[i]||0}%`).join(', ');
-  const bgName = p.background === 'custom' ? 'eigener Hintergrund'
-    : (p.background != null ? `Hintergrund ${p.background+1}` : 'kein Hintergrund');
-  return {
-    title: p.title||'(kein Titel)', about: p.about||'', beg: p.beg||'',
-    ten: p.ten||'', end: p.end||'', shots: S.shots.length,
-    fps: S.fps||8, quality: S.quality||'480p', format: S.format||'webm',
-    vol: Math.round((S.vol||0.8)*100), musicName,
-    figs, scenes, scenesSummary, groups, groupsSummary,
-    subsCount: subs.length, progSummary, bgName,
-  };
-}
-
-// ── Alle Projektdaten sammeln ────────────────────────────────────
-function karlGetContext() {
   if (typeof S === 'undefined') return {shots:0,figs:[],scenes:[],groups:[],subsCount:0,musicName:'keine',title:'',about:'',beg:'',ten:'',end:'',fps:8,quality:'480p',format:'webm',vol:80,progSummary:'',bgName:'kein Hintergrund'};
   const p = S.project||{}, figs=p.figures||[], scenes=p.scenes||[], groups=S.groups||[], subs=S.subtitles||[], prog=p.progress||[];
   const progLabels=['Geschichte','Figuren','Storyboard','Drehen','Schnitt','Export'];
@@ -7282,24 +7247,14 @@ function openRetouchModal(shotIndex) {
     canvas.height = Math.round(img.height * scale);
     const w = canvas.width, h = canvas.height;
 
-    // Background layer (protected from eraser)
+    // Background layer = the original shot baked in full
+    // (so erasing reveals whatever was behind the foreground in the shot)
     const bgCv = document.createElement('canvas');
     bgCv.width = w; bgCv.height = h;
-    const bgCtx = bgCv.getContext('2d');
-    if (typeof gsBgImage !== 'undefined' && gsBgImage) {
-      const srcW = gsBgImage.naturalWidth||gsBgImage.width;
-      const srcH = gsBgImage.naturalHeight||gsBgImage.height;
-      const srcR = srcW/srcH, dstR = w/h;
-      let sx=0,sy=0,sw=srcW,sh=srcH;
-      if (srcR>dstR){sh=srcH;sw=sh*dstR;sx=(srcW-sw)/2;}
-      else           {sw=srcW;sh=sw/dstR;sy=(srcH-sh)/2;}
-      bgCtx.drawImage(gsBgImage, sx, sy, sw, sh, 0, 0, w, h);
-    } else {
-      bgCtx.fillStyle='#1a1a2e'; bgCtx.fillRect(0,0,w,h);
-    }
+    bgCv.getContext('2d').drawImage(img, 0, 0, w, h);
     Retouch.bgCanvas = bgCv;
 
-    // Foreground layer (the photo, erasable)
+    // Foreground layer = same shot, destination-out erases pixels here
     const fgCv = document.createElement('canvas');
     fgCv.width = w; fgCv.height = h;
     fgCv.getContext('2d').drawImage(img, 0, 0, w, h);
