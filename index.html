@@ -307,19 +307,93 @@ textarea.field-input{min-height:80px;line-height:1.5}
    INTRO & ONBOARDING
    ═══════════════════════════ */
 .intro{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;
-  justify-content:center;background:#000;overflow:hidden}
+  justify-content:center;background:#0a0005;overflow:hidden}
 .intro.hidden{display:none}
-.intro-curtain{position:absolute;left:0;right:0;height:50%;z-index:2;
-  will-change:transform;
-  background-color:#111;
-  background-image:repeating-linear-gradient(90deg,transparent 0,transparent 28px,
-    rgba(60,60,60,.9) 28px,rgba(60,60,60,.9) 36px)}
-.intro-curtain-top{top:0;transform-origin:top center}
-.intro-curtain-bottom{bottom:0;transform-origin:bottom center}
-.intro.play .intro-curtain-top{animation:curtainUp 1.4s .2s cubic-bezier(.86,0,.07,1) forwards}
-.intro.play .intro-curtain-bottom{animation:curtainDown 1.4s .2s cubic-bezier(.86,0,.07,1) forwards}
-@keyframes curtainUp{0%{transform:translateY(0)}100%{transform:translateY(-100%)}}
-@keyframes curtainDown{0%{transform:translateY(0)}100%{transform:translateY(100%)}}
+
+/* ── Kinovorhang ── */
+.curtain-side{
+  position:absolute;top:0;bottom:0;width:52%;z-index:2;
+  display:flex;will-change:transform;overflow:hidden}
+.curtain-left{left:-2%;transform-origin:left center}
+.curtain-right{right:-2%;transform-origin:right center;flex-direction:row-reverse}
+
+/* Einzelne Vorhang-Falte */
+.curtain-fold{
+  flex:1;height:100%;position:relative;
+  background:linear-gradient(180deg,#6b0f1a 0%,#8b1a2a 15%,#7a1520 50%,#6b1018 80%,#550d16 100%);
+  box-shadow:inset -8px 0 16px rgba(0,0,0,.45),inset 8px 0 10px rgba(180,30,50,.15)}
+/* Alternierende Hell-/Dunkelfalten für 3D-Stoff-Effekt */
+.curtain-fold:nth-child(odd){
+  background:linear-gradient(180deg,#8b1a2a 0%,#a82035 15%,#961b2f 50%,#8b1825 80%,#701420 100%);
+  box-shadow:inset -6px 0 18px rgba(0,0,0,.35),inset 6px 0 12px rgba(220,60,80,.12)}
+.curtain-fold:nth-child(3n){
+  background:linear-gradient(180deg,#550d16 0%,#6b0f1a 15%,#601018 50%,#550d16 80%,#440b13 100%);
+  box-shadow:inset -10px 0 20px rgba(0,0,0,.55),inset 4px 0 8px rgba(140,20,35,.1)}
+/* Glanzlicht auf Stoff */
+.curtain-fold::before{
+  content:'';position:absolute;top:0;bottom:0;left:20%;width:25%;
+  background:linear-gradient(90deg,transparent,rgba(255,220,200,.06),transparent);
+  pointer-events:none}
+/* Vertikale Faltenlinien */
+.curtain-fold::after{
+  content:'';position:absolute;top:0;bottom:0;right:0;width:3px;
+  background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.3),rgba(0,0,0,.6));
+  pointer-events:none}
+
+/* Goldene Borte oben */
+.curtain-valance{
+  position:absolute;top:0;left:0;right:0;height:52px;z-index:4;
+  background:linear-gradient(180deg,#7a5a00,#c9920a 30%,#f0b429 50%,#c9920a 70%,#7a5a00);
+  box-shadow:0 4px 18px rgba(0,0,0,.7),inset 0 2px 4px rgba(255,240,150,.4);
+  display:flex;align-items:center;overflow:hidden}
+.curtain-valance::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,
+    transparent 0,transparent 18px,
+    rgba(0,0,0,.25) 18px,rgba(0,0,0,.25) 22px);
+  opacity:.6}
+.curtain-valance::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:12px;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.5));
+  border-bottom:2px solid rgba(80,40,0,.8)}
+/* Wellen-Unterkante der Borte */
+.valance-scallop{
+  position:absolute;bottom:-10px;left:0;right:0;height:20px;z-index:5;
+  background:
+    radial-gradient(ellipse 28px 14px at 14px 0,#c9920a 99%,transparent 100%) left/28px 14px repeat-x,
+    radial-gradient(ellipse 28px 14px at 14px 0,#7a5a00 99%,transparent 100%) 14px 4px/28px 14px repeat-x}
+
+/* Tasseln */
+.curtain-tassel{
+  position:absolute;z-index:6;top:42px;width:14px;display:flex;flex-direction:column;align-items:center}
+.curtain-tassel-head{width:12px;height:14px;border-radius:50% 50% 0 0;
+  background:linear-gradient(180deg,#f0b429,#8b6200);
+  box-shadow:0 2px 4px rgba(0,0,0,.5)}
+.curtain-tassel-body{width:2px;height:22px;
+  background:linear-gradient(180deg,#c9920a,#6b4800);
+  box-shadow:2px 0 0 1px #f0b42955}
+.curtain-tassel-end{width:8px;height:8px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#ffe066,#8b6200);
+  box-shadow:0 2px 4px rgba(0,0,0,.6)}
+
+/* Animations-Klassen */
+.intro.play .curtain-left{animation:curtainOpenLeft 1.8s .1s cubic-bezier(.77,0,.18,1) forwards}
+.intro.play .curtain-right{animation:curtainOpenRight 1.8s .1s cubic-bezier(.77,0,.18,1) forwards}
+/* Falten bauchen sich beim Öffnen leicht aus */
+.intro.play .curtain-fold{animation:foldBulge 1.8s .1s ease-in-out forwards}
+
+@keyframes curtainOpenLeft{
+  0%{transform:translateX(0) scaleX(1)}
+  15%{transform:translateX(-4%) scaleX(1.03)}
+  100%{transform:translateX(-100%) scaleX(1)}}
+@keyframes curtainOpenRight{
+  0%{transform:translateX(0) scaleX(1)}
+  15%{transform:translateX(4%) scaleX(1.03)}
+  100%{transform:translateX(100%) scaleX(1)}}
+@keyframes foldBulge{
+  0%{filter:brightness(1)}
+  30%{filter:brightness(1.12)}
+  100%{filter:brightness(1)}}
 .intro-content{display:flex;flex-direction:column;align-items:center;gap:20px;
   z-index:1;text-align:center;pointer-events:none}
 .intro-logo{display:flex;flex-direction:column;align-items:center;gap:8px;
@@ -737,17 +811,18 @@ textarea.field-input{min-height:80px;line-height:1.5}
 .gs-thresh-slider{flex:1;min-width:80px;accent-color:var(--yellow)}
 
 /* Filmstrip */
-#filmstrip-wrap{flex:1;min-height:0;overflow:hidden;border-top:1px solid var(--border);
+#filmstrip-wrap{flex:1;min-height:60px;max-height:140px;overflow:hidden;border-top:1px solid var(--border);
   background:var(--surface);display:flex;flex-direction:column}
-#filmstrip{display:flex;gap:6px;overflow-x:auto;padding:8px 10px;
-  align-items:center;height:100%;scrollbar-width:thin;
+#filmstrip{display:flex;gap:6px;overflow-x:auto;padding:6px 10px;
+  align-items:stretch;flex:1;scrollbar-width:thin;
   scrollbar-color:var(--border) transparent}
 #filmstrip::-webkit-scrollbar{height:3px}
 #filmstrip::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .strip-empty{color:var(--muted);font-size:13px;font-family:'Fredoka One',cursive;
   white-space:nowrap;margin:auto}
-.strip-thumb{position:relative;flex-shrink:0;width:60px;height:45px;border-radius:4px;
-  overflow:hidden;border:2px solid transparent;transition:border-color .15s;cursor:pointer}
+.strip-thumb{position:relative;flex-shrink:0;height:100%;aspect-ratio:4/3;
+  border-radius:4px;overflow:hidden;border:2px solid transparent;
+  transition:border-color .15s;cursor:pointer}
 .strip-thumb:hover{border-color:var(--yellow)}
 .strip-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .strip-del{position:absolute;top:1px;right:1px;width:16px;height:16px;
@@ -1142,14 +1217,144 @@ textarea.field-input{min-height:80px;line-height:1.5}
 #help-body dd{color:#8b949e;margin-left:16px;margin-bottom:4px}
 #help-body strong{color:#fbbf24}
 #help-body p{margin-bottom:8px}
+
+/* ═══════════════════════════════════════════════
+   SMARTPHONE OPTIMIERUNGEN (max-width: 480px)
+   ═══════════════════════════════════════════════ */
+@media (max-width:480px){
+  :root{
+    --topbar-h:48px;
+    --nav-h:60px;
+    --r:10px;
+    --r-sm:6px;
+  }
+  .topbar{padding:0 8px;gap:6px}
+  .logo-inline{padding:4px 8px;gap:7px}
+  .inline-icon{font-size:18px}
+  .inline-trickfilm{font-size:14px}
+  .inline-meine,.inline-werkstatt{font-size:7px;letter-spacing:2px}
+  .topbar-title{font-size:13px}
+  .bottom-nav{height:var(--nav-h)}
+  .nav-icon{font-size:20px}
+  .nav-label{font-size:9px}
+  .nav-tab{gap:2px;padding:4px 2px}
+  #cam-box{max-height:52vw}
+  .cam-controls{padding:6px 8px;gap:6px}
+  .cam-row1{gap:4px}
+  .cch{font-size:11px;padding:5px 9px}
+  .cam-shoot-row{gap:10px;padding:2px 8px}
+  #shoot-btn{width:62px;height:62px;font-size:24px}
+  .cam-action-btn{font-size:11px;padding:6px 10px}
+  #filmstrip-wrap{min-height:70px;max-height:110px}
+  #shot-cnt{font-size:10px;padding:3px 8px}
+  #scene-progress-bar{font-size:10px}
+  .spb-track{width:60px}
+  .plan-subtabs{padding:8px 8px 0}
+  .plan-subtab{font-size:11px;padding:6px 10px}
+  .plan-section{padding:12px}
+  .sec-title{font-size:17px;margin-bottom:12px}
+  .story-grid{gap:10px}
+  .story-field{padding:10px}
+  .field-input.lg{font-size:18px;padding:10px 12px}
+  .fig-grid{grid-template-columns:1fr 1fr}
+  .fig-emoji{font-size:32px}
+  .fig-name{font-size:13px}
+  .scene-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .scene-card{padding:8px}
+  .bg-grid{grid-template-columns:repeat(2,1fr)}
+  #prev-cv{max-height:45vw}
+  .prev-controls{padding:5px 8px}
+  .prev-row{gap:5px}
+  .prev-label{font-size:10px;width:50px}
+  .prev-val{font-size:11px;min-width:28px}
+  .edit-toolbar{padding:4px 6px;gap:4px}
+  .etb{font-size:10px;padding:5px 8px}
+  #frm-grid{grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:4px}
+  .frm-num{font-size:8px}
+  .intro-logo-icon{font-size:60px}
+  .intro-logo-trickfilm{font-size:36px}
+  .intro-logo-meine{font-size:10px;letter-spacing:4px}
+  .intro-logo-werkstatt{font-size:10px;letter-spacing:4px}
+  .intro-tagline{font-size:16px}
+  .ki-btn{font-size:13px;padding:10px 12px}
+  .ki-btn-icon{font-size:18px}
+  .draw-tools-row{gap:4px}
+  .draw-tool-btn{width:34px;height:34px;font-size:16px}
+  .draw-colors{gap:4px}
+  .draw-color{width:22px;height:22px}
+  .fx-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .fx-card{padding:10px}
+  .fx-card-icon{font-size:20px}
+  .fx-card-name{font-size:12px}
+  .fx-sheet{padding:12px}
+  .ed-card{padding:14px;border-radius:12px}
+  .ed-card-title{font-size:16px}
+  .toast{font-size:12px;padding:7px 14px;bottom:76px}
+  .ob-card{padding:24px 18px 20px}
+  .ob-title{font-size:22px}
+  .ob-icon{font-size:52px}
+  #ai-bubble{width:46px;height:46px;font-size:20px;bottom:70px}
+  #ai-panel{right:8px;bottom:120px;width:calc(100vw - 16px);height:min(460px,calc(100vh - 160px))}
+}
+@media (max-width:360px){
+  .inline-trickfilm{font-size:12px}
+  .topbar-title{display:none}
+  .nav-label{display:none}
+  .nav-icon{font-size:22px}
+  .bottom-nav{height:52px}
+  :root{--nav-h:52px}
+  #shoot-btn{width:56px;height:56px;font-size:22px}
+  .cch{font-size:10px;padding:4px 7px}
+}
+@media (hover:none) and (pointer:coarse){
+  .nav-tab{min-height:44px}
+  .btn-primary{min-height:44px}
+  .etb{min-height:36px}
+  .cch{min-height:34px}
+  .strip-del,.strip-retouch{opacity:1;width:20px;height:20px;font-size:11px}
+  .frm-mv-l,.frm-mv-r{width:34px;height:34px}
+}
 </style>
 </head>
 <body>
 
 <!-- INTRO -->
 <div id="intro" class="intro" aria-hidden="true">
-  <div class="intro-curtain intro-curtain-top"></div>
-  <div class="intro-curtain intro-curtain-bottom"></div>
+
+  <!-- Linker Vorhang -->
+  <div class="curtain-side curtain-left">
+    <div class="curtain-fold"></div>
+    <div class="curtain-fold"></div>
+    <div class="curtain-fold"></div>
+    <div class="curtain-fold"></div>
+    <div class="curtain-fold"></div>
+    <div class="curtain-fold"></div>
+    <div class="curtain-fold"></div>
+  </div>
+
+  <!-- Rechter Vorhang -->
+  <div class="curtain-side curtain-right">
+    <div class="curtain-fold"></div>
+    <div class="curtain-fold"></div>
+    <div class="curtain-fold"></div>
+    <div class="curtain-fold"></div>
+    <div class="curtain-fold"></div>
+    <div class="curtain-fold"></div>
+    <div class="curtain-fold"></div>
+  </div>
+
+  <!-- Goldborte oben mit Wellen und Tasseln -->
+  <div class="curtain-valance">
+    <div class="valance-scallop"></div>
+    <div class="curtain-tassel" style="left:12%"><div class="curtain-tassel-head"></div><div class="curtain-tassel-body"></div><div class="curtain-tassel-end"></div></div>
+    <div class="curtain-tassel" style="left:26%"><div class="curtain-tassel-head"></div><div class="curtain-tassel-body"></div><div class="curtain-tassel-end"></div></div>
+    <div class="curtain-tassel" style="left:40%"><div class="curtain-tassel-head"></div><div class="curtain-tassel-body"></div><div class="curtain-tassel-end"></div></div>
+    <div class="curtain-tassel" style="left:54%"><div class="curtain-tassel-head"></div><div class="curtain-tassel-body"></div><div class="curtain-tassel-end"></div></div>
+    <div class="curtain-tassel" style="left:68%"><div class="curtain-tassel-head"></div><div class="curtain-tassel-body"></div><div class="curtain-tassel-end"></div></div>
+    <div class="curtain-tassel" style="left:82%"><div class="curtain-tassel-head"></div><div class="curtain-tassel-body"></div><div class="curtain-tassel-end"></div></div>
+  </div>
+
+  <!-- Inhalt (Logo erscheint nach Öffnung) -->
   <div class="intro-content">
     <div class="intro-logo">
       <span class="intro-logo-icon">🎬</span>
