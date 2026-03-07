@@ -6671,14 +6671,7 @@ Aktueller Projektstand:
 }
 
 function aiToggle() {
-  aiOpen = !aiOpen;
-  const panel = document.getElementById('ai-panel');
-  panel.style.display = aiOpen ? 'flex' : 'none';
-  if (aiOpen) {
-    if (!aiGreeted) { aiGreet(); aiGreeted = true; }
-    renderAiChips();
-    setTimeout(() => document.getElementById('ai-input').focus(), 100);
-  }
+  showToast('🚫 Kamera-Karl ist aktuell deaktiviert.', 3500);
 }
 
 function aiGreet() {
