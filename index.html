@@ -1341,7 +1341,13 @@ textarea.field-input{min-height:80px;line-height:1.5}
     </div>
     <p class="intro-tagline">Deine Ideen. Dein Film.</p>
   </div>
-  <button class="intro-skip" id="intro-skip">Überspringen ✕</button>
+  <div style="position:absolute;top:16px;right:16px;z-index:3;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+    <button class="intro-skip" id="intro-skip">Überspringen ✕</button>
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:rgba(255,255,255,.45)">
+      <input type="checkbox" id="intro-skip-remember" style="accent-color:#fbbf24;cursor:pointer"/>
+      Nicht mehr anzeigen
+    </label>
+  </div>
 </div>
 
 <!-- ONBOARDING -->
@@ -3487,13 +3493,22 @@ function closeIntro() {
   }, 400);
 }
 function initIntro() {
-  // Always play intro on every page load
+  // Skip if user previously chose to skip
+  if (localStorage.getItem('tfw-skip-intro') === '1') {
+    $('intro').classList.add('hidden');
+    checkOnboarding();
+    return;
+  }
   const el = $('intro');
   el.classList.remove('hidden');
   el.style.opacity = '1';
-  // Double rAF ensures browser has painted before animation starts
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('play')));
-  $('intro-skip').addEventListener('click', closeIntro);
+  $('intro-skip').addEventListener('click', () => {
+    if ($('intro-skip-remember')?.checked) {
+      localStorage.setItem('tfw-skip-intro', '1');
+    }
+    closeIntro();
+  });
   setTimeout(closeIntro, 4000);
 }
 
@@ -4179,8 +4194,61 @@ function doSnap() {
     // ── Normalmodus ────────────────────────────────────────────
     const cv = document.createElement('canvas');
     cv.width = vW; cv.height = vH;
-    cv.getContext('2d').drawImage(vid, 0, 0);
-    addShot(cv.toDataURL('image/jpeg', 0.88), false);
+    const ctx = cv.getContext('2d');
+
+    // Projekt-Hintergrund ins Foto rendern (falls gesetzt)
+    const bgSrc = (() => {
+      const bg = S.project.background;
+      if (bg === null || bg === undefined) return null;
+      if (typeof bg === 'string' && bg.startsWith('custom:')) {
+        const id = bg.replace('custom:', '');
+        return getCustomBgs().find(b => b.id === id)?.dataUrl || S.project.customBg || null;
+      }
+      if (bg === 'custom') return S.project.customBg || null;
+      if (typeof bg === 'number' && BG_LIB[bg]) return 'svg:' + bg;
+      return null;
+    })();
+
+    function finishSnap(bgImg, isSvg) {
+      if (bgImg) {
+        if (isSvg) {
+          // SVG: einfach auf die volle Canvas-Größe strecken (viewBox passt sich an)
+          ctx.drawImage(bgImg, 0, 0, vW, vH);
+        } else {
+          // Bild: cover-fit, damit nichts abgeschnitten wird
+          const srcW = bgImg.naturalWidth || vW;
+          const srcH = bgImg.naturalHeight || vH;
+          const srcR = srcW / srcH, dstR = vW / vH;
+          let sx = 0, sy = 0, sw = srcW, sh = srcH;
+          if (srcR > dstR) { sh = srcH; sw = sh * dstR; sx = (srcW - sw) / 2; }
+          else              { sw = srcW; sh = sw / dstR; sy = (srcH - sh) / 2; }
+          ctx.drawImage(bgImg, sx, sy, sw, sh, 0, 0, vW, vH);
+        }
+      }
+      ctx.drawImage(vid, 0, 0);
+      addShot(cv.toDataURL('image/jpeg', 0.88), false);
+    }
+
+    if (!bgSrc) {
+      finishSnap(null);
+    } else if (bgSrc.startsWith('svg:')) {
+      const idx = +bgSrc.replace('svg:', '');
+      // SVG viewBox setzen damit Browser korrekte Größe kennt
+      let svgStr = BG_LIB[idx].svg;
+      svgStr = svgStr.replace('<svg ', `<svg width="${vW}" height="${vH}" `);
+      const blob = new Blob([svgStr], {type: 'image/svg+xml'});
+      const url  = URL.createObjectURL(blob);
+      const img  = new Image();
+      img.width  = vW; img.height = vH;
+      img.onload = () => { URL.revokeObjectURL(url); finishSnap(img, true); };
+      img.onerror = () => { finishSnap(null); };
+      img.src = url;
+    } else {
+      const img = new Image();
+      img.onload = () => finishSnap(img, false);
+      img.onerror = () => finishSnap(null);
+      img.src = bgSrc;
+    }
   }
 
   flashEffect();
@@ -4351,10 +4419,14 @@ function initGsBgLib() {
 function setGsBgFromLib(index) {
   const bg = BG_LIB[index];
   if (!bg) return;
-  // Render SVG to an Image via Blob URL
-  const blob = new Blob([bg.svg], {type:'image/svg+xml'});
+  // Explizite Größe ins SVG schreiben damit Browser korrekt rendert
+  const vid = $('cam-vid');
+  const w = vid.videoWidth || 1280, h = vid.videoHeight || 720;
+  let svgStr = bg.svg.replace('<svg ', `<svg width="${w}" height="${h}" `);
+  const blob = new Blob([svgStr], {type:'image/svg+xml'});
   const url  = URL.createObjectURL(blob);
   const img  = new Image();
+  img.width = w; img.height = h;
   img.onload = () => {
     gsBgImage = img;
     URL.revokeObjectURL(url);
@@ -7512,11 +7584,14 @@ function initRetouchModal() {
         return;
       }
     } else {
-      // Rasterize SVG to image
+      // Rasterize SVG with explicit canvas dimensions so it fills correctly
       const bg = BG_LIB[+rbg];
-      const blob = new Blob([bg.svg], {type:'image/svg+xml'});
+      const w = Retouch.canvas.width, h = Retouch.canvas.height;
+      let svgStr = bg.svg.replace('<svg ', `<svg width="${w}" height="${h}" `);
+      const blob = new Blob([svgStr], {type:'image/svg+xml'});
       const url  = URL.createObjectURL(blob);
       const img  = new Image();
+      img.width = w; img.height = h;
       img.onload = () => { Retouch.bgImage = img; URL.revokeObjectURL(url); retouchComposite(); };
       img.src = url;
       return;
