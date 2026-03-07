@@ -658,6 +658,15 @@ textarea.field-input{min-height:80px;line-height:1.5}
   background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);
   border-radius:var(--r-sm);padding:7px 10px}
 .retouch-actions{display:flex;gap:8px}
+.retouch-bg-section{margin-bottom:8px}
+.retouch-bg-label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block}
+.retouch-bg-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.retouch-bg-option{width:36px;height:36px;border-radius:6px;border:2px solid transparent;cursor:pointer;overflow:hidden;flex-shrink:0;background:#222;transition:border-color .15s}
+.retouch-bg-option:hover{border-color:rgba(255,255,255,.4)}
+.retouch-bg-option.active{border-color:var(--red)}
+.retouch-bg-option svg{width:100%;height:100%;display:block;pointer-events:none}
+.retouch-bg-option.transparent-opt{background:repeating-conic-gradient(#aaa 0% 25%,#fff 0% 50%) 0 0/12px 12px}
+#retouch-bg-upload{display:none}
 .retouch-actions .btn-primary{flex:1}
 
 /* Retusche button im Filmstreifen */
@@ -1400,8 +1409,14 @@ textarea.field-input{min-height:80px;line-height:1.5}
       <button class="retouch-tool-btn active" data-rtool="eraser">🧹 Radieren</button>
       <button class="retouch-tool-btn" data-rtool="restore">🖌️ Wiederherstellen</button>
     </div>
-    <div class="retouch-hint">
-      💡 Male über Bereiche um sie zu radieren. Nutze <strong>Wiederherstellen</strong> um Fehler zu korrigieren.
+    <div class="retouch-bg-section">
+      <span class="retouch-bg-label">🌄 Hintergrund (wird unter radierten Stellen angezeigt):</span>
+      <div class="retouch-bg-row" id="retouch-bg-row">
+        <div class="retouch-bg-option transparent-opt active" data-rbg="transparent" title="Transparent (Schachbrett)"></div>
+        <!-- BG options injected by JS -->
+        <button class="btn-ghost" id="retouch-bg-upload-btn" style="height:36px;padding:0 8px;font-size:11px;flex-shrink:0">📁 Eigenes</button>
+        <input type="file" id="retouch-bg-upload" accept="image/*"/>
+      </div>
     </div>
     <div class="retouch-size-row">
       <span class="retouch-size-label">Pinselgröße:</span>
@@ -3935,49 +3950,34 @@ function takeShot() {
   }
 }
 function doSnap() {
-  const vid  = $('cam-vid');
-  const vW   = vid.videoWidth  || 640;
-  const vH   = vid.videoHeight || 480;
-  const cv   = document.createElement('canvas');
-  cv.width   = vW;
-  cv.height  = vH;
-  const ctx  = cv.getContext('2d');
+  const vid = $('cam-vid');
+  const vW  = vid.videoWidth  || 640;
+  const vH  = vid.videoHeight || 480;
+
+  function coverFitSnap(srcW, srcH, dstW, dstH) {
+    const srcR = srcW / srcH, dstR = dstW / dstH;
+    let sw, sh, sx = 0, sy = 0;
+    if (srcR > dstR) { sh = srcH; sw = sh * dstR; sx = (srcW - sw) / 2; }
+    else              { sw = srcW; sh = sw / dstR; sy = (srcH - sh) / 2; }
+    return {sx, sy, sw, sh};
+  }
 
   if (gsOn) {
-    // ── Greenscreen aktiv: Effekt in voller Videoauflösung berechnen ──
-    function coverFit(srcW, srcH, dstW, dstH) {
-      const srcR = srcW / srcH, dstR = dstW / dstH;
-      let sw, sh, sx = 0, sy = 0;
-      if (srcR > dstR) { sh = srcH; sw = sh * dstR; sx = (srcW - sw) / 2; }
-      else              { sw = srcW; sh = sw / dstR; sy = (srcH - sh) / 2; }
-      return {sx, sy, sw, sh};
-    }
+    // ── Greenscreen aktiv ──────────────────────────────────────
+    // Ausgabegröße = Videoauflösung (beste Qualität)
+    const dstW = vW, dstH = vH;
 
-    // Hintergrund zeichnen — immer auf dstW/dstH (Ausgabegröße), nicht Videoauflösung
-    if (gsBgImage) {
-      const {sx, sy, sw, sh} = coverFit(
-        gsBgImage.naturalWidth || gsBgImage.width,
-        gsBgImage.naturalHeight || gsBgImage.height,
-        dstW, dstH
-      );
-      ctx.drawImage(gsBgImage, sx, sy, sw, sh, 0, 0, dstW, dstH);
-    } else {
-      ctx.fillStyle = '#1a1a2e';
-      ctx.fillRect(0, 0, dstW, dstH);
-    }
-
-    // Videobild auf Offscreen-Canvas mit Cover-Crop
+    // Offscreen-Canvas: Chroma-Key auf Videobild anwenden → transparente Pixel
     const tmp = document.createElement('canvas');
-    tmp.width  = vW; tmp.height = vH;
+    tmp.width = dstW; tmp.height = dstH;
     const tc = tmp.getContext('2d');
-    tc.drawImage(vid, 0, 0, vW, vH);
+    tc.drawImage(vid, 0, 0, dstW, dstH);
 
-    // Chroma-Key anwenden (identischer Algorithmus wie startGsLoop)
-    const imgData = tc.getImageData(0, 0, vW, vH);
-    const data    = imgData.data;
+    const imgData = tc.getImageData(0, 0, dstW, dstH);
+    const data = imgData.data;
     const {r:kr, g:kg, b:kb} = gsColor;
-    const thresh  = gsThreshold / 100;
-    function rgbToHsv(r,g,b) {
+    const thresh = gsThreshold / 100;
+    function rgbToHsvSnap(r,g,b) {
       r/=255; g/=255; b/=255;
       const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
       let h=0, s=max===0?0:d/max, v=max;
@@ -3989,11 +3989,11 @@ function doSnap() {
       }
       return {h,s,v};
     }
-    const kHsv     = rgbToHsv(kr,kg,kb);
+    const kHsv = rgbToHsvSnap(kr,kg,kb);
     const tolerance = thresh * 1.4;
     const softEdge  = thresh * 0.25;
     for (let i = 0; i < data.length; i += 4) {
-      const pHsv = rgbToHsv(data[i], data[i+1], data[i+2]);
+      const pHsv = rgbToHsvSnap(data[i], data[i+1], data[i+2]);
       const dh   = Math.min(Math.abs(pHsv.h - kHsv.h), 1 - Math.abs(pHsv.h - kHsv.h));
       const ds   = Math.abs(pHsv.s - kHsv.s);
       const dv   = Math.abs(pHsv.v - kHsv.v);
@@ -4013,23 +4013,42 @@ function doSnap() {
     }
     tc.putImageData(imgData, 0, 0);
 
-    // Vordergrund (Figur ohne Grün) über Hintergrund compositen
-    ctx.drawImage(tmp, 0, 0);
+    // Ausgabe-Canvas: erst Hintergrund (oder transparent), dann Vordergrund
+    const cv = document.createElement('canvas');
+    cv.width = dstW; cv.height = dstH;
+    const ctx = cv.getContext('2d');
+
+    if (gsBgImage) {
+      const {sx, sy, sw, sh} = coverFitSnap(
+        gsBgImage.naturalWidth || gsBgImage.width,
+        gsBgImage.naturalHeight || gsBgImage.height,
+        dstW, dstH
+      );
+      ctx.drawImage(gsBgImage, sx, sy, sw, sh, 0, 0, dstW, dstH);
+      ctx.drawImage(tmp, 0, 0);
+      // Mit Hintergrund als JPEG speichern
+      addShot(cv.toDataURL('image/jpeg', 0.88), false);
+    } else {
+      // Kein Hintergrund → transparent als PNG speichern
+      ctx.drawImage(tmp, 0, 0);
+      addShot(cv.toDataURL('image/png'), true);
+    }
   } else {
-    // ── Normalmodus: einfach Videobild ──
-    ctx.drawImage(vid, 0, 0);
+    // ── Normalmodus ────────────────────────────────────────────
+    const cv = document.createElement('canvas');
+    cv.width = vW; cv.height = vH;
+    cv.getContext('2d').drawImage(vid, 0, 0);
+    addShot(cv.toDataURL('image/jpeg', 0.88), false);
   }
 
-  const dataUrl = cv.toDataURL('image/jpeg', 0.88);
-  addShot(dataUrl);
   flashEffect();
   playBeep(900, 0.05);
 }
 function genShotId() {
   return 'f' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
 }
-function addShot(dataUrl) {
-  const shot = { id: genShotId(), data: dataUrl, groupId: null };
+function addShot(dataUrl, isTransparent) {
+  const shot = { id: genShotId(), data: dataUrl, groupId: null, transparent: !!isTransparent };
   S.shots.push(shot);
   idbSaveShots(S.shots);
   renderStrip();
@@ -7198,8 +7217,9 @@ const Retouch = {
   canvas: null,
   ctx: null,
   origImage: null,
-  fgCanvas: null,   // foreground (gets erased)
-  bgCanvas: null,   // background (protected)
+  fgCanvas: null,
+  bgCanvas: null,
+  bgImage: null,    // selected background image (null = checkerboard/transparent)
   history: [],
   tool: 'eraser',
   size: 20,
@@ -7209,14 +7229,24 @@ function retouchComposite() {
   const ctx = Retouch.ctx;
   const w = Retouch.canvas.width, h = Retouch.canvas.height;
   ctx.clearRect(0, 0, w, h);
-  // Checkerboard so erased areas are visible
-  for (let y = 0; y < h; y += 14) {
-    for (let x = 0; x < w; x += 14) {
-      ctx.fillStyle = (((x / 14) + (y / 14)) % 2 === 0) ? '#ddd' : '#fff';
-      ctx.fillRect(x, y, 14, 14);
+  if (Retouch.bgImage) {
+    // Custom background image
+    const srcW = Retouch.bgImage.naturalWidth || Retouch.bgImage.width;
+    const srcH = Retouch.bgImage.naturalHeight || Retouch.bgImage.height;
+    const srcR = srcW / srcH, dstR = w / h;
+    let sx = 0, sy = 0, sw = srcW, sh = srcH;
+    if (srcR > dstR) { sh = srcH; sw = sh * dstR; sx = (srcW - sw) / 2; }
+    else              { sw = srcW; sh = sw / dstR; sy = (srcH - sh) / 2; }
+    ctx.drawImage(Retouch.bgImage, sx, sy, sw, sh, 0, 0, w, h);
+  } else {
+    // Checkerboard = transparent
+    for (let y = 0; y < h; y += 14) {
+      for (let x = 0; x < w; x += 14) {
+        ctx.fillStyle = (((x / 14) + (y / 14)) % 2 === 0) ? '#ddd' : '#fff';
+        ctx.fillRect(x, y, 14, 14);
+      }
     }
   }
-  // Draw photo (with transparent holes from eraser)
   if (Retouch.fgCanvas) ctx.drawImage(Retouch.fgCanvas, 0, 0);
 }
 
@@ -7225,7 +7255,12 @@ function openRetouchModal(shotIndex) {
   if (!shot) return;
   Retouch.shotIndex = shotIndex;
   Retouch.tool = 'eraser';
+  Retouch.bgImage = null;
   Retouch.history = [];
+  // Reset BG selection to transparent
+  document.querySelectorAll('.retouch-bg-option').forEach(o => o.classList.remove('active'));
+  const transparentOpt = document.querySelector('[data-rbg="transparent"]');
+  if (transparentOpt) transparentOpt.classList.add('active');
 
   const modal = document.getElementById('retouch-modal');
   modal.classList.remove('hidden');
@@ -7278,6 +7313,71 @@ function retouchUpdateSizePreview() {
 function initRetouchModal() {
   const canvas = document.getElementById('retouch-canvas');
 
+  // ── Build BG options from BG_LIB ───────────────────────────────
+  const bgRow = document.getElementById('retouch-bg-row');
+  // Insert first 8 BG_LIB entries as small thumbnails
+  BG_LIB.slice(0, 8).forEach((bg, i) => {
+    const div = document.createElement('div');
+    div.className = 'retouch-bg-option';
+    div.dataset.rbg = String(i);
+    div.title = bg.name;
+    div.innerHTML = bg.svg;
+    bgRow.insertBefore(div, document.getElementById('retouch-bg-upload-btn'));
+  });
+
+  bgRow.addEventListener('click', e => {
+    const opt = e.target.closest('.retouch-bg-option');
+    if (!opt) return;
+    bgRow.querySelectorAll('.retouch-bg-option').forEach(o => o.classList.remove('active'));
+    opt.classList.add('active');
+    const rbg = opt.dataset.rbg;
+    if (rbg === 'transparent') {
+      Retouch.bgImage = null;
+    } else {
+      // Rasterize SVG to image
+      const bg = BG_LIB[+rbg];
+      const blob = new Blob([bg.svg], {type:'image/svg+xml'});
+      const url  = URL.createObjectURL(blob);
+      const img  = new Image();
+      img.onload = () => { Retouch.bgImage = img; URL.revokeObjectURL(url); retouchComposite(); };
+      img.src = url;
+      return;
+    }
+    retouchComposite();
+  });
+
+  // Custom image upload
+  document.getElementById('retouch-bg-upload-btn').addEventListener('click', () => {
+    document.getElementById('retouch-bg-upload').click();
+  });
+  document.getElementById('retouch-bg-upload').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        Retouch.bgImage = img;
+        bgRow.querySelectorAll('.retouch-bg-option').forEach(o => o.classList.remove('active'));
+        // Create custom thumbnail
+        let customOpt = bgRow.querySelector('[data-rbg="custom"]');
+        if (!customOpt) {
+          customOpt = document.createElement('div');
+          customOpt.className = 'retouch-bg-option active';
+          customOpt.dataset.rbg = 'custom';
+          customOpt.title = 'Eigenes Bild';
+          bgRow.insertBefore(customOpt, document.getElementById('retouch-bg-upload-btn'));
+        }
+        customOpt.style.backgroundImage = 'url(' + ev.target.result + ')';
+        customOpt.style.backgroundSize = 'cover';
+        customOpt.classList.add('active');
+        retouchComposite();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
   // Tool buttons
   document.querySelectorAll('.retouch-tool-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -7323,10 +7423,23 @@ function initRetouchModal() {
 
   // Save
   document.getElementById('retouch-save').addEventListener('click', () => {
-    // Save fgCanvas as PNG to preserve transparency from erasing
-    const dataUrl = Retouch.fgCanvas
-      ? Retouch.fgCanvas.toDataURL('image/png')
-      : Retouch.canvas.toDataURL('image/png');
+    // Save: composite bgImage + fgCanvas as PNG (preserves transparency if no bg)
+    const saveCv = document.createElement('canvas');
+    saveCv.width  = Retouch.fgCanvas ? Retouch.fgCanvas.width  : Retouch.canvas.width;
+    saveCv.height = Retouch.fgCanvas ? Retouch.fgCanvas.height : Retouch.canvas.height;
+    const saveCtx = saveCv.getContext('2d');
+    if (Retouch.bgImage) {
+      const w = saveCv.width, h = saveCv.height;
+      const srcW = Retouch.bgImage.naturalWidth || Retouch.bgImage.width;
+      const srcH = Retouch.bgImage.naturalHeight || Retouch.bgImage.height;
+      const srcR = srcW / srcH, dstR = w / h;
+      let sx = 0, sy = 0, sw = srcW, sh = srcH;
+      if (srcR > dstR) { sh = srcH; sw = sh * dstR; sx = (srcW - sw) / 2; }
+      else              { sw = srcW; sh = sw / dstR; sy = (srcH - sh) / 2; }
+      saveCtx.drawImage(Retouch.bgImage, sx, sy, sw, sh, 0, 0, w, h);
+    }
+    if (Retouch.fgCanvas) saveCtx.drawImage(Retouch.fgCanvas, 0, 0);
+    const dataUrl = saveCv.toDataURL(Retouch.bgImage ? 'image/jpeg' : 'image/png', 0.92);
     S.shots[Retouch.shotIndex].data = dataUrl;
     idbSaveShots(S.shots);
     renderStrip();
