@@ -3939,12 +3939,92 @@ function takeShot() {
   }
 }
 function doSnap() {
-  const vid = $('cam-vid');
-  const cv  = document.createElement('canvas');
-  cv.width  = vid.videoWidth  || 640;
-  cv.height = vid.videoHeight || 480;
-  cv.getContext('2d').drawImage(vid, 0, 0);
-  const dataUrl = cv.toDataURL('image/jpeg', 0.85);
+  const vid  = $('cam-vid');
+  const vW   = vid.videoWidth  || 640;
+  const vH   = vid.videoHeight || 480;
+  const cv   = document.createElement('canvas');
+  cv.width   = vW;
+  cv.height  = vH;
+  const ctx  = cv.getContext('2d');
+
+  if (gsOn) {
+    // ── Greenscreen aktiv: Effekt in voller Videoauflösung berechnen ──
+    function coverFit(srcW, srcH, dstW, dstH) {
+      const srcR = srcW / srcH, dstR = dstW / dstH;
+      let sw, sh, sx = 0, sy = 0;
+      if (srcR > dstR) { sh = srcH; sw = sh * dstR; sx = (srcW - sw) / 2; }
+      else              { sw = srcW; sh = sw / dstR; sy = (srcH - sh) / 2; }
+      return {sx, sy, sw, sh};
+    }
+
+    // Hintergrund zeichnen
+    if (gsBgImage) {
+      const {sx, sy, sw, sh} = coverFit(
+        gsBgImage.naturalWidth || gsBgImage.width,
+        gsBgImage.naturalHeight || gsBgImage.height,
+        vW, vH
+      );
+      ctx.drawImage(gsBgImage, sx, sy, sw, sh, 0, 0, vW, vH);
+    } else {
+      ctx.fillStyle = '#1a1a2e';
+      ctx.fillRect(0, 0, vW, vH);
+    }
+
+    // Videobild auf Offscreen-Canvas mit Cover-Crop
+    const tmp = document.createElement('canvas');
+    tmp.width  = vW; tmp.height = vH;
+    const tc = tmp.getContext('2d');
+    tc.drawImage(vid, 0, 0, vW, vH);
+
+    // Chroma-Key anwenden (identischer Algorithmus wie startGsLoop)
+    const imgData = tc.getImageData(0, 0, vW, vH);
+    const data    = imgData.data;
+    const {r:kr, g:kg, b:kb} = gsColor;
+    const thresh  = gsThreshold / 100;
+    function rgbToHsv(r,g,b) {
+      r/=255; g/=255; b/=255;
+      const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+      let h=0, s=max===0?0:d/max, v=max;
+      if(d!==0){
+        if(max===r) h=((g-b)/d+6)%6;
+        else if(max===g) h=(b-r)/d+2;
+        else h=(r-g)/d+4;
+        h/=6;
+      }
+      return {h,s,v};
+    }
+    const kHsv     = rgbToHsv(kr,kg,kb);
+    const tolerance = thresh * 1.4;
+    const softEdge  = thresh * 0.25;
+    for (let i = 0; i < data.length; i += 4) {
+      const pHsv = rgbToHsv(data[i], data[i+1], data[i+2]);
+      const dh   = Math.min(Math.abs(pHsv.h - kHsv.h), 1 - Math.abs(pHsv.h - kHsv.h));
+      const ds   = Math.abs(pHsv.s - kHsv.s);
+      const dv   = Math.abs(pHsv.v - kHsv.v);
+      const match = dh * 2.0 + ds * 0.6 + dv * 0.3;
+      if (match < tolerance) {
+        if (match < tolerance - softEdge) {
+          data[i+3] = 0;
+        } else {
+          const alpha = Math.round(((match - (tolerance - softEdge)) / softEdge) * 200);
+          data[i+3] = Math.min(data[i+3], alpha);
+        }
+        if (data[i+3] > 0 && data[i+3] < 220) {
+          if (kr < 50 && kg > 150) data[i+1] = Math.round(data[i+1] * 0.6);
+          else if (kb > 150)       data[i+2] = Math.round(data[i+2] * 0.6);
+        }
+      }
+    }
+    tc.putImageData(imgData, 0, 0);
+
+    // Vordergrund (Figur ohne Grün) über Hintergrund compositen
+    ctx.drawImage(tmp, 0, 0);
+  } else {
+    // ── Normalmodus: einfach Videobild ──
+    ctx.drawImage(vid, 0, 0);
+  }
+
+  const dataUrl = cv.toDataURL('image/jpeg', 0.88);
   addShot(dataUrl);
   flashEffect();
   playBeep(900, 0.05);
@@ -6484,7 +6564,7 @@ const KARL_KB = [
     a: '🎬 Ein Storyboard hilft dir, den Film vorher zu planen! Zeichne kleine Skizzen für jede Szene – Anfang, Spannung, Ende. Das spart später viel Zeit beim Fotografieren.' },
   { q: ['figur','figuren','charakter','knete','lego','papier'],
     a: '🎭 Deine Figuren können aus allem sein: Knete, Lego, Papierpuppen oder Spielzeug! Knete ist super weil man sie leicht verbiegen kann. Mache die Schritte immer klein – 5mm pro Foto reichen!' },
-  { q: ['geschichte','story','idee','ideen','thema'],
+  { q: ['ideen','thema','was soll ich machen','womit anfangen'],
     a: '📖 Eine gute Geschichte hat 3 Teile: Anfang (wer ist die Figur?), Mitte (was ist das Problem?) und Ende (wie wird es gelöst?). Im Plan-Tab kannst du alles aufschreiben!' },
   { q: ['musik','ton','sound','melodie'],
     a: '🎵 Im Musik-Tab findest du kostenlose Tracks von Musicfox! Du kannst auch eigene Musik hochladen. Die Musik wird automatisch beim Export zum Film hinzugefügt.' },
@@ -6510,15 +6590,122 @@ const KARL_KB = [
     a: '🎬 Ich kenne mich aus mit: Fototipps 📷, Beleuchtung 💡, Storyboard 🎬, Figuren 🎭, Musik 🎵, Schnitt ✂️, Export 📤 und allem rund um Stop-Motion! Frag mich einfach drauflos!' },
 ];
 
+// ── Alle Projektdaten sammeln ────────────────────────────────────
+function karlGetContext() {
+  if (typeof S === 'undefined') return {};
+  const p    = S.project || {};
+  const figs = p.figures  || [];
+  const scenes = p.scenes || [];
+  const groups = S.groups || [];
+  const subs   = S.subtitles || [];
+  const prog   = p.progress  || [];
+  const progLabels = ['Geschichte','Figuren','Storyboard','Drehen','Schnitt','Export'];
+  const plan   = p.prodplan  || [];
+  let musicName = 'keine';
+  if (S.music) musicName = S.music.name || S.music.key || 'unbekannt';
+  const scenesSummary = scenes.map((s,i) =>
+    `Szene ${i+1}: ${s.title||'(kein Titel)'} – ${s.notes||'(keine Notizen)'}`
+  ).join('; ') || '(keine Szenen)';
+  const groupsSummary = groups.map(g =>
+    `${g.name||'Gruppe'} (${(g.frameIds||[]).length} Frames)`
+  ).join(', ') || '(keine Gruppen)';
+  const progSummary = progLabels.map((l,i) => `${l}: ${prog[i]||0}%`).join(', ');
+  const bgName = p.background === 'custom' ? 'eigener Hintergrund'
+    : (p.background != null ? `Hintergrund ${p.background+1}` : 'kein Hintergrund');
+  return {
+    title: p.title||'(kein Titel)', about: p.about||'', beg: p.beg||'',
+    ten: p.ten||'', end: p.end||'', shots: S.shots.length,
+    fps: S.fps||8, quality: S.quality||'480p', format: S.format||'webm',
+    vol: Math.round((S.vol||0.8)*100), musicName,
+    figs, scenes, scenesSummary, groups, groupsSummary,
+    subsCount: subs.length, progSummary, bgName,
+  };
+}
+
+// ── Alle Projektdaten sammeln ────────────────────────────────────
+function karlGetContext() {
+  if (typeof S === 'undefined') return {shots:0,figs:[],scenes:[],groups:[],subsCount:0,musicName:'keine',title:'',about:'',beg:'',ten:'',end:'',fps:8,quality:'480p',format:'webm',vol:80,progSummary:'',bgName:'kein Hintergrund'};
+  const p = S.project||{}, figs=p.figures||[], scenes=p.scenes||[], groups=S.groups||[], subs=S.subtitles||[], prog=p.progress||[];
+  const progLabels=['Geschichte','Figuren','Storyboard','Drehen','Schnitt','Export'];
+  let musicName='keine';
+  if (S.music) musicName=S.music.name||S.music.key||'unbekannt';
+  const scenesSummary=scenes.map((s,i)=>`Szene ${i+1}: ${s.title||'(kein Titel)'} – ${s.notes||'keine Notizen'}`).join('; ')||'(keine)';
+  const groupsSummary=groups.map(g=>`${g.name||'Gruppe'} (${(g.frameIds||[]).length} Frames)`).join(', ')||'(keine)';
+  const progSummary=progLabels.map((l,i)=>`${l}: ${prog[i]||0}%`).join(', ');
+  const bgName=p.background==='custom'?'eigener Hintergrund':(p.background!=null?`Hintergrund ${p.background+1}`:'kein Hintergrund');
+  return {title:p.title||'(kein Titel)',about:p.about||'',beg:p.beg||'',ten:p.ten||'',end:p.end||'',shots:S.shots.length,fps:S.fps||8,quality:S.quality||'480p',format:S.format||'webm',vol:Math.round((S.vol||0.8)*100),musicName,figs,scenes,scenesSummary,groups,groupsSummary,subsCount:subs.length,progSummary,bgName};
+}
+
 function karlOfflineAnswer(msg) {
-  const m = msg.toLowerCase();
-  for (const entry of KARL_KB) {
-    if (entry.q.some(kw => m.includes(kw))) return entry.a;
+  const m=msg.toLowerCase(), c=karlGetContext();
+
+  if (['geschichte','story','meine idee','was passiert','anfang','mitte','ende','handlung','plot','worum','erzähl','mein film','meine geschichte','hilf mir'].some(kw=>m.includes(kw))) {
+    if (!c.about&&!c.beg&&!c.ten&&!c.end) return '📖 Deine Geschichte ist noch leer! Geh zu Plan → Geschichte und füll die Felder aus. Dann helfe ich dir gerne weiter!';
+    let r=`📽️ Dein Film „${c.title}":
+`;
+    if (c.about) r+=`📝 Thema: ${c.about}
+`;
+    if (c.beg)   r+=`🌅 Anfang: ${c.beg}
+`;
+    if (c.ten)   r+=`⚡ Was passiert: ${c.ten}
+`;
+    if (c.end)   r+=`🌟 Ende: ${c.end}
+`;
+    if (!c.ten)  r+='
+💡 Was ist das Abenteuer? Das macht die Geschichte spannend!';
+    else if (!c.end) r+='
+💡 Das Ende fehlt noch – wie löst deine Figur das Problem?';
+    else r+='
+🎬 Klasse Geschichte! Starte jetzt das Storyboard.';
+    return r.trim();
   }
-  // Generic helpful fallback
-  const ctx = (typeof S !== 'undefined') ? S.shots.length : 0;
-  if (ctx === 0) return '🎬 Du hast noch keine Fotos aufgenommen! Geh zum 📷 Kamera-Tab und fang an zu fotografieren. Schon 20 Fotos reichen für eine kurze Szene!';
-  return `🎬 Gute Frage! Du hast schon ${ctx} Fotos – super! Wenn du Hilfe brauchst, frag mich nach Themen wie: Beleuchtung, Zwiebelhaut, FPS, Figuren, Storyboard, Musik oder Export!`;
+
+  if (['meine figur','meine figuren','welche figur','wer ist','charakter','figuren'].some(kw=>m.includes(kw))) {
+    if (c.figs.length===0) return '🎭 Noch keine Figuren! Geh zu Plan → Figuren und leg los.';
+    return `🎭 ${c.figs.length} Figur${c.figs.length===1?'':'en'}: ${c.figs.map(f=>`${f.emoji||'🎭'} ${f.name} (${f.role||'?'})`).join(', ')}. Kleine Schritte = flüssige Bewegung!`;
+  }
+
+  if (['storyboard','meine szenen','szenenplan'].some(kw=>m.includes(kw))) {
+    if (c.scenes.length===0) return '🎬 Kein Storyboard! Geh zu Plan → Storyboard und füge Szenen hinzu.';
+    return `🎬 ${c.scenes.length} Szene${c.scenes.length===1?'':'n'}: ${c.scenesSummary}`;
+  }
+
+  if (['welche musik','meine musik','song','track','musiktab'].some(kw=>m.includes(kw))) {
+    const sel=c.musicName!=='keine'?`„${c.musicName}" (${c.vol}% Lautstärke)`:'noch keine';
+    return `🎵 Musik: ${sel}. Im Musik-Tab findest du kostenlose Musicfox-Tracks oder kannst eigene hochladen.`;
+  }
+
+  if (['gruppe','gruppen','meine gruppen'].some(kw=>m.includes(kw))) {
+    if (c.groups.length===0) return '📁 Noch keine Gruppen! Markiere Frames im Editor → 📁 Gruppe erstellen.';
+    return `📁 ${c.groups.length} Gruppe${c.groups.length===1?'':'n'}: ${c.groupsSummary}.`;
+  }
+
+  if (['export','format','qualität','auflösung'].some(kw=>m.includes(kw))) {
+    return `📤 Export: ${c.format.toUpperCase()}, ${c.quality}, ${c.fps} FPS. ${c.format==='webm'?'WebM ist klein und schnell.':'MP4 läuft überall.'} Im Export-Tab anpassbar!`;
+  }
+
+  if (['untertitel','subtitle','text im film'].some(kw=>m.includes(kw))) {
+    return c.subsCount>0?`📝 ${c.subsCount} Untertitel vorhanden. Bearbeiten im Export-Tab.`:'📝 Noch keine Untertitel! Im Export-Tab hinzufügbar.';
+  }
+
+  if (['wie weit','fortschritt','stand','status','wie viel','produktionsplan'].some(kw=>m.includes(kw))) {
+    return `📊 Stand „${c.title}":
+• 📷 ${c.shots} Fotos  • 🎭 ${c.figs.length} Figuren  • 🎬 ${c.scenes.length} Szenen
+• 📁 ${c.groups.length} Gruppen  • 🎵 ${c.musicName}  • 🌄 ${c.bgName}
+• 📈 ${c.progSummary}
+${c.shots<10?'💡 Fang mit Fotografieren an!':c.shots<30?'🎬 Gut – weiter so!':'🌟 Fast fertig!'}`.trim();
+  }
+
+  if (['hintergrund','kulisse','background'].some(kw=>m.includes(kw))) {
+    return `🌄 Aktuell: ${c.bgName}. In Plan → Hintergründe findest du viele Motive.`;
+  }
+
+  for (const entry of KARL_KB) {
+    if (entry.q.some(kw=>m.includes(kw))) return entry.a;
+  }
+
+  if (c.shots===0) return '🎬 Noch keine Fotos! Geh zum 📷 Kamera-Tab – 20 Fotos reichen für eine erste Szene.';
+  return `🎬 ${c.shots} Fotos, ${c.figs.length} Figuren, ${c.scenes.length} Szenen. Frag mich nach: Geschichte, Figuren, Storyboard, Musik, Gruppen, Export oder Fortschritt!`;
 }
 
 async function aiSend() {
@@ -7055,12 +7242,21 @@ const Retouch = {
   shotIndex: -1,
   canvas: null,
   ctx: null,
-  origImage: null,   // original Image object (for restore brush)
+  origImage: null,
+  fgCanvas: null,   // foreground (gets erased)
+  bgCanvas: null,   // background (protected)
   history: [],
   tool: 'eraser',
   size: 20,
   drawing: false,
 };
+function retouchComposite() {
+  const ctx = Retouch.ctx;
+  const w = Retouch.canvas.width, h = Retouch.canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  if (Retouch.bgCanvas) ctx.drawImage(Retouch.bgCanvas, 0, 0);
+  if (Retouch.fgCanvas) ctx.drawImage(Retouch.fgCanvas, 0, 0);
+}
 
 function openRetouchModal(shotIndex) {
   const shot = S.shots[shotIndex];
@@ -7072,27 +7268,46 @@ function openRetouchModal(shotIndex) {
   const modal = document.getElementById('retouch-modal');
   modal.classList.remove('hidden');
 
-  // Load image onto canvas
   const img = new Image();
   img.onload = () => {
     Retouch.origImage = img;
-    const wrap = document.getElementById('retouch-canvas-wrap');
+    const wrap   = document.getElementById('retouch-canvas-wrap');
     const canvas = document.getElementById('retouch-canvas');
     Retouch.canvas = canvas;
-    Retouch.ctx = canvas.getContext('2d');
-
-    // Size canvas to fit wrap while keeping aspect ratio
+    Retouch.ctx    = canvas.getContext('2d');
     const maxW = wrap.clientWidth  - 16;
     const maxH = wrap.clientHeight - 16;
     const scale = Math.min(maxW / img.width, maxH / img.height, 1);
     canvas.width  = Math.round(img.width  * scale);
     canvas.height = Math.round(img.height * scale);
+    const w = canvas.width, h = canvas.height;
 
-    Retouch.ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    // Background layer (protected from eraser)
+    const bgCv = document.createElement('canvas');
+    bgCv.width = w; bgCv.height = h;
+    const bgCtx = bgCv.getContext('2d');
+    if (typeof gsBgImage !== 'undefined' && gsBgImage) {
+      const srcW = gsBgImage.naturalWidth||gsBgImage.width;
+      const srcH = gsBgImage.naturalHeight||gsBgImage.height;
+      const srcR = srcW/srcH, dstR = w/h;
+      let sx=0,sy=0,sw=srcW,sh=srcH;
+      if (srcR>dstR){sh=srcH;sw=sh*dstR;sx=(srcW-sw)/2;}
+      else           {sw=srcW;sh=sw/dstR;sy=(srcH-sh)/2;}
+      bgCtx.drawImage(gsBgImage, sx, sy, sw, sh, 0, 0, w, h);
+    } else {
+      bgCtx.fillStyle='#1a1a2e'; bgCtx.fillRect(0,0,w,h);
+    }
+    Retouch.bgCanvas = bgCv;
+
+    // Foreground layer (the photo, erasable)
+    const fgCv = document.createElement('canvas');
+    fgCv.width = w; fgCv.height = h;
+    fgCv.getContext('2d').drawImage(img, 0, 0, w, h);
+    Retouch.fgCanvas = fgCv;
+
+    retouchComposite();
     retouchSnapshot();
     retouchUpdateSizePreview();
-
-    // Tool buttons
     document.querySelectorAll('.retouch-tool-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.rtool === 'eraser');
     });
@@ -7101,7 +7316,8 @@ function openRetouchModal(shotIndex) {
 }
 
 function retouchSnapshot() {
-  Retouch.history.push(Retouch.canvas.toDataURL());
+  const src = Retouch.fgCanvas || Retouch.canvas;
+  Retouch.history.push(src.toDataURL());
   if (Retouch.history.length > 30) Retouch.history.shift();
 }
 
@@ -7134,8 +7350,10 @@ function initRetouchModal() {
     Retouch.history.pop();
     const img = new Image();
     img.onload = () => {
-      Retouch.ctx.clearRect(0, 0, Retouch.canvas.width, Retouch.canvas.height);
-      Retouch.ctx.drawImage(img, 0, 0);
+      const fgCtx = Retouch.fgCanvas.getContext('2d');
+      fgCtx.clearRect(0, 0, Retouch.fgCanvas.width, Retouch.fgCanvas.height);
+      fgCtx.drawImage(img, 0, 0);
+      retouchComposite();
     };
     img.src = Retouch.history[Retouch.history.length - 1];
   });
@@ -7143,8 +7361,10 @@ function initRetouchModal() {
   // Reset
   document.getElementById('retouch-reset').addEventListener('click', () => {
     if (!Retouch.origImage) return;
-    Retouch.ctx.clearRect(0, 0, Retouch.canvas.width, Retouch.canvas.height);
-    Retouch.ctx.drawImage(Retouch.origImage, 0, 0, Retouch.canvas.width, Retouch.canvas.height);
+    const fgCtx = Retouch.fgCanvas.getContext('2d');
+    fgCtx.clearRect(0, 0, Retouch.fgCanvas.width, Retouch.fgCanvas.height);
+    fgCtx.drawImage(Retouch.origImage, 0, 0, Retouch.fgCanvas.width, Retouch.fgCanvas.height);
+    retouchComposite();
     Retouch.history = [];
     retouchSnapshot();
     showToast('🔄 Zurückgesetzt');
@@ -7157,7 +7377,12 @@ function initRetouchModal() {
 
   // Save
   document.getElementById('retouch-save').addEventListener('click', () => {
-    const dataUrl = Retouch.canvas.toDataURL('image/png');
+    const saveCv = document.createElement('canvas');
+    saveCv.width = Retouch.canvas.width; saveCv.height = Retouch.canvas.height;
+    const saveCtx = saveCv.getContext('2d');
+    if (Retouch.bgCanvas) saveCtx.drawImage(Retouch.bgCanvas, 0, 0);
+    if (Retouch.fgCanvas) saveCtx.drawImage(Retouch.fgCanvas, 0, 0);
+    const dataUrl = saveCv.toDataURL('image/jpeg', 0.92);
     S.shots[Retouch.shotIndex].data = dataUrl;
     idbSaveShots(S.shots);
     renderStrip();
@@ -7180,26 +7405,26 @@ function initRetouchModal() {
   }
 
   function retouchDraw(x, y) {
-    const ctx = Retouch.ctx;
+    const fgCtx = Retouch.fgCanvas.getContext('2d');
     const r = Retouch.size;
     if (Retouch.tool === 'eraser') {
-      ctx.save();
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(0,0,0,1)';
-      ctx.fill();
-      ctx.restore();
+      fgCtx.save();
+      fgCtx.globalCompositeOperation = 'destination-out';
+      fgCtx.beginPath();
+      fgCtx.arc(x, y, r, 0, Math.PI * 2);
+      fgCtx.fillStyle = 'rgba(0,0,0,1)';
+      fgCtx.fill();
+      fgCtx.restore();
     } else {
-      // Restore: paint from original image
-      ctx.save();
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(Retouch.origImage, 0, 0, Retouch.canvas.width, Retouch.canvas.height);
-      ctx.restore();
+      fgCtx.save();
+      fgCtx.globalCompositeOperation = 'source-over';
+      fgCtx.beginPath();
+      fgCtx.arc(x, y, r, 0, Math.PI * 2);
+      fgCtx.clip();
+      fgCtx.drawImage(Retouch.origImage, 0, 0, Retouch.canvas.width, Retouch.canvas.height);
+      fgCtx.restore();
     }
+    retouchComposite();
   }
 
   canvas.addEventListener('pointerdown', e => {
