@@ -1926,6 +1926,14 @@ textarea.field-input{min-height:80px;line-height:1.5}
           Klicke auf „Laden" um einen Track zu laden – danach kannst du ihn direkt auswählen und abspielen.
         </p>
         <div id="mus-lib-list" style="display:flex;flex-direction:column;gap:10px"></div>
+      <div style="margin-top:12px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);display:flex;align-items:center;gap:10px">
+        <span style="font-size:18px">🎼</span>
+        <span style="font-size:12px;color:var(--muted);line-height:1.5">
+          Musik von <a href="https://www.musicfox.com" target="_blank" rel="noopener"
+            style="color:var(--yellow);text-decoration:none;font-family:'Fredoka One',cursive">musicfox.com</a>
+          – lizenzfreie Musik für kreative Projekte.
+        </span>
+      </div>
       </div>
 
       <!-- ── Eigene Musik ── -->
@@ -5362,6 +5370,19 @@ function musDeleteCustom(key) {
   });
 }
 
+function autoLoadMusicLib() {
+  MUSIC_LIB.forEach(track => {
+    idbHasMusic(track.key, has => {
+      if (!has) {
+        fetch(track.file)
+          .then(r => { if (!r.ok) throw new Error(); return r.arrayBuffer(); })
+          .then(buf => idbSaveMusic(track.key, buf, () => renderMusLib()))
+          .catch(() => {}); // silent fail – kein Netz kein Fehler
+      }
+    });
+  });
+}
+
 function initMusicTab() {
   // Restore slider
   const slider = $('mus-vol-slider');
@@ -5372,6 +5393,7 @@ function initMusicTab() {
   musUpdateSelBar();
   renderMusLib();
   renderMusCustom();
+  autoLoadMusicLib(); // Alle Tracks beim Start im Hintergrund laden
   // Reload when tab is clicked
   document.querySelector('[data-page="pg-mus"]').addEventListener('click', () => {
     musUpdateSelBar();
@@ -6446,6 +6468,59 @@ function aiGreet() {
   aiHistory.push({ role: 'assistant', content: msg });
 }
 
+// ── Offline-Wissensbasis für Kamera-Karl ─────────────────────────
+const KARL_KB = [
+  { q: ['wie viele fotos','wie viele bilder','bilder brauche','fotos brauche'],
+    a: '📷 Für eine flüssige Bewegung brauchst du etwa 12 Fotos pro Sekunde – das nennt man 12fps! Für 5 Sekunden Film also ca. 60 Fotos. Fang klein an, z.B. mit 20–30 Fotos für eine kurze Szene!' },
+  { q: ['zwiebelhaut','onion','onionskin','durchscheinen'],
+    a: '🧅 Die Zwiebelhaut zeigt dir das letzte Foto leicht durchsichtig im Kamerabild – so siehst du genau, wie weit du deine Figur bewegen musst. Schalte sie mit dem 🧅-Button ein!' },
+  { q: ['fps','bilder pro sekunde','frame','framerate'],
+    a: '🎞️ FPS = Bilder pro Sekunde. 8 fps ist gut für Anfänger, 12 fps wirkt flüssiger, 24 fps ist Kinostandard. Im Editor-Tab kannst du die FPS jederzeit ändern und direkt sehen wie es aussieht!' },
+  { q: ['beleuchtung','licht','hell','dunkel','schatten'],
+    a: '💡 Gutes Licht ist super wichtig! Stell deine Figur nah ans Fenster – aber nicht in direkte Sonne, sonst flackert es. Eine Schreibtischlampe von der Seite gibt tolle Schatten!' },
+  { q: ['stativ','wackelt','wackeln','kamera bewegt','verwackelt'],
+    a: '📷 Lege dein Handy auf einen Stapel Bücher oder nutze ein Stativ – das ist der wichtigste Tipp überhaupt! Wenn die Kamera wackelt, wird der Film unruhig. Versuche, das Handy nie zu berühren, wenn du fotografierst.' },
+  { q: ['storyboard','szene','szenen','planung','planen'],
+    a: '🎬 Ein Storyboard hilft dir, den Film vorher zu planen! Zeichne kleine Skizzen für jede Szene – Anfang, Spannung, Ende. Das spart später viel Zeit beim Fotografieren.' },
+  { q: ['figur','figuren','charakter','knete','lego','papier'],
+    a: '🎭 Deine Figuren können aus allem sein: Knete, Lego, Papierpuppen oder Spielzeug! Knete ist super weil man sie leicht verbiegen kann. Mache die Schritte immer klein – 5mm pro Foto reichen!' },
+  { q: ['geschichte','story','idee','ideen','thema'],
+    a: '📖 Eine gute Geschichte hat 3 Teile: Anfang (wer ist die Figur?), Mitte (was ist das Problem?) und Ende (wie wird es gelöst?). Im Plan-Tab kannst du alles aufschreiben!' },
+  { q: ['musik','ton','sound','melodie'],
+    a: '🎵 Im Musik-Tab findest du kostenlose Tracks von Musicfox! Du kannst auch eigene Musik hochladen. Die Musik wird automatisch beim Export zum Film hinzugefügt.' },
+  { q: ['export','speichern','video','mp4','webm','gif'],
+    a: '📤 Im Export-Tab kannst du deinen Film als Video (WebM oder MP4) oder GIF speichern. WebM ist sehr klein, MP4 läuft auf fast allen Geräten. Für Instagram oder WhatsApp empfehle ich MP4!' },
+  { q: ['gruppe','gruppen','szene markieren','frames markieren'],
+    a: '📁 Gruppen helfen dir, Szenen zu organisieren! Markiere mehrere Frames und klicke auf 📁 Gruppe erstellen. Du kannst dann den ganzen Szene einen Voiceover-Kommentar hinzufügen!' },
+  { q: ['voiceover','stimme','sprechen','kommentar','erzähler'],
+    a: '🎙 Mit Voiceover kannst du Kommentare zu einzelnen Szenen aufnehmen! Erstelle zuerst eine Gruppe, dann klicke auf 🎙 Voiceover im Editor-Tab.' },
+  { q: ['fehler','rückgängig','undo','gelöscht','falsch'],
+    a: '↩️ Keine Panik! Im Editor-Tab gibt es den ↩ Rückgängig-Button, der das letzte Foto zurückbringt. Und im Kamera-Tab gibt es auch einen ↩ Rückgängig-Button!' },
+  { q: ['greenscreen','grüner hintergrund','chroma','hintergrund wechseln'],
+    a: '🟢 Greenscreen ist super cool! Halte deine Figur vor einen grünen Hintergrund (z.B. grünes Papier) und aktiviere 🟢 Greenscreen im Kamera-Tab. Dann wird das Grün automatisch durch deinen Wunsch-Hintergrund ersetzt!' },
+  { q: ['timelapse','zeitraffer','automatisch fotografieren'],
+    a: '⚡ Mit dem Zeitraffer-Modus fotografiert die App automatisch alle paar Sekunden! Perfekt für Sonnenuntergänge oder langsame Bewegungen. Aktiviere ⚡ Zeitraffer im Kamera-Tab.' },
+  { q: ['effekt','filter','fx','spezialeffekt'],
+    a: '✨ Im Editor-Tab gibt es den ✨ FX-Button mit coolen Spezialeffekten wie Sepia, Regenbogen oder Wackeln! Markiere zuerst die Frames, auf die du den Effekt anwenden willst.' },
+  { q: ['hallo','hi','hey','guten','servus','moin'],
+    a: '👋 Hallo! Ich bin Kamera-Karl, dein persönlicher Stop-Motion-Experte! Frag mich alles über Filmtechnik, Geschichten, Figuren oder wie du deinen Film noch besser machen kannst! 🎬' },
+  { q: ['danke','super','toll','klasse','prima','cool'],
+    a: '😊 Sehr gerne! Du machst das großartig – weiter so! Wenn du weitere Fragen hast, bin ich immer da. Dein Film wird bestimmt ein Meisterwerk! 🌟' },
+  { q: ['hilfe','help','was kannst du','was weißt du'],
+    a: '🎬 Ich kenne mich aus mit: Fototipps 📷, Beleuchtung 💡, Storyboard 🎬, Figuren 🎭, Musik 🎵, Schnitt ✂️, Export 📤 und allem rund um Stop-Motion! Frag mich einfach drauflos!' },
+];
+
+function karlOfflineAnswer(msg) {
+  const m = msg.toLowerCase();
+  for (const entry of KARL_KB) {
+    if (entry.q.some(kw => m.includes(kw))) return entry.a;
+  }
+  // Generic helpful fallback
+  const ctx = (typeof S !== 'undefined') ? S.shots.length : 0;
+  if (ctx === 0) return '🎬 Du hast noch keine Fotos aufgenommen! Geh zum 📷 Kamera-Tab und fang an zu fotografieren. Schon 20 Fotos reichen für eine kurze Szene!';
+  return `🎬 Gute Frage! Du hast schon ${ctx} Fotos – super! Wenn du Hilfe brauchst, frag mich nach Themen wie: Beleuchtung, Zwiebelhaut, FPS, Figuren, Storyboard, Musik oder Export!`;
+}
+
 async function aiSend() {
   const input = document.getElementById('ai-input');
   const msg = input.value.trim();
@@ -6456,40 +6531,15 @@ async function aiSend() {
   aiHistory.push({ role: 'user', content: msg });
   aiShowThinking();
 
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 400,
-        system: AI_SYSTEM + '\n\n' + getProjectContext(),
-        messages: aiHistory.slice(-20)
-      })
-    });
+  // Small delay so thinking indicator is visible
+  await new Promise(r => setTimeout(r, 400 + Math.random() * 500));
 
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || 'HTTP ' + response.status);
-    }
-
-    const data = await response.json();
-    const reply = data.content[0].text;
-
-    aiHideThinking();
-    aiAddMsg('bot', reply);
-    aiHistory.push({ role: 'assistant', content: reply });
-    if (aiHistory.length > 20) aiHistory = aiHistory.slice(-20);
-    renderAiChips();
-
-  } catch(err) {
-    aiHideThinking();
-    aiAddMsg('bot', '⚠️ Ups, da ist etwas schiefgelaufen – bitte prüfe deine Internetverbindung und versuche es nochmal!');
-  }
+  const reply = karlOfflineAnswer(msg);
+  aiHideThinking();
+  aiAddMsg('bot', reply);
+  aiHistory.push({ role: 'assistant', content: reply });
+  if (aiHistory.length > 40) aiHistory = aiHistory.slice(-40);
+  renderAiChips();
 }
 
 function aiAddMsg(role, text) {
