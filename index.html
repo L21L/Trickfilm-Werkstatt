@@ -916,41 +916,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
 }
 #ai-messages::-webkit-scrollbar { width: 3px; }
 #ai-messages::-webkit-scrollbar-thumb { background: #21262d; border-radius: 2px; }
-#ai-key-box {
-  margin: 8px 12px;
-  background: #161b22;
-  border: 1px solid #21262d;
-  border-radius: 12px;
-  padding: 12px;
-  flex-shrink: 0;
-}
-#ai-key-box label { font-size: 0.75rem; color: #8b949e; display: block; margin-bottom: 6px; font-family: 'Fredoka One', cursive; }
-#ai-key-row { display: flex; gap: 6px; margin-bottom: 6px; }
-#ai-key-input {
-  flex: 1;
-  background: #0d1117;
-  border: 1px solid #21262d;
-  border-radius: 8px;
-  padding: 6px 10px;
-  color: #e6edf3;
-  font-size: 0.78rem;
-  outline: none;
-}
-#ai-key-input:focus { border-color: #fbbf24; }
-#ai-key-save {
-  background: #fbbf24;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-family: 'Fredoka One', cursive;
-  font-size: 0.78rem;
-  cursor: pointer;
-  color: #000;
-  white-space: nowrap;
-}
-#ai-key-status { font-size: 0.72rem; }
-#ai-key-link { font-size: 0.68rem; color: #8b949e; margin-top: 4px; display: block; }
-#ai-key-link a { color: #fbbf24; text-decoration: none; }
+
 #ai-suggestions {
   display: flex;
   flex-wrap: wrap;
@@ -6368,15 +6334,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <button id="ai-close" onclick="aiToggle()" aria-label="Schließen">✕</button>
   </div>
   <div id="ai-messages"></div>
-  <div id="ai-key-box" style="display:none">
-    <label>🔑 Anthropic API-Key</label>
-    <div id="ai-key-row">
-      <input id="ai-key-input" type="password" placeholder="sk-ant-…"/>
-      <button id="ai-key-save" onclick="saveAiKey(document.getElementById('ai-key-input').value)">💾 Speichern</button>
-    </div>
-    <div id="ai-key-status"></div>
-    <span id="ai-key-link">Wo bekomme ich einen Key? → <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a></span>
-  </div>
+
   <div id="ai-suggestions"></div>
   <div id="ai-input-row">
     <input id="ai-input" type="text" placeholder="Frag Kamera-Karl…" autocomplete="off"/>
@@ -6389,7 +6347,6 @@ document.addEventListener('DOMContentLoaded', () => {
    KAMERA-KARL – KI-ASSISTENT
    ═══════════════════════════════════════════════ */
 
-let aiKey      = localStorage.getItem('tfw-ai-key') || '';
 let aiHistory  = [];
 let aiThinking = false;
 let aiOpen     = false;
@@ -6466,35 +6423,12 @@ Aktueller Projektstand:
 `.trim();
 }
 
-function saveAiKey(val) {
-  aiKey = val.trim();
-  localStorage.setItem('tfw-ai-key', aiKey);
-  showAiKeyStatus();
-  if (aiKey) document.getElementById('ai-key-box').style.display = 'none';
-}
-
-function showAiKeyStatus() {
-  const el = document.getElementById('ai-key-status');
-  if (!el) return;
-  if (aiKey) {
-    el.textContent = '✅ API-Key gespeichert';
-    el.style.color = '#22c55e';
-  } else {
-    el.textContent = '⚠️ Kein API-Key – Kamera-Karl kann nicht antworten';
-    el.style.color = '#f59e0b';
-  }
-}
-
 function aiToggle() {
   aiOpen = !aiOpen;
   const panel = document.getElementById('ai-panel');
   panel.style.display = aiOpen ? 'flex' : 'none';
   if (aiOpen) {
     if (!aiGreeted) { aiGreet(); aiGreeted = true; }
-    if (!aiKey) {
-      document.getElementById('ai-key-box').style.display = 'block';
-      showAiKeyStatus();
-    }
     renderAiChips();
     setTimeout(() => document.getElementById('ai-input').focus(), 100);
   }
@@ -6518,13 +6452,6 @@ async function aiSend() {
   if (!msg || aiThinking) return;
   input.value = '';
 
-  if (!aiKey) {
-    aiAddMsg('bot', '🔑 Ich brauche noch einen Anthropic API-Key um antworten zu können. Gib ihn oben im Schlüsselfeld ein – den bekommst du kostenlos auf console.anthropic.com!');
-    document.getElementById('ai-key-box').style.display = 'block';
-    showAiKeyStatus();
-    return;
-  }
-
   aiAddMsg('user', msg);
   aiHistory.push({ role: 'user', content: msg });
   aiShowThinking();
@@ -6534,7 +6461,6 @@ async function aiSend() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': aiKey,
         'anthropic-version': '2023-06-01',
         'anthropic-dangerous-direct-browser-access': 'true'
       },
@@ -6562,13 +6488,7 @@ async function aiSend() {
 
   } catch(err) {
     aiHideThinking();
-    const errMsg = err.message || 'Verbindungsfehler';
-    if (errMsg.includes('401') || errMsg.toLowerCase().includes('api key')) {
-      aiAddMsg('bot', '🔑 Der API-Key scheint nicht zu stimmen. Überprüfe ihn bitte – du findest ihn auf console.anthropic.com.');
-      document.getElementById('ai-key-box').style.display = 'block';
-    } else {
-      aiAddMsg('bot', '⚠️ ' + errMsg + ' – bitte prüfe deine Verbindung oder den API-Key.');
-    }
+    aiAddMsg('bot', '⚠️ Ups, da ist etwas schiefgelaufen – bitte prüfe deine Internetverbindung und versuche es nochmal!');
   }
 }
 
@@ -6616,10 +6536,6 @@ function renderAiChips() {
 }
 
 function initKameraKarl() {
-  if (aiKey) {
-    const inp = document.getElementById('ai-key-input');
-    if (inp) inp.value = aiKey;
-  }
   document.getElementById('ai-input').addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); aiSend(); }
   });
