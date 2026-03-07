@@ -1589,11 +1589,30 @@ textarea.field-input{min-height:80px;line-height:1.5}
         Wähle einen Hintergrund für deinen Film:
       </p>
       <div class="bg-grid" id="bg-grid"></div>
-      <label class="bg-upload-area" id="bg-upload-area">
-        <div class="bg-upload-icon">📁</div>
-        <div class="bg-upload-text">Eigenes Bild hochladen</div>
-        <input type="file" accept="image/*" id="bg-file-input" style="display:none"/>
-      </label>
+
+      <!-- Eigene Hintergründe -->
+      <div id="custom-bg-section" style="display:none">
+        <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--teal);margin:16px 0 10px;display:flex;align-items:center;gap:6px">✨ Meine eigenen Hintergründe</div>
+        <div class="bg-grid" id="custom-bg-grid"></div>
+      </div>
+
+      <!-- Aktionen -->
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+        <label class="bg-upload-area" id="bg-upload-area" style="flex:1;min-width:140px;margin-top:0">
+          <div class="bg-upload-icon">📁</div>
+          <div class="bg-upload-text">Bild hochladen</div>
+          <input type="file" accept="image/*" id="bg-file-input" style="display:none"/>
+        </label>
+        <button id="bg-draw-btn" onclick="openBgDraw()"
+          style="flex:1;min-width:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          border:2px dashed var(--border);border-radius:var(--r);padding:24px 16px;text-align:center;cursor:pointer;
+          transition:border-color .2s,background .2s;background:transparent;color:var(--text)"
+          onmouseover="this.style.borderColor='var(--teal)';this.style.background='rgba(45,212,191,.05)'"
+          onmouseout="this.style.borderColor='var(--border)';this.style.background='transparent'">
+          <div style="font-size:32px;margin-bottom:8px;line-height:1">🎨</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:14px;color:var(--muted)">Hintergrund zeichnen</div>
+        </button>
+      </div>
     </div>
 
     <!-- ── TAB 5: Produktionsplan ── -->
@@ -2821,9 +2840,10 @@ function initBackgrounds() {
     card.addEventListener('click', () => {
       S.project.background = i;
       scheduleSave();
-      grid.querySelectorAll('.bg-card').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('.bg-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       showToast(`🌄 ${bg.name} gewählt!`);
+      updateDrawBgProjectButton();
     });
     grid.appendChild(card);
   });
@@ -2833,14 +2853,132 @@ function initBackgrounds() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = ev => {
-      S.project.customBg = ev.target.result;
-      S.project.background = 'custom';
-      scheduleSave();
-      showToast('📁 Eigenes Bild geladen!');
+      addCustomBg({ name: file.name.replace(/\.[^.]+$/, ''), dataUrl: ev.target.result });
+      showToast('📁 Eigener Hintergrund gespeichert!');
     };
     reader.readAsDataURL(file);
   });
+
+  renderCustomBgGrid();
 }
+
+function getCustomBgs() {
+  if (!S.project.customBgList) S.project.customBgList = [];
+  return S.project.customBgList;
+}
+
+function addCustomBg(item) {
+  const list = getCustomBgs();
+  const id = 'cbg_' + Date.now();
+  list.push({ id, name: item.name || 'Eigener Hintergrund', dataUrl: item.dataUrl });
+  // Auto-select the new bg
+  S.project.background = 'custom:' + id;
+  S.project.customBg = item.dataUrl;
+  scheduleSave();
+  renderCustomBgGrid();
+  updateDrawBgProjectButton();
+  // Mark it selected
+  document.querySelectorAll('.bg-card').forEach(c => c.classList.remove('selected'));
+  const newCard = document.querySelector(`[data-cbg-id="${id}"]`);
+  if (newCard) newCard.classList.add('selected');
+}
+
+function renderCustomBgGrid() {
+  const list = getCustomBgs();
+  const section = document.getElementById('custom-bg-section');
+  const grid = document.getElementById('custom-bg-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  if (list.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  list.forEach(item => {
+    const isSelected = S.project.background === 'custom:' + item.id;
+    const card = document.createElement('div');
+    card.className = 'bg-card' + (isSelected ? ' selected' : '');
+    card.dataset.cbgId = item.id;
+    card.style.cssText = 'position:relative';
+    card.innerHTML = `
+      <img src="${item.dataUrl}" style="width:100%;display:block;aspect-ratio:4/3;object-fit:cover;border-radius:6px"/>
+      <div class="bg-card-name">${item.name}</div>
+      <button onclick="deleteCustomBg('${item.id}',event)"
+        style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);border:none;
+        color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+    `;
+    card.addEventListener('click', () => {
+      S.project.background = 'custom:' + item.id;
+      S.project.customBg = item.dataUrl;
+      scheduleSave();
+      document.querySelectorAll('.bg-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      showToast(`🎨 ${item.name} gewählt!`);
+      updateDrawBgProjectButton();
+    });
+    grid.appendChild(card);
+  });
+}
+
+function deleteCustomBg(id, e) {
+  e.stopPropagation();
+  S.project.customBgList = getCustomBgs().filter(b => b.id !== id);
+  if (S.project.background === 'custom:' + id) {
+    S.project.background = null;
+    S.project.customBg = null;
+  }
+  scheduleSave();
+  renderCustomBgGrid();
+  updateDrawBgProjectButton();
+  showToast('🗑 Hintergrund gelöscht');
+}
+
+function updateDrawBgProjectButton() {
+  const btn = $('draw-bg-project');
+  if (!btn) return;
+  const bg = S.project.background;
+  if (bg === null || bg === undefined) { btn.style.display = 'none'; return; }
+  btn.style.display = 'inline-block';
+  if (typeof bg === 'string' && bg.startsWith('custom:')) {
+    const id = bg.replace('custom:', '');
+    const item = getCustomBgs().find(b => b.id === id);
+    btn.textContent = `🌄 ${item?.name || 'Eigener Hintergrund'}`;
+  } else if (bg === 'custom') {
+    btn.textContent = '🌄 Eigenes Bild';
+  } else {
+    btn.textContent = `🌄 ${BG_LIB[bg]?.name || 'Hintergrund'}`;
+  }
+}
+
+// ── Hintergrund im Zeichenmodus öffnen ──
+function openBgDraw() {
+  // Reuse draw modal in bg-draw mode
+  Draw.target = { type: 'bg', index: null };
+  Draw.history = [];
+  const modal = $('draw-modal');
+  modal.classList.remove('hidden');
+  $('draw-title').textContent = '🎨 Hintergrund zeichnen';
+
+  const wrap  = $('draw-canvas-wrap');
+  const canvas = $('draw-canvas');
+  Draw.canvas = canvas;
+  const maxW = wrap.clientWidth  - 24;
+  const maxH = wrap.clientHeight - 24;
+  const cw = Math.min(maxW, maxH * 4/3);
+  const ch = cw * 3/4;
+  canvas.width  = Math.floor(cw);
+  canvas.height = Math.floor(ch);
+  Draw.ctx = canvas.getContext('2d');
+
+  $all('.draw-bg-btn').forEach(b => b.classList.remove('active'));
+  Draw.bg = 'white';
+  document.querySelector('.draw-bg-btn[data-bg="white"]').classList.add('active');
+  drawFill('white');
+  drawSnapshot();
+
+  // Show project bg button if applicable
+  updateDrawBgProjectButton();
+}
+
 
 /* ═══════════════════════════════════════════════
    PRODUKTIONSPLAN (ersetzt Wochenplan)
@@ -3037,15 +3175,7 @@ function openDraw(type, index) {
   modal.classList.remove('hidden');
 
   // Refresh project BG button
-  const projectBgBtn = $('draw-bg-project');
-  if (S.project.background !== null && S.project.background !== undefined) {
-    projectBgBtn.style.display = 'inline-block';
-    const bgName = S.project.background === 'custom' ? 'Eigenes Bild'
-      : (BG_LIB[S.project.background]?.name || 'Hintergrund');
-    projectBgBtn.textContent = `🌄 ${bgName}`;
-  } else {
-    projectBgBtn.style.display = 'none';
-  }
+  updateDrawBgProjectButton();
 
   // Title
   if (type === 'figure') {
@@ -3101,12 +3231,20 @@ function drawFill(bgColor) {
   if (bgColor === 'project') {
     // Draw the selected project background onto canvas
     const bg = S.project.background;
-    if (bg === 'custom' && S.project.customBg) {
+    const customBgSrc = (() => {
+      if (typeof bg === 'string' && bg.startsWith('custom:')) {
+        const id = bg.replace('custom:', '');
+        return getCustomBgs().find(b => b.id === id)?.dataUrl || S.project.customBg;
+      }
+      if (bg === 'custom') return S.project.customBg;
+      return null;
+    })();
+    if (customBgSrc) {
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, c.width, c.height);
       const img = new Image();
       img.onload = () => ctx.drawImage(img, 0, 0, c.width, c.height);
-      img.src = S.project.customBg;
+      img.src = customBgSrc;
     } else if (typeof bg === 'number' && BG_LIB[bg]) {
       // Render SVG to canvas
       ctx.fillStyle = '#ffffff';
@@ -3208,15 +3346,7 @@ function initDrawModal() {
   });
 
   // BG buttons — show "Projekt" only if a background is selected
-  const projectBgBtn = $('draw-bg-project');
-  if (S.project.background !== null && S.project.background !== undefined) {
-    projectBgBtn.style.display = 'inline-block';
-    const bgName = S.project.background === 'custom' ? 'Eigenes Bild'
-      : (BG_LIB[S.project.background]?.name || 'Hintergrund');
-    projectBgBtn.textContent = `🌄 ${bgName}`;
-  } else {
-    projectBgBtn.style.display = 'none';
-  }
+  updateDrawBgProjectButton();
 
   $all('.draw-bg-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -3267,6 +3397,18 @@ function initDrawModal() {
   $('draw-save').addEventListener('click', () => {
     const dataUrl = Draw.canvas.toDataURL('image/png');
     const {type, index} = Draw.target;
+    if (type === 'bg') {
+      // Save as a new custom background
+      const name = 'Gezeichnet ' + new Date().toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit'});
+      addCustomBg({ name, dataUrl });
+      $('draw-modal').classList.add('hidden');
+      showToast('🎨 Hintergrund gespeichert!');
+      playSuccess();
+      // Switch to bg tab if not already there
+      const bgTab = document.querySelector('[data-sub="sub-bg"]');
+      if (bgTab) bgTab.click();
+      return;
+    }
     if (type === 'figure') {
       S.project.figures[index].drawing = dataUrl;
       renderFigures();
@@ -4183,6 +4325,22 @@ function initGsBgLib() {
     wrap.querySelector('svg').style.cssText = 'width:52px;height:39px;display:block;pointer-events:none';
     wrap.addEventListener('click', () => {
       setGsBgFromLib(i);
+      container.querySelectorAll('div').forEach(el => el.style.borderColor = 'transparent');
+      wrap.style.borderColor = 'var(--yellow)';
+    });
+    container.appendChild(wrap);
+  });
+  // Custom backgrounds
+  getCustomBgs().forEach(item => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'flex-shrink:0;cursor:pointer;border-radius:4px;overflow:hidden;' +
+      'border:2px solid transparent;transition:border-color .15s;width:52px;height:39px;' +
+      `background-image:url(${item.dataUrl});background-size:cover;`;
+    wrap.title = item.name;
+    wrap.addEventListener('click', () => {
+      const img = new Image();
+      img.onload = () => { gsBgImage = img; $('gs-bg-label').textContent = '✓ ' + item.name; };
+      img.src = item.dataUrl;
       container.querySelectorAll('div').forEach(el => el.style.borderColor = 'transparent');
       wrap.style.borderColor = 'var(--yellow)';
     });
@@ -7315,13 +7473,23 @@ function initRetouchModal() {
 
   // ── Build BG options from BG_LIB ───────────────────────────────
   const bgRow = document.getElementById('retouch-bg-row');
-  // Insert first 8 BG_LIB entries as small thumbnails
-  BG_LIB.slice(0, 8).forEach((bg, i) => {
+  // Insert ALL BG_LIB entries as small thumbnails
+  BG_LIB.forEach((bg, i) => {
     const div = document.createElement('div');
     div.className = 'retouch-bg-option';
     div.dataset.rbg = String(i);
     div.title = bg.name;
     div.innerHTML = bg.svg;
+    bgRow.insertBefore(div, document.getElementById('retouch-bg-upload-btn'));
+  });
+  // Insert custom backgrounds
+  getCustomBgs().forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'retouch-bg-option';
+    div.dataset.rbg = 'custom:' + item.id;
+    div.title = item.name;
+    div.style.backgroundImage = 'url(' + item.dataUrl + ')';
+    div.style.backgroundSize = 'cover';
     bgRow.insertBefore(div, document.getElementById('retouch-bg-upload-btn'));
   });
 
@@ -7333,6 +7501,16 @@ function initRetouchModal() {
     const rbg = opt.dataset.rbg;
     if (rbg === 'transparent') {
       Retouch.bgImage = null;
+    } else if (rbg && rbg.startsWith('custom:')) {
+      // Custom drawn/uploaded bg from library
+      const id = rbg.replace('custom:', '');
+      const item = getCustomBgs().find(b => b.id === id);
+      if (item) {
+        const img = new Image();
+        img.onload = () => { Retouch.bgImage = img; retouchComposite(); };
+        img.src = item.dataUrl;
+        return;
+      }
     } else {
       // Rasterize SVG to image
       const bg = BG_LIB[+rbg];
