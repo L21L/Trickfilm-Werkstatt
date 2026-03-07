@@ -1748,7 +1748,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
 
     <!-- Preview Player -->
     <div id="preview-wrap">
-      <canvas id="prev-cv"></canvas>
+      <canvas id="prev-cv" onclick="if(prevRunning) stopPrev();" style="cursor:pointer"></canvas>
       <button id="prev-play" onclick="togglePrev()">▶</button>
     </div>
 
@@ -4912,13 +4912,16 @@ function startPrev() {
   if (S.shots.length === 0) return;
   prevRunning = true; prevIdx = 0;
   prevGroupsPlayed = new Set();
-  $('prev-play').textContent = '⏸';
+  $('prev-play').style.opacity = '0';
+  $('prev-play').style.pointerEvents = 'none';
   prevStep();
 }
 function stopPrev() {
   prevRunning = false;
   clearTimeout(prevTimer);
   $('prev-play').textContent = '▶';
+  $('prev-play').style.opacity = '';
+  $('prev-play').style.pointerEvents = '';
   // Stop any voiceover
   const vp = $('vo-player');
   if (vp) { vp.pause(); vp.currentTime = 0; }
