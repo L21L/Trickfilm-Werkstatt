@@ -6,7 +6,13 @@
 <meta name="theme-color" content="#060914"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Trickfilm"/>
+<meta name="description" content="Stop-Motion Trickfilm App für Kinder"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <title>Meine Trickfilm Werkstatt</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet"/>
@@ -19,6 +25,11 @@
   --text:#e6edf3; --muted:#8b949e; --yellow:#fbbf24; --teal:#2dd4bf;
   --purple:#a855f7; --green:#22c55e; --red:#ef4444;
   --r:14px; --r-sm:8px; --topbar-h:52px; --nav-h:68px;
+  /* COCKPIT */
+  --panel-w:320px;
+  --timeline-h:100px;
+  --glass-bg:rgba(13,17,23,0.75);
+  --glass-border:rgba(255,255,255,0.07);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
@@ -28,15 +39,161 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 input,textarea,select{font-family:inherit}
 textarea{resize:vertical}
 
-/* ── Topbar ── */
+/* ═══════════════════════════════════════════════
+   COCKPIT LAYOUT
+   ═══════════════════════════════════════════════ */
+
+/* Topbar */
 .topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-h);
-  background:rgba(6,9,20,.95);border-bottom:1px solid var(--border);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  display:flex;align-items:center;padding:0 12px;z-index:100;gap:10px}
+  background:rgba(6,9,20,.96);border-bottom:1px solid var(--glass-border);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  display:flex;align-items:center;padding:0 12px;z-index:200;gap:10px;
+  box-shadow:0 1px 30px rgba(0,0,0,.5)}
 .topbar::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--yellow),transparent);opacity:.3}
+  background:linear-gradient(90deg,transparent,var(--yellow),transparent);opacity:.4}
 .topbar-title{flex:1;text-align:center;font-family:'Fredoka One',cursive;font-size:16px;
   color:var(--text);opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px}
+
+/* ── Cockpit: center stage ── */
+#cockpit{position:fixed;inset:0;padding-top:var(--topbar-h);display:flex;flex-direction:column;}
+
+/* ── Cockpit body (panels + center) ── */
+#cockpit-body{flex:1;display:flex;overflow:hidden;position:relative;}
+
+/* ── Center stage ── */
+#center-stage{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;
+  background:var(--bg);}
+
+/* Center content area */
+#center-content{flex:1;overflow:hidden;position:relative;}
+
+/* ── Mode selector bar ── */
+#mode-bar{display:flex;align-items:center;background:rgba(6,9,20,.9);
+  border-bottom:1px solid var(--glass-border);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  padding:0 8px;gap:4px;flex-shrink:0;height:48px;z-index:10;position:relative;}
+.mode-btn{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:10px;
+  color:var(--muted);font-family:'Fredoka One',cursive;font-size:13px;
+  transition:all .2s;border:1px solid transparent;white-space:nowrap;flex-shrink:0}
+.mode-btn .mode-icon{font-size:18px}
+.mode-btn.active{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.3);
+  color:var(--yellow)}
+.mode-btn:hover:not(.active){background:rgba(255,255,255,.05);color:var(--text)}
+.mode-bar-spacer{flex:1}
+#mode-bar-panel-btns{display:flex;gap:6px;align-items:center}
+.panel-toggle-btn{display:flex;align-items:center;gap:6px;padding:7px 12px;
+  border-radius:10px;border:1px solid var(--glass-border);
+  color:var(--muted);font-family:'Fredoka One',cursive;font-size:12px;
+  transition:all .2s;background:rgba(255,255,255,.03)}
+.panel-toggle-btn.active{background:rgba(45,212,191,.1);border-color:rgba(45,212,191,.35);color:var(--teal)}
+.panel-toggle-btn:hover:not(.active){border-color:rgba(255,255,255,.15);color:var(--text)}
+
+/* ── Side Panels ── */
+.side-panel{position:relative;width:0;flex-shrink:0;overflow:hidden;
+  transition:width .3s cubic-bezier(.4,0,.2,1);z-index:50;}
+.side-panel.open{width:var(--panel-w)}
+.side-panel-inner{width:var(--panel-w);height:100%;display:flex;flex-direction:column;
+  background:var(--glass-bg);border:1px solid var(--glass-border);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  overflow:hidden}
+#left-panel .side-panel-inner{border-left:none;border-radius:0 0 var(--r) 0}
+#right-panel .side-panel-inner{border-right:none;border-radius:0 0 0 var(--r)}
+
+.panel-header{display:flex;align-items:center;padding:12px 14px;
+  border-bottom:1px solid var(--glass-border);flex-shrink:0;gap:8px}
+.panel-title{font-family:'Fredoka One',cursive;font-size:16px;color:var(--yellow);flex:1}
+.panel-close-btn{width:32px;height:32px;border-radius:var(--r-sm);
+  display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);
+  transition:all .2s;background:rgba(255,255,255,.03);border:1px solid var(--glass-border)}
+.panel-close-btn:hover{color:var(--text);background:rgba(255,255,255,.08)}
+
+.panel-body{flex:1;overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.panel-body::-webkit-scrollbar{width:3px}
+.panel-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* Panel sub-tabs */
+.panel-subtabs{display:flex;overflow-x:auto;gap:3px;padding:8px 10px;
+  background:rgba(0,0,0,.2);border-bottom:1px solid var(--glass-border);
+  scrollbar-width:none;flex-shrink:0}
+.panel-subtabs::-webkit-scrollbar{display:none}
+.panel-subtab{flex-shrink:0;font-family:'Fredoka One',cursive;font-size:11px;
+  padding:6px 11px;border-radius:8px;color:var(--muted);
+  transition:all .2s;white-space:nowrap;border:1px solid transparent}
+.panel-subtab.active{color:var(--yellow);background:rgba(251,191,36,.1);
+  border-color:rgba(251,191,36,.25)}
+.panel-subtab:hover:not(.active){color:var(--text)}
+
+/* ── Bottom Timeline ── */
+#bottom-timeline{flex-shrink:0;height:var(--timeline-h);
+  background:var(--glass-bg);border-top:1px solid var(--glass-border);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  display:flex;flex-direction:column;position:relative;transition:height .3s}
+#bottom-timeline.minimized{height:36px}
+.timeline-header{display:flex;align-items:center;padding:0 12px;height:36px;flex-shrink:0;
+  border-bottom:1px solid var(--glass-border);gap:8px}
+.timeline-title{font-family:'Fredoka One',cursive;font-size:12px;color:var(--muted);
+  display:flex;align-items:center;gap:6px}
+.timeline-count{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.25);
+  color:var(--yellow);font-family:'Fredoka One',cursive;font-size:11px;
+  padding:2px 8px;border-radius:99px}
+.timeline-spacer{flex:1}
+.timeline-minimize-btn{width:28px;height:28px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;color:var(--muted);
+  font-size:14px;transition:all .2s}
+.timeline-minimize-btn:hover{background:rgba(255,255,255,.08);color:var(--text)}
+
+.timeline-strip-wrap{flex:1;overflow:hidden;padding:0 8px}
+#bottom-filmstrip{display:flex;gap:5px;overflow-x:auto;height:100%;
+  align-items:center;scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+  padding:4px 0}
+#bottom-filmstrip::-webkit-scrollbar{height:3px}
+#bottom-filmstrip::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.tl-thumb{position:relative;flex-shrink:0;height:52px;width:70px;
+  border-radius:6px;overflow:hidden;border:2px solid transparent;
+  transition:border-color .15s,transform .15s;cursor:pointer}
+.tl-thumb:hover{border-color:rgba(251,191,36,.6);transform:scale(1.05)}
+.tl-thumb.selected{border-color:var(--yellow)}
+.tl-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.tl-num{position:absolute;bottom:1px;left:2px;font-size:9px;color:rgba(255,255,255,.8);
+  font-family:'Fredoka One',cursive;line-height:1;
+  text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.tl-empty{color:var(--muted);font-size:12px;font-family:'Fredoka One',cursive;margin:auto}
+
+/* ── Frame context overlay ── */
+#frame-ctx{position:absolute;z-index:300;background:rgba(13,17,23,.92);
+  border:1px solid var(--glass-border);border-radius:12px;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  padding:6px;display:flex;gap:4px;box-shadow:0 8px 32px rgba(0,0,0,.6);
+  transition:opacity .15s,transform .15s;opacity:0;pointer-events:none;transform:translateY(4px)}
+#frame-ctx.show{opacity:1;pointer-events:all;transform:translateY(0)}
+.ctx-btn{display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 10px;border-radius:8px;transition:background .15s;
+  font-family:'Fredoka One',cursive;font-size:10px;color:var(--text);min-width:52px}
+.ctx-btn:hover{background:rgba(255,255,255,.1)}
+.ctx-btn .ctx-icon{font-size:20px}
+.ctx-btn.ctx-danger{color:var(--red)}
+.ctx-btn.ctx-danger:hover{background:rgba(239,68,68,.15)}
+
+/* ── Center page rendering ── */
+/* Pages now render inside center-content */
+/* ── Center page rendering ── */
+/* Pages now render inside center-content */
+.ck-page{display:none;position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;background:var(--bg);}
+.ck-page.active{display:block}
+
+/* Camera page special */
+#pg-cam{display:none;flex-direction:column;overflow:hidden;position:absolute;inset:0}
+#pg-cam.active{display:flex}
+
+/* Editor page */
+#pg-edit{display:none;position:absolute;inset:0;overflow-y:auto;overflow-x:hidden}
+#pg-edit.active{display:block}
+
+/* ── OLD .page references still work ── */
+.pages-container{display:none}/* hidden – layout replaced by cockpit */
+.bottom-nav{display:none}/* replaced by mode-bar */
 
 /* ── Logo ── */
 .logo-inline{display:flex;align-items:center;gap:10px;background:rgba(6,9,20,.9);
@@ -52,12 +209,15 @@ textarea{resize:vertical}
 @keyframes cameraFloat{0%,100%{transform:translateY(0) rotate(0deg)}
   33%{transform:translateY(-3px) rotate(.5deg)}66%{transform:translateY(-1px) rotate(-.5deg)}}
 
-/* ── Pages ── */
-.pages-container{position:fixed;inset:0}
-.page{display:none;position:absolute;inset:0;
-  padding-top:var(--topbar-h);padding-bottom:var(--nav-h);
-  overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-.page.active{display:block}
+/* ── Pages (legacy, now handled by cockpit) ── */
+.pages-container{display:none!important}
+.page{display:none!important}
+.page.active{display:none!important}
+#pg-cam{display:none;flex-direction:column;overflow:hidden;position:absolute;inset:0}
+#pg-cam.active{display:flex}
+/* ck-cam is the live camera cockpit page */
+#ck-cam{display:none!important;flex-direction:column;overflow:hidden;position:absolute;inset:0;background:#000}
+#ck-cam.active{display:flex!important}
 
 /* ── Placeholder ── */
 .placeholder-card{display:flex;flex-direction:column;align-items:center;
@@ -128,15 +288,15 @@ textarea.field-input{min-height:80px;line-height:1.5}
 /* ═══════════════════════════
    PLAN PAGE — SUB TABS
    ═══════════════════════════ */
-.plan-subtabs{display:flex;overflow-x:auto;gap:4px;padding:12px 12px 0;
-  background:var(--bg);position:sticky;top:0;z-index:10;
-  border-bottom:1px solid var(--border);scrollbar-width:none}
+.plan-subtabs{display:flex;overflow-x:auto;gap:3px;padding:8px 10px;
+  background:rgba(0,0,0,.2);position:sticky;top:0;z-index:10;
+  border-bottom:1px solid var(--glass-border);scrollbar-width:none}
 .plan-subtabs::-webkit-scrollbar{display:none}
-.plan-subtab{flex-shrink:0;font-family:'Fredoka One',cursive;font-size:13px;
-  padding:8px 14px;border-radius:var(--r-sm) var(--r-sm) 0 0;color:var(--muted);
-  transition:color .2s,background .2s;border-bottom:2px solid transparent;
-  white-space:nowrap}
-.plan-subtab.active{color:var(--yellow);border-bottom-color:var(--yellow);background:var(--s2)}
+.plan-subtab{flex-shrink:0;font-family:'Fredoka One',cursive;font-size:11px;
+  padding:6px 11px;border-radius:8px;color:var(--muted);
+  transition:all .2s;white-space:nowrap;border:1px solid transparent}
+.plan-subtab.active{color:var(--yellow);background:rgba(251,191,36,.1);
+  border-color:rgba(251,191,36,.25)}
 .plan-subtab:hover:not(.active){color:var(--text)}
 
 .plan-section{display:none;padding:16px}
@@ -165,7 +325,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
   border-radius:var(--r);padding:14px}
 .story-field-icon{font-size:20px;margin-bottom:6px}
 /* ── Impressum ── */
-.legal-link{position:fixed;bottom:calc(var(--nav-h) + 4px);right:10px;z-index:90;
+.legal-link{position:fixed;bottom:calc(var(--timeline-h) + 4px);right:10px;z-index:90;
   font-size:10px;color:rgba(139,148,158,.35);font-family:'Fredoka One',cursive;
   letter-spacing:.3px;cursor:pointer;transition:color .2s;padding:4px;
   text-decoration:none;background:none;border:none}
@@ -200,7 +360,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
   color:var(--muted);font-family:'Fredoka One',cursive;font-size:13px;
   padding:6px 14px;border-radius:var(--r-sm);cursor:pointer;transition:all .2s}
 .legal-close:hover{color:var(--text);border-color:var(--text)}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+.toast{position:fixed;bottom:calc(var(--timeline-h) + 16px);left:50%;transform:translateX(-50%) translateY(20px);
   background:var(--s2);border:1px solid var(--border);color:var(--text);font-family:'Fredoka One',cursive;
   font-size:13px;padding:9px 18px;border-radius:20px;z-index:9999;
   opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
@@ -765,100 +925,157 @@ textarea.field-input{min-height:80px;line-height:1.5}
 /* ═══════════════════════════
    KAMERA TAB
    ═══════════════════════════ */
-#pg-cam{display:none;flex-direction:column;gap:0;padding:var(--topbar-h) 0 var(--nav-h)}
+#pg-cam{display:none;flex-direction:column;gap:0}
 #pg-cam.active{display:flex}
 
-/* Camera Box */
-#cam-box{position:relative;width:100%;background:#000;overflow:hidden;flex-shrink:0;
-  max-height:55vw;aspect-ratio:var(--cam-aspect, 4/3)}
-#cam-box.portrait{max-height:none;max-width:75vw;margin:0 auto;aspect-ratio:var(--cam-aspect, 3/4)}
+/* ck-cam: flex column — 3 zones stack: viewfinder | adj-toggle | adj-panel | shoot-bar */
+#ck-cam{display:none!important;position:absolute;inset:0;background:#0a0d14;
+  flex-direction:column;overflow:hidden}
+#ck-cam.active{display:flex!important}
+
+/* ── Zone 1: Viewfinder — grows to fill available space ── */
+#cam-vf-wrap{
+  position:relative;flex:1;min-height:0;
+  display:flex;align-items:center;justify-content:center;
+  background:#0a0d14;overflow:visible}
+/* cam-box: sized by JS to exact crop ratio */
+#cam-box{position:relative;flex-shrink:0;background:#000;overflow:hidden}
 #cam-vid{width:100%;height:100%;object-fit:cover;display:block}
 #onion-cv,#gs-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 #cam-grid{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .2s;
-  background-image:
-    linear-gradient(rgba(255,255,255,.5) .5px,transparent .5px),
-    linear-gradient(90deg,rgba(255,255,255,.5) .5px,transparent .5px);
+  background-image:linear-gradient(rgba(255,255,255,.4) .5px,transparent .5px),
+    linear-gradient(90deg,rgba(255,255,255,.4) .5px,transparent .5px);
   background-size:33.33% 33.33%}
 #cam-grid.on{opacity:1}
-#cam-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;
-  transition:opacity .05s}
-#shot-cnt{position:absolute;top:8px;left:10px;background:rgba(0,0,0,.55);
-  color:#fff;font-family:'Fredoka One',cursive;font-size:12px;padding:4px 10px;
-  border-radius:99px;backdrop-filter:blur(4px)}
-#scene-progress-bar{position:absolute;top:8px;right:10px;background:rgba(0,0,0,.55);
-  color:#fff;font-family:'Fredoka One',cursive;font-size:11px;padding:4px 8px;
-  border-radius:99px;backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:flex-end;gap:3px}
-.spb-track{width:80px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden}
-.spb-fill{height:100%;background:var(--yellow);border-radius:2px;transition:width .3s}
+#cam-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .05s}
 #cam-countdown{position:absolute;inset:0;display:flex;align-items:center;
-  justify-content:center;pointer-events:none;z-index:10}
+  justify-content:center;pointer-events:none;z-index:30}
 .cd-num{font-family:'Fredoka One',cursive;font-size:96px;color:#fff;
-  text-shadow:0 4px 24px rgba(0,0,0,.8);opacity:0;transform:scale(1.5);
-  animation:cdPop .8s ease forwards}
+  text-shadow:0 4px 24px rgba(0,0,0,.8);opacity:0;transform:scale(1.5);animation:cdPop .8s ease forwards}
 @keyframes cdPop{0%{opacity:0;transform:scale(1.5)}40%{opacity:1;transform:scale(1)}
   80%{opacity:1;transform:scale(.9)}100%{opacity:0;transform:scale(.8)}}
-#motion-warn{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
-  background:rgba(239,68,68,.9);color:#fff;font-family:'Fredoka One',cursive;
-  font-size:13px;padding:6px 16px;border-radius:99px;pointer-events:none;
-  opacity:0;transition:opacity .3s;white-space:nowrap}
+#motion-warn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(239,68,68,.88);color:#fff;font-family:'Fredoka One',cursive;
+  font-size:13px;padding:7px 18px;border-radius:99px;pointer-events:none;
+  opacity:0;transition:opacity .3s;white-space:nowrap;backdrop-filter:blur(6px);z-index:25}
 #motion-warn.show{opacity:1}
 #cam-fallback{position:absolute;inset:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;background:#0d1117;gap:10px;padding:20px;text-align:center}
 .cam-fallback-icon{font-size:48px}
 .cam-fallback-title{font-family:'Fredoka One',cursive;font-size:18px;color:var(--text)}
 .cam-fallback-sub{font-size:13px;color:var(--muted);line-height:1.5}
-
-/* Controls */
-.cam-controls{padding:8px 10px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
-.cam-row1{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+/* HUD badges */
+#shot-cnt{position:absolute;top:10px;left:10px;background:rgba(6,9,20,.65);
+  color:#fff;font-family:'Fredoka One',cursive;font-size:13px;padding:5px 12px;
+  border-radius:99px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.12);z-index:22;pointer-events:none}
+#scene-progress-bar{position:absolute;top:10px;right:10px;background:rgba(6,9,20,.65);
+  color:#fff;font-family:'Fredoka One',cursive;font-size:11px;padding:5px 9px;
+  border-radius:10px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;
+  align-items:flex-end;gap:3px;z-index:22;pointer-events:none}
+.spb-track{width:80px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden}
+.spb-fill{height:100%;background:var(--yellow);border-radius:2px;transition:width .3s}
+/* Toggle chips overlay */
+#cam-overlay-top{position:absolute;top:0;left:0;right:0;z-index:20;
+  padding:44px 8px 8px;pointer-events:none}
+.cam-controls{padding:0;display:flex;flex-direction:column;gap:6px;flex-shrink:0;pointer-events:all}
+.cam-row1{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;flex-wrap:nowrap}
 .cam-row1::-webkit-scrollbar{display:none}
-.cch{flex-shrink:0;background:var(--s2);border:1px solid var(--border);
-  color:var(--muted);font-family:'Fredoka One',cursive;font-size:12px;
-  padding:7px 11px;border-radius:var(--r-sm);transition:all .2s;white-space:nowrap}
-.cch.on{background:rgba(251,191,36,.15);border-color:var(--yellow);color:var(--yellow)}
+.cch{flex-shrink:0;background:rgba(6,9,20,.6);border:1px solid rgba(255,255,255,.18);
+  color:rgba(255,255,255,.85);font-family:'Fredoka One',cursive;font-size:12px;
+  padding:7px 12px;border-radius:18px;transition:all .2s;white-space:nowrap;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);min-height:36px}
+.cch.on{background:rgba(251,191,36,.25);border-color:rgba(251,191,36,.7);color:var(--yellow)}
 .cch:active{transform:scale(.94)}
-
-/* Shoot row */
-.cam-shoot-row{display:flex;align-items:center;justify-content:center;
-  gap:16px;padding:4px 12px;flex-shrink:0}
-#shoot-btn{width:72px;height:72px;border-radius:50%;
-  background:linear-gradient(135deg,#fbbf24,#f59e0b);
-  font-size:28px;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 20px rgba(251,191,36,.5);transition:transform .12s,box-shadow .12s;
-  flex-shrink:0;position:relative;overflow:visible}
-#shoot-btn:active{transform:scale(.88);box-shadow:0 2px 10px rgba(251,191,36,.3)}
-.cam-row2{display:flex;gap:8px;flex:1;justify-content:center}
-.cam-action-btn{background:var(--s2);border:1px solid var(--border);color:var(--text);
-  font-family:'Fredoka One',cursive;font-size:12px;padding:8px 14px;
-  border-radius:var(--r-sm);transition:all .2s;white-space:nowrap}
-.cam-action-btn:hover{border-color:var(--yellow);color:var(--yellow)}
-.cam-action-btn:active{transform:scale(.94)}
-
-/* Timelapse Panel */
-#tl-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:12px;margin:0 10px;display:none;flex-shrink:0}
+/* Timelapse / Greenscreen glass panels */
+#tl-panel{background:rgba(6,9,20,.75);border:1px solid rgba(255,255,255,.12);
+  border-radius:var(--r);padding:10px 12px;margin:6px 8px 0;display:none;flex-shrink:0;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 #tl-panel.open{display:block}
 .tl-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
-.tl-label{font-size:12px;color:var(--muted);flex-shrink:0}
+.tl-label{font-size:12px;color:rgba(255,255,255,.7);flex-shrink:0}
 .tl-slider{flex:1;min-width:80px;accent-color:var(--yellow)}
-.tl-val{font-family:'Fredoka One',cursive;font-size:14px;color:var(--yellow);
-  min-width:30px;text-align:right}
+.tl-val{font-family:'Fredoka One',cursive;font-size:14px;color:var(--yellow);min-width:30px;text-align:right}
 .tl-btns{display:flex;gap:8px}
-
-/* Greenscreen Panel */
-#gs-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:12px;margin:0 10px;display:none;flex-shrink:0}
+#gs-panel{background:rgba(6,9,20,.75);border:1px solid rgba(255,255,255,.12);
+  border-radius:var(--r);padding:10px 12px;margin:6px 8px 0;display:none;flex-shrink:0;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 #gs-panel.open{display:block}
 .gs-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
-.gs-label{font-size:12px;color:var(--muted);flex-shrink:0}
-.gs-preset{width:28px;height:28px;border-radius:50%;border:2px solid transparent;
-  cursor:pointer;transition:border-color .2s;flex-shrink:0}
+.gs-label{font-size:12px;color:rgba(255,255,255,.7);flex-shrink:0}
+.gs-preset{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:border-color .2s;flex-shrink:0}
 .gs-preset.active{border-color:var(--yellow)}
 .gs-thresh-slider{flex:1;min-width:80px;accent-color:var(--yellow)}
 
-/* Filmstrip */
-#filmstrip-wrap{flex:1;min-height:60px;max-height:140px;overflow:hidden;border-top:1px solid var(--border);
-  background:var(--surface);display:flex;flex-direction:column}
+/* ── Zone 2a: Portrait-mode adj toggle tab ── */
+#cam-adj-toggle{
+  flex-shrink:0;width:100%;
+  display:none;/* JS shows in portrait */
+  background:rgba(15,20,35,.97);
+  border-top:1px solid rgba(255,255,255,.08);
+  padding:8px 14px;
+  color:rgba(255,255,255,.55);font-size:12px;font-family:'Fredoka One',cursive;
+  text-align:center;cursor:pointer;transition:color .2s,background .2s;
+  letter-spacing:.3px}
+#cam-adj-toggle:hover{color:rgba(255,255,255,.8);background:rgba(30,40,60,.97)}
+#cam-adj-toggle:active{color:var(--yellow)}
+
+/* ── Zone 2b: Adjustment panel ── */
+#cam-adj-panel{
+  flex-shrink:0;overflow:hidden;
+  background:rgba(6,9,20,.96);
+  border-top:1px solid rgba(255,255,255,.06);
+  /* landscape: always visible */
+  max-height:200px;
+  transition:max-height .3s ease}
+/* portrait: collapsed by default */
+#ck-cam.portrait-mode #cam-adj-panel{max-height:0}
+#ck-cam.portrait-mode #cam-adj-panel.portrait-open{max-height:180px}
+/* also hide toggle in landscape */
+#ck-cam:not(.portrait-mode) #cam-adj-toggle{display:none!important}
+#ck-cam.portrait-mode #cam-adj-toggle{display:block}
+
+#cam-adj-inner{padding:8px 14px 10px;display:flex;flex-direction:column;gap:5px}
+.adj-row{display:flex;align-items:center;gap:8px}
+.adj-icon{font-size:14px;flex-shrink:0;width:18px;text-align:center}
+.adj-label{font-size:11px;color:rgba(255,255,255,.45);font-family:'Fredoka One',cursive;
+  flex-shrink:0;width:34px}
+.adj-slider{flex:1;accent-color:var(--yellow);cursor:pointer}
+.adj-val{font-family:'Fredoka One',cursive;font-size:11px;color:var(--yellow);
+  min-width:30px;text-align:right}
+.adj-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 14px}
+/* Mini filmstrip row */
+#cam-mini-strip{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;
+  padding:6px 14px 4px;align-items:center;flex-shrink:0;min-height:51px}
+#cam-mini-strip::-webkit-scrollbar{display:none}
+.cam-mini-thumb{width:44px;height:33px;border-radius:5px;object-fit:cover;
+  flex-shrink:0;border:2px solid transparent;transition:border-color .15s;cursor:pointer;background:#111}
+.cam-mini-thumb:last-child{border-color:rgba(251,191,36,.6)}
+
+/* ── Zone 3: Shoot bar ── */
+#cam-overlay-bottom{
+  flex-shrink:0;display:flex;flex-direction:column;gap:8px;
+  padding:10px 12px 14px;
+  background:rgba(6,9,20,.98);border-top:1px solid rgba(255,255,255,.08)}
+.cam-shoot-row{display:flex;align-items:center;justify-content:center;gap:18px}
+#shoot-btn{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,#fbbf24,#f59e0b);
+  font-size:34px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 28px rgba(251,191,36,.55);
+  transition:transform .12s,box-shadow .12s;
+  flex-shrink:0;border:3px solid rgba(255,255,255,.25)}
+#shoot-btn:active{transform:scale(.88);box-shadow:0 2px 10px rgba(251,191,36,.3)}
+.cam-row2{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+.cam-action-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+  color:rgba(255,255,255,.85);font-family:'Fredoka One',cursive;font-size:12px;
+  padding:9px 15px;border-radius:20px;transition:all .2s;white-space:nowrap;min-height:40px}
+.cam-action-btn:hover{border-color:rgba(251,191,36,.5);color:var(--yellow)}
+.cam-action-btn:active{transform:scale(.94)}
+
+/* Filmstrip (original – hidden, timeline used instead) */
+#filmstrip-wrap{display:none}
 #filmstrip{display:flex;gap:6px;overflow-x:auto;padding:6px 10px;
   align-items:stretch;flex:1;scrollbar-width:thin;
   scrollbar-color:var(--border) transparent}
@@ -884,7 +1101,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
    ═══════════════════════════ */
 #ai-bubble {
   position: fixed;
-  bottom: 80px;
+  bottom: calc(var(--timeline-h) + 16px);
   right: 16px;
   width: 52px;
   height: 52px;
@@ -918,7 +1135,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
 }
 #ai-panel {
   position: fixed;
-  bottom: 140px;
+  bottom: calc(var(--timeline-h) + 76px);
   right: 12px;
   width: min(380px, calc(100vw - 24px));
   height: min(520px, calc(100vh - 200px));
@@ -1072,7 +1289,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
 /* ── Floating Help Button ── */
 #help-float-btn {
   position: fixed;
-  bottom: 80px;
+  bottom: calc(var(--timeline-h) + 16px);
   left: 16px;
   width: 52px;
   height: 52px;
@@ -1153,22 +1370,21 @@ textarea.field-input{min-height:80px;line-height:1.5}
   from{transform:scale(0);opacity:.5}
   to{transform:scale(3);opacity:0}
 }
-/* Shoot button pulse ring - fixed circular */
+/* Shoot button pulse ring - sized relative to button */
+#shoot-btn{position:relative;overflow:visible}
 #shoot-btn::after {
   content:'';
   position:absolute;
-  width:72px;height:72px;
-  top:50%;left:50%;
-  transform:translate(-50%,-50%) scale(1);
+  inset:-6px;
   border-radius:50%;
   border:3px solid rgba(251,191,36,.6);
   animation:shootRing 2s ease-out infinite;
   pointer-events:none;
 }
 @keyframes shootRing {
-  0%  { transform:translate(-50%,-50%) scale(1);   opacity:.7; }
-  70% { transform:translate(-50%,-50%) scale(1.6); opacity:0; }
-  100%{ transform:translate(-50%,-50%) scale(1.6); opacity:0; }
+  0%  { transform:scale(1);   opacity:.7; }
+  70% { transform:scale(1.5); opacity:0; }
+  100%{ transform:scale(1.5); opacity:0; }
 }
 /* Nav tab entry animation on load */
 .bottom-nav .nav-tab {
@@ -1523,24 +1739,129 @@ textarea.field-input{min-height:80px;line-height:1.5}
   <button onclick="showBadges()" id="badge-btn" title="Abzeichen anzeigen">🏆</button>
 </header>
 
-<!-- PAGES -->
-<main class="pages-container" role="main">
+<!-- ════════════════════════════════════
+     COCKPIT LAYOUT
+════════════════════════════════════ -->
+<div id="cockpit">
 
-  <!-- ══════════════════════════════════════
-       PG-PLAN: PLANEN
-  ══════════════════════════════════════ -->
-  <section id="pg-plan" class="page active" aria-label="Planen">
+  <!-- Mode Bar -->
+  <div id="mode-bar" role="navigation" aria-label="Hauptnavigation">
+    <button class="mode-btn active" data-mode="cam" onclick="ckGoMode('cam')">
+      <span class="mode-icon">📷</span><span>Kamera</span>
+    </button>
+    <button class="mode-btn" data-mode="edit" onclick="ckGoMode('edit')">
+      <span class="mode-icon">✂️</span><span>Editor</span>
+    </button>
+    <button class="mode-btn" data-mode="exp" onclick="ckGoMode('exp')">
+      <span class="mode-icon">🎬</span><span>Export</span>
+    </button>
+    <div class="mode-bar-spacer"></div>
+    <div id="mode-bar-panel-btns">
+      <button class="panel-toggle-btn" id="left-panel-btn" onclick="ckTogglePanel('left')">
+        <span>📋</span><span>Planen</span>
+      </button>
+      <button class="panel-toggle-btn" id="right-panel-btn" onclick="ckTogglePanel('right')">
+        <span>🎵</span><span>Audio &amp; FX</span>
+      </button>
+    </div>
+  </div>
 
-    <!-- Sub-Tab Bar -->
-    <div class="plan-subtabs" id="plan-subtabs">
-      <button class="plan-subtab active" data-sub="sub-story">📖 Geschichte</button>
-      <button class="plan-subtab" data-sub="sub-figures">🎭 Figuren</button>
-      <button class="plan-subtab" data-sub="sub-storyboard">🎬 Storyboard</button>
-      <button class="plan-subtab" data-sub="sub-bg">🌄 Hintergrund</button>
-      <button class="plan-subtab" data-sub="sub-week">🎬 Produktionsplan</button>
-      <button class="plan-subtab" data-sub="sub-progress">📊 Fortschritt</button>
+  <!-- Cockpit Body -->
+  <div id="cockpit-body">
+
+    <!-- LEFT PANEL: Planning tools -->
+    <div class="side-panel" id="left-panel">
+      <div class="side-panel-inner">
+        <div class="panel-header">
+          <span class="panel-title">📋 Planen</span>
+          <button class="panel-close-btn" onclick="ckTogglePanel('left')">✕</button>
+        </div>
+        <!-- Plan sub-tabs -->
+        <div class="plan-subtabs" id="plan-subtabs">
+          <button class="plan-subtab active" data-sub="sub-story">📖 Geschichte</button>
+          <button class="plan-subtab" data-sub="sub-figures">🎭 Figuren</button>
+          <button class="plan-subtab" data-sub="sub-storyboard">🎬 Storyboard</button>
+          <button class="plan-subtab" data-sub="sub-bg">🌄 Hintergrund</button>
+          <button class="plan-subtab" data-sub="sub-week">📅 Plan</button>
+          <button class="plan-subtab" data-sub="sub-progress">📊 Fortschritt</button>
+        </div>
+        <!-- Plan content injected from existing sections -->
+        <div class="panel-body" id="plan-panel-body"></div>
+      </div>
     </div>
 
+    <!-- CENTER STAGE -->
+    <div id="center-stage">
+      <div id="center-content">
+
+        <!-- KAMERA MODE -->
+        <section id="ck-cam" class="ck-page active" aria-label="Kamera" style="position:absolute;inset:0;display:flex;flex-direction:column;">
+          <!-- Content moved here from pg-cam by JS -->
+        </section>
+
+        <!-- EDITOR MODE -->
+        <section id="ck-edit" class="ck-page" aria-label="Editor">
+          <!-- Content moved here from pg-edit by JS -->
+        </section>
+
+        <!-- EXPORT MODE -->
+        <section id="ck-exp" class="ck-page" aria-label="Export">
+          <!-- Content moved here from pg-exp by JS -->
+        </section>
+
+      </div>
+
+      <!-- PERMANENT BOTTOM TIMELINE -->
+      <div id="bottom-timeline">
+        <div class="timeline-header">
+          <span class="timeline-title">🎞️ Timeline <span class="timeline-count" id="tl-count-display">0 Frames</span></span>
+          <div class="timeline-spacer"></div>
+          <button class="timeline-minimize-btn" id="tl-minimize-btn" onclick="ckToggleTimeline()" title="Timeline ein-/ausblenden">▼</button>
+        </div>
+        <div class="timeline-strip-wrap">
+          <div id="bottom-filmstrip">
+            <span class="tl-empty" id="tl-bottom-empty">Noch keine Fotos – drück auf 📷</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Frame context overlay -->
+      <div id="frame-ctx">
+        <button class="ctx-btn" id="ctx-retouch" title="Retuschieren">
+          <span class="ctx-icon">✏️</span><span>Retusche</span>
+        </button>
+        <button class="ctx-btn" id="ctx-dup" title="Duplizieren">
+          <span class="ctx-icon">📋</span><span>Duplizieren</span>
+        </button>
+        <button class="ctx-btn ctx-danger" id="ctx-del" title="Löschen">
+          <span class="ctx-icon">🗑️</span><span>Löschen</span>
+        </button>
+        <button class="ctx-btn" id="ctx-close" title="Schließen" onclick="hideFrameCtx()">
+          <span class="ctx-icon">✕</span><span>Schließen</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL: Audio & FX -->
+    <div class="side-panel" id="right-panel">
+      <div class="side-panel-inner">
+        <div class="panel-header">
+          <span class="panel-title">🎵 Audio &amp; FX</span>
+          <button class="panel-close-btn" onclick="ckTogglePanel('right')">✕</button>
+        </div>
+        <div class="panel-body" id="audio-panel-body"></div>
+      </div>
+    </div>
+
+  </div><!-- cockpit-body -->
+</div><!-- cockpit -->
+
+<!-- HIDDEN ORIGINAL PAGES (source for content injection) -->
+<div id="ck-page-sources" style="display:none!important;position:absolute;left:-9999px;visibility:hidden">
+
+  <!-- PG-PLAN -->
+  <section id="pg-plan" class="page" aria-label="Planen">
     <!-- ── TAB 1: Geschichte ── -->
     <div id="sub-story" class="plan-section active">
       <div class="sec-title">📖 Meine Geschichte</div>
@@ -1682,97 +2003,139 @@ textarea.field-input{min-height:80px;line-height:1.5}
   <!-- KAMERA -->
   <section id="pg-cam" class="page" aria-label="Kamera">
 
-    <!-- Camera Box -->
-    <div id="cam-box">
-      <video id="cam-vid" autoplay playsinline muted></video>
-      <canvas id="onion-cv"></canvas>
-      <canvas id="gs-cv" style="display:none"></canvas>
-      <div id="cam-grid"></div>
-      <div id="cam-flash"></div>
-      <div id="shot-cnt">0 Fotos</div>
-      <div id="scene-progress-bar">
-        <span id="spb-label">Szene 1 · 0/12</span>
-        <div class="spb-track"><div class="spb-fill" id="spb-fill" style="width:0%"></div></div>
-      </div>
-      <div id="cam-countdown"></div>
-      <div id="motion-warn">⚠️ Zu viel Bewegung!</div>
-    </div>
-
-    <!-- Controls Row 1: Feature Toggles -->
-    <div class="cam-controls">
-      <div class="cam-row1">
-        <button class="cch" id="btn-swcam"   onclick="swCam()">🔄 Wechseln</button>
-        <button class="cch" id="btn-format"  onclick="togFormat()">📐 Querformat</button>
-        <button class="cch" id="btn-grid"    onclick="togGrid()">⊞ Raster</button>
-        <button class="cch" id="btn-onion"   onclick="togOnion()">🧅 Zwiebelhaut</button>
-        <button class="cch" id="btn-timer"   onclick="togTimer()">⏱ Timer</button>
-        <button class="cch" id="btn-tl"      onclick="togTimelapse()">⚡ Zeitraffer</button>
-        <button class="cch" id="btn-motion"  onclick="togMotion()">👁 Bewegung</button>
-        <button class="cch" id="btn-gs"      onclick="togGreenScreen()">🟢 Greenscreen</button>
-        <button class="cch" id="btn-exp"     onclick="togExposureLock()">🔓 Belichtung</button>
-      </div>
-    </div>
-
-    <!-- Timelapse Panel -->
-    <div id="tl-panel">
-      <div class="tl-row">
-        <span class="tl-label">Intervall:</span>
-        <input type="range" class="tl-slider" id="tl-slider" min="1" max="10" value="2"/>
-        <span class="tl-val" id="tl-val">2s</span>
-      </div>
-      <div class="tl-btns">
-        <button class="btn-primary sm" id="tl-start-btn" onclick="startTimelapse()">▶ Starten</button>
-        <button class="cam-action-btn" id="tl-stop-btn"  onclick="stopTimelapse()" style="display:none">⏹ Stoppen</button>
-        <span class="tl-label" id="tl-count" style="margin-left:auto;color:var(--yellow)"></span>
-      </div>
-    </div>
-
-    <!-- Greenscreen Panel -->
-    <div id="gs-panel">
-      <div class="gs-row">
-        <span class="gs-label">Farbe:</span>
-        <div class="gs-preset active" id="gs-green" style="background:#00ff00" title="Grün" onclick="setGsColor('green')"></div>
-        <div class="gs-preset" id="gs-blue"  style="background:#0000ff" title="Blau"  onclick="setGsColor('blue')"></div>
-        <input type="color" id="gs-custom" value="#00ff00" title="Eigene Farbe"
-          style="width:28px;height:28px;border:none;border-radius:50%;cursor:pointer;padding:0"
-          onchange="setGsColorHex(this.value)"/>
-        <button id="gs-eyedropper" onclick="startGsEyedropper()"
-          style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--yellow);
-          border-radius:6px;padding:4px 10px;font-size:12px;font-family:'Fredoka One',cursive;cursor:pointer"
-          title="Farbe aus Kamerabild aufnehmen">💉 Pick</button>
-      </div>
-      <div class="gs-row">
-        <span class="gs-label">Toleranz:</span>
-        <input type="range" class="gs-thresh-slider" id="gs-thresh" min="0" max="100" value="40"/>
-        <span class="tl-val" id="gs-thresh-val">40</span>
-      </div>
-      <div class="gs-row" style="align-items:flex-start;flex-direction:column;gap:6px">
-        <span class="gs-label">Hintergrund:</span>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-          <button class="cam-action-btn" onclick="pickGsBg()" style="font-size:11px;padding:6px 10px">📁 Eigenes Bild</button>
-          <input type="file" id="gs-bg-input" accept="image/*" style="display:none" onchange="loadGsBg(this)"/>
+    <!-- ── Viewfinder: exact crop ratio ── -->
+    <div id="cam-vf-wrap">
+      <div id="cam-box">
+        <video id="cam-vid" autoplay playsinline muted></video>
+        <canvas id="onion-cv"></canvas>
+        <canvas id="gs-cv" style="display:none"></canvas>
+        <div id="cam-grid"></div>
+        <div id="cam-flash"></div>
+        <div id="cam-countdown"></div>
+        <div id="motion-warn">⚠️ Zu viel Bewegung!</div>
+        <div id="cam-fallback" style="display:none">
+          <div class="cam-fallback-icon">📷</div>
+          <div class="cam-fallback-title">Keine Kamera verfügbar</div>
+          <div class="cam-fallback-sub">Bitte erlaube den Kamerazugriff.</div>
         </div>
-        <div id="gs-bg-lib" style="display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;width:100%"></div>
-        <span class="tl-label" id="gs-bg-label" style="color:var(--green);font-size:11px"></span>
+        <!-- HUD badges -->
+        <div id="shot-cnt">0 Fotos</div>
+        <div id="scene-progress-bar">
+          <span id="spb-label">Szene 1 · 0/12</span>
+          <div class="spb-track"><div class="spb-fill" id="spb-fill" style="width:0%"></div></div>
+        </div>
+        <!-- Toggle chips overlay (top) -->
+        <div id="cam-overlay-top">
+          <div class="cam-controls">
+            <div class="cam-row1">
+              <button class="cch" id="btn-swcam"  onclick="swCam()">🔄 Wechseln</button>
+              <button class="cch" id="btn-format" onclick="togFormat()">📐 Querformat</button>
+              <button class="cch" id="btn-grid"   onclick="togGrid()">⊞ Raster</button>
+              <button class="cch" id="btn-onion"  onclick="togOnion()">🧅 Zwiebelhaut</button>
+              <button class="cch" id="btn-timer"  onclick="togTimer()">⏱ Timer</button>
+              <button class="cch" id="btn-tl"     onclick="togTimelapse()">⚡ Zeitraffer</button>
+              <button class="cch" id="btn-motion" onclick="togMotion()">👁 Bewegung</button>
+              <button class="cch" id="btn-gs"     onclick="togGreenScreen()">🟢 Greenscreen</button>
+              <button class="cch" id="btn-exp"    onclick="togExposureLock()">🔓 Belichtung</button>
+            </div>
+            <!-- Timelapse Panel -->
+            <div id="tl-panel">
+              <div class="tl-row">
+                <span class="tl-label">Intervall:</span>
+                <input type="range" class="tl-slider" id="tl-slider" min="1" max="10" value="2"/>
+                <span class="tl-val" id="tl-val">2s</span>
+              </div>
+              <div class="tl-btns">
+                <button class="btn-primary sm" id="tl-start-btn" onclick="startTimelapse()">▶ Starten</button>
+                <button class="cam-action-btn" id="tl-stop-btn" onclick="stopTimelapse()" style="display:none">⏹ Stoppen</button>
+                <span class="tl-label" id="tl-count" style="margin-left:auto;color:var(--yellow)"></span>
+              </div>
+            </div>
+            <!-- Greenscreen Panel -->
+            <div id="gs-panel">
+              <div class="gs-row">
+                <span class="gs-label">Farbe:</span>
+                <div class="gs-preset active" id="gs-green" style="background:#00ff00" title="Grün" onclick="setGsColor('green')"></div>
+                <div class="gs-preset" id="gs-blue" style="background:#0000ff" title="Blau" onclick="setGsColor('blue')"></div>
+                <input type="color" id="gs-custom" value="#00ff00" style="width:28px;height:28px;border:none;border-radius:50%;cursor:pointer;padding:0" onchange="setGsColorHex(this.value)"/>
+                <button id="gs-eyedropper" onclick="startGsEyedropper()"
+                  style="background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.5);color:var(--yellow);border-radius:18px;padding:5px 11px;font-size:12px;font-family:'Fredoka One',cursive;cursor:pointer">💉 Pick</button>
+              </div>
+              <div class="gs-row">
+                <span class="gs-label">Toleranz:</span>
+                <input type="range" class="gs-thresh-slider" id="gs-thresh" min="0" max="100" value="40"/>
+                <span class="tl-val" id="gs-thresh-val">40</span>
+              </div>
+              <div class="gs-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+                <span class="gs-label">Hintergrund:</span>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                  <button class="cam-action-btn" onclick="pickGsBg()" style="font-size:11px;padding:5px 10px">📁 Eigenes Bild</button>
+                  <input type="file" id="gs-bg-input" accept="image/*" style="display:none" onchange="loadGsBg(this)"/>
+                </div>
+                <div id="gs-bg-lib" style="display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;width:100%"></div>
+                <span class="tl-label" id="gs-bg-label" style="color:var(--green);font-size:11px"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end #cam-vf-wrap -->
+
+    <!-- ── Portrait toggle tab (flex sibling, shown only in portrait via CSS/JS) ── -->
+    <button id="cam-adj-toggle" onclick="toggleCamAdj()">⚙️ Regler ▾</button>
+
+    <!-- ── Adjustment panel ── -->
+    <div id="cam-adj-panel">
+      <!-- Mini filmstrip: last shots -->
+      <div id="cam-mini-strip"></div>
+      <div id="cam-adj-inner">
+        <div class="adj-grid">
+          <div class="adj-row">
+            <span class="adj-icon">☀️</span>
+            <span class="adj-label">Hell.</span>
+            <input type="range" class="adj-slider" id="adj-bri" min="-100" max="100" value="0"
+              oninput="updateCamAdj()"/>
+            <span class="adj-val" id="adj-bri-val">0</span>
+          </div>
+          <div class="adj-row">
+            <span class="adj-icon">◑</span>
+            <span class="adj-label">Kontr.</span>
+            <input type="range" class="adj-slider" id="adj-con" min="-100" max="100" value="0"
+              oninput="updateCamAdj()"/>
+            <span class="adj-val" id="adj-con-val">0</span>
+          </div>
+          <div class="adj-row">
+            <span class="adj-icon">🔍</span>
+            <span class="adj-label">Zoom</span>
+            <input type="range" class="adj-slider" id="adj-zoom" min="100" max="300" value="100"
+              oninput="updateCamAdj()"/>
+            <span class="adj-val" id="adj-zoom-val">1×</span>
+          </div>
+          <div class="adj-row">
+            <span class="adj-icon">🌡️</span>
+            <span class="adj-label">Weiß</span>
+            <input type="range" class="adj-slider" id="adj-wb" min="-50" max="50" value="0"
+              oninput="updateCamAdj()"/>
+            <span class="adj-val" id="adj-wb-val">0</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Shoot Row -->
-    <div class="cam-controls" style="padding-top:0">
+    <!-- ── Shoot controls ── -->
+    <div id="cam-overlay-bottom">
+      <div class="cam-row2">
+        <button class="cam-action-btn" onclick="undoShot()">↩ Rückgängig</button>
+        <button class="cam-action-btn" onclick="impPh()">📁 Importieren</button>
+        <button class="cam-action-btn" onclick="clearAllShots()">🗑 Alle löschen</button>
+        <input type="file" id="ph-inp" multiple accept="image/*" style="display:none" onchange="onImport(event)"/>
+      </div>
       <div class="cam-shoot-row">
-        <div class="cam-row2">
-          <button class="cam-action-btn" onclick="undoShot()">↩ Rückgängig</button>
-          <button class="cam-action-btn" onclick="impPh()">📁 Importieren</button>
-          <button class="cam-action-btn" onclick="clearAllShots()">🗑 Alle löschen</button>
-          <input type="file" id="ph-inp" multiple accept="image/*" style="display:none" onchange="onImport(event)"/>
-        </div>
-      </div>
-      <div style="display:flex;justify-content:center">
         <button id="shoot-btn" onclick="takeShot()">📷</button>
       </div>
     </div>
 
-    <!-- Filmstrip -->
+    <!-- Filmstrip (hidden – permanent timeline used instead) -->
     <div id="filmstrip-wrap">
       <div id="filmstrip">
         <span class="strip-empty" id="strip-empty">Noch keine Fotos – drück auf 📷</span>
@@ -2221,10 +2584,10 @@ textarea.field-input{min-height:80px;line-height:1.5}
     </div>
   </section>
 
-</main>
+</div><!-- ck-page-sources -->
 
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav" role="navigation" aria-label="Hauptnavigation">
+<!-- BOTTOM NAV (legacy, hidden - replaced by mode-bar) -->
+<nav class="bottom-nav" role="navigation" aria-label="Hauptnavigation" style="display:none!important">
   <button class="nav-tab active" data-page="pg-plan" aria-label="Planen">
     <span class="nav-icon">📋</span><span class="nav-label">Planen</span>
   </button>
@@ -2477,14 +2840,202 @@ function showToast(msg, duration) {
    NAVIGATION
    ═══════════════════════════════════════════════ */
 function goPage(pageId) {
-  $all('.page').forEach(p => p.classList.remove('active'));
-  const t = $(pageId); if (t) t.classList.add('active');
-  $all('.nav-tab').forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
+  // Legacy compat: map old page IDs to cockpit modes
+  const pageToMode = {
+    'pg-plan': null,      // opens left panel
+    'pg-cam':  'cam',
+    'pg-edit': 'edit',
+    'pg-mus':  'right',   // opens right panel
+    'pg-exp':  'exp',
+  };
+  if (pageId === 'pg-plan') { ckTogglePanel('left', true); return; }
+  if (pageId === 'pg-mus')  { ckTogglePanel('right', true); return; }
+  const mode = pageToMode[pageId];
+  if (mode) ckGoMode(mode);
   playSwoosh();
 }
+
 /* ═══════════════════════════════════════════════
-   TAB-INTRO SYSTEM
+   COCKPIT NAVIGATION
    ═══════════════════════════════════════════════ */
+let ckCurrentMode = 'cam';
+
+function ckGoMode(mode) {
+  ckCurrentMode = mode;
+  // Update mode buttons
+  $all('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  // Show the right ck-page
+  $all('.ck-page').forEach(p => p.classList.remove('active'));
+  const target = $('ck-' + mode);
+  if (target) target.classList.add('active');
+  // Trigger cam init if switching to cam
+  if (mode === 'cam') { try { if (typeof camStream !== 'undefined' && !camStream) initCam(); sizeCamViewfinder(); } catch(e){} }
+  try { playSwoosh(); } catch(e){}
+}
+
+function ckTogglePanel(side, forceOpen) {
+  const panel = $(side + '-panel');
+  const btn   = $(side + '-panel-btn');
+  if (!panel) return;
+  const isOpen = panel.classList.contains('open');
+  const shouldOpen = forceOpen !== undefined ? forceOpen : !isOpen;
+  if (shouldOpen) {
+    panel.classList.add('open');
+    if (btn) btn.classList.add('active');
+  } else {
+    panel.classList.remove('open');
+    if (btn) btn.classList.remove('active');
+  }
+}
+
+function ckToggleTimeline() {
+  const tl = $('bottom-timeline');
+  const btn = $('tl-minimize-btn');
+  const minimized = tl.classList.toggle('minimized');
+  if (btn) btn.textContent = minimized ? '▲' : '▼';
+}
+
+/* ── Bottom Timeline: render frames ── */
+function renderBottomTimeline() {
+  const strip = $('bottom-filmstrip');
+  const emptyEl = $('tl-bottom-empty');
+  const countEl = $('tl-count-display');
+  if (!strip) return;
+
+  // Remove all tl-thumb elements
+  strip.querySelectorAll('.tl-thumb').forEach(el => el.remove());
+
+  if (!S.shots || S.shots.length === 0) {
+    if (emptyEl) emptyEl.style.display = '';
+    if (countEl) countEl.textContent = '0 Frames';
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+  if (countEl) countEl.textContent = S.shots.length + ' Frame' + (S.shots.length !== 1 ? 's' : '');
+
+  S.shots.forEach((shot, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'tl-thumb';
+    thumb.dataset.idx = i;
+    const img = document.createElement('img');
+    img.src = shot.data || shot;
+    img.loading = 'lazy';
+    const num = document.createElement('span');
+    num.className = 'tl-num';
+    num.textContent = i + 1;
+    thumb.appendChild(img);
+    thumb.appendChild(num);
+    thumb.addEventListener('click', (e) => showFrameCtx(e, i));
+    strip.appendChild(thumb);
+  });
+}
+
+/* ── Frame context menu ── */
+let ckCtxIdx = -1;
+function showFrameCtx(e, idx) {
+  ckCtxIdx = idx;
+  const ctx = $('frame-ctx');
+  if (!ctx) return;
+  // Position above the clicked thumb
+  const rect = e.currentTarget.getBoundingClientRect();
+  ctx.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+  ctx.style.left = Math.max(4, rect.left - 20) + 'px';
+  ctx.classList.add('show');
+  e.stopPropagation();
+}
+function hideFrameCtx() {
+  const ctx = $('frame-ctx');
+  if (ctx) ctx.classList.remove('show');
+  ckCtxIdx = -1;
+}
+
+function initCockpit() {
+  // Move plan content into left panel body
+  const planBody = $('plan-panel-body');
+  const pgPlan = $('pg-plan');
+  if (planBody && pgPlan) {
+    // Move children of pg-plan (except subtabs row) to panel body
+    // The subtabs stay in the panel header area
+    Array.from(pgPlan.children).forEach(child => {
+      if (!child.classList.contains('plan-subtabs')) {
+        planBody.appendChild(child);
+      }
+    });
+  }
+
+  // Move camera content into ck-cam
+  const ckCam = $('ck-cam');
+  const pgCam = $('pg-cam');
+  if (ckCam && pgCam) {
+    Array.from(pgCam.children).forEach(child => ckCam.appendChild(child));
+  }
+
+  // Move editor content into ck-edit
+  const ckEdit = $('ck-edit');
+  const pgEdit = $('pg-edit');
+  if (ckEdit && pgEdit) {
+    Array.from(pgEdit.children).forEach(child => ckEdit.appendChild(child));
+  }
+
+  // Move music content into right panel audio body
+  const audioBody = $('audio-panel-body');
+  const pgMus = $('pg-mus');
+  if (audioBody && pgMus) {
+    Array.from(pgMus.children).forEach(child => audioBody.appendChild(child));
+  }
+
+  // Move export content into ck-exp
+  const ckExp = $('ck-exp');
+  const pgExp = $('pg-exp');
+  if (ckExp && pgExp) {
+    Array.from(pgExp.children).forEach(child => ckExp.appendChild(child));
+  }
+
+  // Frame context actions
+  const ctxDel = $('ctx-del');
+  const ctxDup = $('ctx-dup');
+  const ctxRetouch = $('ctx-retouch');
+  if (ctxDel) ctxDel.addEventListener('click', () => {
+    if (ckCtxIdx >= 0 && ckCtxIdx < S.shots.length) {
+      S.shots.splice(ckCtxIdx, 1);
+      try { idbSaveShots(S.shots); renderStrip(); updateShotCount(); renderFrames(); renderBottomTimeline(); } catch(e){}
+      showToast('🗑️ Frame gelöscht');
+    }
+    hideFrameCtx();
+  });
+  if (ctxDup) ctxDup.addEventListener('click', () => {
+    if (ckCtxIdx >= 0 && ckCtxIdx < S.shots.length) {
+      const copy = Object.assign({}, S.shots[ckCtxIdx], {id: 'f' + Date.now() + '_dup'});
+      S.shots.splice(ckCtxIdx + 1, 0, copy);
+      try { idbSaveShots(S.shots); renderStrip(); updateShotCount(); renderFrames(); renderBottomTimeline(); } catch(e){}
+      showToast('📋 Frame dupliziert');
+    }
+    hideFrameCtx();
+  });
+  if (ctxRetouch) ctxRetouch.addEventListener('click', () => {
+    const idx = ckCtxIdx;
+    hideFrameCtx();
+    if (idx >= 0) {
+      try { openRetouchModal(idx); } catch(e){}
+    }
+  });
+
+  // Close ctx on outside click
+  document.addEventListener('click', (e) => {
+    const ctx = $('frame-ctx');
+    if (ctx && ctx.classList.contains('show') && !ctx.contains(e.target)) {
+      hideFrameCtx();
+    }
+  });
+
+  // Start in cam mode
+  ckGoMode('cam');
+}
+
+/* Also expose globally */
+window.renderBottomTimeline = renderBottomTimeline;
+
+/* TAB-INTRO SYSTEM */
 const TAB_INTROS = {
   'pg-plan': {
     icon: '📋', title: 'Planen',
@@ -2584,10 +3135,13 @@ function showTabIntro(pageId) {
 }
 
 function initNav() {
+  // Legacy nav-tabs still work
   $all('.nav-tab').forEach(b => b.addEventListener('click', () => {
     goPage(b.dataset.page);
     showTabIntro(b.dataset.page);
   }));
+  // Initialize cockpit layout
+  initCockpit();
 }
 
 /* ═══════════════════════════════════════════════
@@ -3590,6 +4144,10 @@ function checkOnboarding() {
 let camStream       = null;
 let camFacing       = 'environment';
 let camAspect       = '4/3'; // '4/3' = Querformat, '3/4' = Hochformat
+let camBrightness   = 0;   // -100…+100
+let camContrast     = 0;   // -100…+100
+let camZoom         = 100; // 100…300 (%)
+let camWB           = 0;   // -50…+50
 let onionOn         = false;
 let timerOn         = false;
 let tlActive        = false;
@@ -3766,6 +4324,8 @@ async function initCam() {
     });
     vid.srcObject = stream;
     camStream = stream;
+    // Size viewfinder to exact crop ratio once video metadata is ready
+    vid.addEventListener('loadedmetadata', () => { sizeCamViewfinder(); applyCamFilter(); }, {once:true});
     // Hide fallback if shown
     const fb = $('cam-fallback');
     if (fb) fb.style.display = 'none';
@@ -3801,25 +4361,119 @@ function swCam() {
 
 /* ── Format Umschalten ──────────────────────── */
 function togFormat() {
-  const box = $('cam-box');
-  const btn = $('btn-format');
+  const box    = $('cam-box');
+  const btn    = $('btn-format');
+  const ckCam  = $('ck-cam');
   if (camAspect === '4/3') {
-    // Wechsel zu Hochformat
     camAspect = '3/4';
     box.classList.add('portrait');
-    box.style.setProperty('--cam-aspect', '3/4');
     btn.textContent = '📐 Hochformat';
     btn.classList.add('on');
+    if (ckCam) ckCam.classList.add('portrait-mode');
   } else {
-    // Wechsel zu Querformat
     camAspect = '4/3';
     box.classList.remove('portrait');
-    box.style.setProperty('--cam-aspect', '4/3');
     btn.textContent = '📐 Querformat';
     btn.classList.remove('on');
+    if (ckCam) { ckCam.classList.remove('portrait-mode'); $('cam-adj-panel').classList.remove('portrait-open'); }
   }
-  // Zwiebelhaut neu zeichnen
+  sizeCamViewfinder();
   if (onionOn) drawOnion();
+}
+
+/* ── Viewfinder: match cam-vf-wrap height so cam-box fills exact ratio ── */
+function sizeCamViewfinder() {
+  const wrap      = $('cam-vf-wrap');
+  const box       = $('cam-box');
+  const ckCam     = $('ck-cam');
+  if (!wrap || !box || !ckCam) return;
+
+  const [arW, arH] = camAspect.split('/').map(Number);
+  const isPortrait  = (arW < arH);
+
+  // Total space available in ck-cam
+  const totalW = ckCam.clientWidth  || window.innerWidth;
+  const totalH = ckCam.clientHeight || window.innerHeight;
+
+  // Measure fixed zones (adj-toggle + adj-panel + shoot-bar)
+  const adjToggle = $('cam-adj-toggle');
+  const adjPanel  = $('cam-adj-panel');
+  const shootBar  = $('cam-overlay-bottom');
+  const fixedH = (adjToggle ? adjToggle.offsetHeight : 0)
+               + (adjPanel  ? adjPanel.offsetHeight  : 0)
+               + (shootBar  ? shootBar.offsetHeight  : 0);
+
+  const availH = Math.max(totalH - fixedH, 80);
+  const availW = totalW;
+
+  // Fit cam-box into available space maintaining aspect ratio
+  let boxW, boxH;
+  if (availW / availH > arW / arH) {
+    // Height-constrained
+    boxH = availH;
+    boxW = boxH * arW / arH;
+  } else {
+    // Width-constrained
+    boxW = availW;
+    boxH = boxW * arH / arW;
+  }
+
+  boxW = Math.floor(boxW);
+  boxH = Math.floor(boxH);
+
+  wrap.style.height = boxH + 'px';
+  box.style.width   = boxW + 'px';
+  box.style.height  = boxH + 'px';
+}
+
+/* ── Adj-Panel toggle (portrait mode) ── */
+function toggleCamAdj() {
+  const panel = $('cam-adj-panel');
+  const btn   = $('cam-adj-toggle');
+  if (!panel) return;
+  const isOpen = panel.classList.toggle('portrait-open');
+  if (btn) btn.textContent = isOpen ? '⚙️ Regler ▴' : '⚙️ Regler ▾';
+}
+
+/* ── Live-Regler: CSS-Filter auf Video + Zoom per transform ── */
+function updateCamAdj() {
+  const briEl  = $('adj-bri');
+  const conEl  = $('adj-con');
+  const zoomEl = $('adj-zoom');
+  const wbEl   = $('adj-wb');
+  if (briEl)  { camBrightness = +briEl.value;  $('adj-bri-val').textContent = (camBrightness >= 0 ? '+' : '') + camBrightness; }
+  if (conEl)  { camContrast   = +conEl.value;   $('adj-con-val').textContent = (camContrast   >= 0 ? '+' : '') + camContrast; }
+  if (zoomEl) { camZoom       = +zoomEl.value;  $('adj-zoom-val').textContent = (camZoom/100).toFixed(1) + '×'; }
+  if (wbEl)   { camWB         = +wbEl.value;    $('adj-wb-val').textContent  = (camWB >= 0 ? '+' : '') + camWB; }
+  applyCamFilter();
+}
+
+function applyCamFilter() {
+  const vid = $('cam-vid');
+  if (!vid) return;
+  const bri  = 1 + camBrightness / 100;   // 0…2
+  const con  = 1 + camContrast   / 100;   // 0…2
+  const hue  = camWB * 0.5;               // subtle hue-rotate for white-balance feel
+  vid.style.filter    = `brightness(${bri.toFixed(3)}) contrast(${con.toFixed(3)}) hue-rotate(${hue.toFixed(1)}deg)`;
+  vid.style.transform = `scale(${(camZoom/100).toFixed(3)})`;
+  vid.style.transformOrigin = 'center center';
+}
+
+/* ── Mini filmstrip: last 5 shots ── */
+function renderCamMiniStrip() {
+  const strip = $('cam-mini-strip');
+  if (!strip) return;
+  strip.innerHTML = '';
+  const last5 = S.shots.slice(-5);
+  last5.forEach((shot, i) => {
+    const img = document.createElement('img');
+    img.className = 'cam-mini-thumb';
+    img.src = shot.data || shot;
+    img.title = `Foto ${S.shots.length - last5.length + i + 1}`;
+    strip.appendChild(img);
+  });
+  // Auto-scroll to end
+  strip.scrollLeft = strip.scrollWidth;
 }
 
 /* ── Raster ─────────────────────────────────── */
@@ -4143,11 +4797,15 @@ function togExposureLock() {
     for (let i=0;i<d.length;i+=4) lum += (d[i]*299+d[i+1]*587+d[i+2]*114)/1000;
     lum /= (d.length/4);
     const target = 128, bri = Math.min(2, Math.max(0.2, target/Math.max(lum,1)));
-    vid.style.filter = `brightness(${bri.toFixed(2)})`;
+    // Merge with existing adj filters
+    camBrightness = Math.round((bri - 1) * 100);
+    const briEl = $('adj-bri');
+    if (briEl) { briEl.value = camBrightness; $('adj-bri-val').textContent = (camBrightness >= 0?'+':'') + camBrightness; }
+    applyCamFilter();
     btn.classList.add('on');
     btn.textContent = '🔒 Belichtung';
   } else {
-    vid.style.filter = '';
+    applyCamFilter();
     btn.classList.remove('on');
     btn.textContent = '🔓 Belichtung';
   }
@@ -4188,9 +4846,42 @@ function doSnap() {
     dstW = vW;
     dstH = Math.round(dstW / targetR);
   }
-  // Cropkoordinaten im Videobild (zentriert)
-  const cropX = Math.round((vW - dstW) / 2);
-  const cropY = Math.round((vH - dstH) / 2);
+  // Cropkoordinaten im Videobild (zentriert) — zoom berücksichtigen
+  // Digital zoom: sample a smaller region from video center
+  const zoomFactor = camZoom / 100;
+  const sampW = Math.round(dstW / zoomFactor);
+  const sampH = Math.round(dstH / zoomFactor);
+  const sampX = Math.round((vW - sampW) / 2);
+  const sampY = Math.round((vH - sampH) / 2);
+  // (legacy cropX/cropY kept for non-zoom path)
+  const cropX = sampX;
+  const cropY = sampY;
+
+  // Helper: bake CSS-style brightness/contrast/hue-rotate into canvas pixel data
+  function bakeFilters(ctx2d, w, h) {
+    if (camBrightness === 0 && camContrast === 0 && camWB === 0) return;
+    const imgd = ctx2d.getImageData(0, 0, w, h);
+    const d = imgd.data;
+    const bri = 1 + camBrightness / 100;
+    const con = 1 + camContrast   / 100;
+    const wbR = 1 + camWB * 0.003;   // warm shift → more red
+    const wbB = 1 - camWB * 0.003;   // warm shift → less blue
+    for (let i = 0; i < d.length; i += 4) {
+      let r = d[i], g = d[i+1], b = d[i+2];
+      // Brightness
+      r = r * bri; g = g * bri; b = b * bri;
+      // Contrast (pivot at 128)
+      r = (r - 128) * con + 128;
+      g = (g - 128) * con + 128;
+      b = (b - 128) * con + 128;
+      // White balance
+      r = r * wbR; b = b * wbB;
+      d[i]   = Math.max(0, Math.min(255, Math.round(r)));
+      d[i+1] = Math.max(0, Math.min(255, Math.round(g)));
+      d[i+2] = Math.max(0, Math.min(255, Math.round(b)));
+    }
+    ctx2d.putImageData(imgd, 0, 0);
+  }
 
   function coverFitSnap(srcW, srcH, dstW, dstH) {
     const srcR = srcW / srcH, dstR = dstW / dstH;
@@ -4208,7 +4899,8 @@ function doSnap() {
     const tmp = document.createElement('canvas');
     tmp.width = dstW; tmp.height = dstH;
     const tc = tmp.getContext('2d');
-    tc.drawImage(vid, cropX, cropY, dstW, dstH, 0, 0, dstW, dstH);
+    tc.drawImage(vid, cropX, cropY, sampW, sampH, 0, 0, dstW, dstH);
+    bakeFilters(tc, dstW, dstH);
 
     const imgData = tc.getImageData(0, 0, dstW, dstH);
     const data = imgData.data;
@@ -4305,8 +4997,9 @@ function doSnap() {
           ctx.drawImage(bgImg, sx, sy, sw, sh, 0, 0, dstW, dstH);
         }
       }
-      // Video auf Zielgröße zuschneiden (Mitte des Videobilds)
-      ctx.drawImage(vid, cropX, cropY, dstW, dstH, 0, 0, dstW, dstH);
+      // Video auf Zielgröße zuschneiden — zoom-korrigierter Sample-Bereich
+      ctx.drawImage(vid, cropX, cropY, sampW, sampH, 0, 0, dstW, dstH);
+      bakeFilters(ctx, dstW, dstH);
       addShot(cv.toDataURL('image/jpeg', 0.88), false);
     }
 
@@ -4345,6 +5038,7 @@ function addShot(dataUrl, isTransparent) {
   renderStrip();
   updateShotCount();
   renderFrames();
+  renderCamMiniStrip();
   if (onionOn) drawOnion();
   // Animate strip thumb
   const thumbs = document.querySelectorAll('.strip-thumb');
@@ -4394,6 +5088,7 @@ function renderStrip() {
   strip.querySelectorAll('.strip-thumb').forEach(t => t.remove());
   if (S.shots.length === 0) {
     if (empty) empty.style.display = 'block';
+    try { renderBottomTimeline(); } catch(e){}
     return;
   }
   if (empty) empty.style.display = 'none';
@@ -4410,6 +5105,7 @@ function renderStrip() {
     strip.appendChild(thumb);
   });
   requestAnimationFrame(() => { strip.scrollLeft = strip.scrollWidth; });
+  try { renderBottomTimeline(); } catch(e){}
 }
 function deleteShotAt(i) {
   const shot = S.shots[i];
@@ -6980,6 +7676,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initExportTab();
   initKameraKarl();
   try { checkAllBadges(); } catch(e) {}
+  // Init bottom timeline after shots loaded
+  setTimeout(() => { try { renderBottomTimeline(); } catch(e){} }, 500);
 });
 </script>
 
@@ -7515,6 +8213,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 }, { once: true });
+
+// Resize + orientation: re-fit viewfinder
+let _camSizeTimer = null;
+function _debouncedCamSize() {
+  clearTimeout(_camSizeTimer);
+  _camSizeTimer = setTimeout(() => { try { sizeCamViewfinder(); } catch(e) {} }, 80);
+}
+window.addEventListener('resize', _debouncedCamSize);
+window.addEventListener('orientationchange', () => setTimeout(_debouncedCamSize, 200));
 
 /* ═══════════════════════════════════════════════
    RETUSCHE MODAL
@@ -8205,7 +8912,7 @@ if (_closeOb) {
     <div class="legal-content active" id="legal-impressum">
       <h3>Angaben gemäß § 5 TMG</h3>
       <p>Lasse Sündermann<br>
-      E-Mail: <a href="mailto:Lasse.suendermann@web.de">Lasse.suendermann@web.de</a></p>
+      E-Mail: <a href="/cdn-cgi/l/email-protection#7e321f0d0d1b500d0b1b101a1b0c131f10103e091b1c501a1b"><span class="__cf_email__" data-cfemail="773b1604041259040212191312051a16191937001215591312">[email&#160;protected]</span></a></p>
       <h3>Verantwortlich für den Inhalt</h3>
       <p>Lasse Sündermann</p>
       <h3>Hinweis</h3>
@@ -8229,20 +8936,29 @@ if (_closeOb) {
       entsprechende Auskunfts- oder Löschansprüche. Deine Daten auf dem Gerät kannst du
       jederzeit selbst löschen.</p>
       <h3>Kontakt</h3>
-      <p>Bei Fragen: <a href="mailto:Lasse.suendermann@web.de">Lasse.suendermann@web.de</a></p>
+      <p>Bei Fragen: <a href="/cdn-cgi/l/email-protection#105c716363753e6365757e7475627d717e7e506775723e7475"><span class="__cf_email__" data-cfemail="a4e8c5d7d7c18ad7d1c1cac0c1d6c9c5cacae4d3c1c68ac0c1">[email&#160;protected]</span></a></p>
     </div>
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 function openLegal(){document.getElementById('legalModal').classList.add('open')}
 function closeLegal(){document.getElementById('legalModal').classList.remove('open')}
-function closeLegalOutside(e){if(e.target===document.getElementById('legalModal'))closeLegal()}
-function switchLegalTab(id,btn){
+function closeLegalOutside(e){if(e.target===document.getElementById('legalModal'))closeLegal();}
+function switchLegalTab(tab,btn){
   document.querySelectorAll('.legal-content').forEach(c=>c.classList.remove('active'));
-  document.querySelectorAll('.legal-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('legal-'+id).classList.add('active');
+  document.querySelectorAll('.legal-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('legal-'+tab).classList.add('active');
   btn.classList.add('active');
+}
+
+// ── PWA Service Worker Registration ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
 }
 </script>
 </body>

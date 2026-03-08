@@ -1,0 +1,36 @@
+{
+  "name": "Meine Trickfilm Werkstatt",
+  "short_name": "Trickfilm",
+  "description": "Stop-Motion Trickfilm App für Kinder",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#060914",
+  "theme_color": "#060914",
+  "lang": "de",
+  "categories": ["education", "entertainment"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Kamera öffnen",
+      "short_name": "Kamera",
+      "description": "Direkt zur Kamera",
+      "url": "./index.html#cam",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
