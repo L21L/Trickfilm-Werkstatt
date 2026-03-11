@@ -2203,44 +2203,6 @@ textarea.field-input{min-height:80px;line-height:1.5}
               <button class="cch" id="btn-gs"     onclick="togGreenScreen()">🟢 Greenscreen</button>
               <button class="cch" id="btn-exp"    onclick="togExposureLock()">🔓 Belichtung</button>
             </div>
-            <!-- Timelapse Panel -->
-            <div id="tl-panel">
-              <div class="tl-row">
-                <span class="tl-label">Intervall:</span>
-                <input type="range" class="tl-slider" id="tl-slider" min="1" max="10" value="2"/>
-                <span class="tl-val" id="tl-val">2s</span>
-              </div>
-              <div class="tl-btns">
-                <button class="btn-primary sm" id="tl-start-btn" onclick="startTimelapse()">▶ Starten</button>
-                <button class="cam-action-btn" id="tl-stop-btn" onclick="stopTimelapse()" style="display:none">⏹ Stoppen</button>
-                <span class="tl-label" id="tl-count" style="margin-left:auto;color:var(--yellow)"></span>
-              </div>
-            </div>
-            <!-- Greenscreen Panel -->
-            <div id="gs-panel">
-              <div class="gs-row">
-                <span class="gs-label">Farbe:</span>
-                <div class="gs-preset active" id="gs-green" style="background:#00ff00" title="Grün" onclick="setGsColor('green')"></div>
-                <div class="gs-preset" id="gs-blue" style="background:#0000ff" title="Blau" onclick="setGsColor('blue')"></div>
-                <input type="color" id="gs-custom" value="#00ff00" style="width:28px;height:28px;border:none;border-radius:50%;cursor:pointer;padding:0" onchange="setGsColorHex(this.value)"/>
-                <button id="gs-eyedropper" onclick="startGsEyedropper()"
-                  style="background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.5);color:var(--yellow);border-radius:18px;padding:5px 11px;font-size:12px;font-family:'Fredoka One',cursive;cursor:pointer">💉 Pick</button>
-              </div>
-              <div class="gs-row">
-                <span class="gs-label">Toleranz:</span>
-                <input type="range" class="gs-thresh-slider" id="gs-thresh" min="0" max="100" value="40"/>
-                <span class="tl-val" id="gs-thresh-val">40</span>
-              </div>
-              <div class="gs-row" style="flex-direction:column;align-items:flex-start;gap:6px">
-                <span class="gs-label">Hintergrund:</span>
-                <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-                  <button class="cam-action-btn" onclick="pickGsBg()" style="font-size:11px;padding:5px 10px">📁 Eigenes Bild</button>
-                  <input type="file" id="gs-bg-input" accept="image/*" style="display:none" onchange="loadGsBg(this)"/>
-                </div>
-                <div id="gs-bg-lib" style="display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;width:100%"></div>
-                <span class="tl-label" id="gs-bg-label" style="color:var(--green);font-size:11px"></span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -2366,6 +2328,19 @@ textarea.field-input{min-height:80px;line-height:1.5}
           <button class="cch" id="btn-gs-s"     onclick="togGreenScreen()">🟢 Greenscreen</button>
           <button class="cch" id="btn-exp-s"    onclick="togExposureLock()">🔓 Belichtung</button>
         </div>
+        <!-- Timelapse Panel (shown when Zeitraffer is active) -->
+        <div id="tl-panel" style="display:none;margin-bottom:10px">
+          <div class="tl-row">
+            <span class="tl-label">Intervall:</span>
+            <input type="range" class="tl-slider" id="tl-slider" min="1" max="10" value="2"/>
+            <span class="tl-val" id="tl-val">2s</span>
+          </div>
+          <div class="tl-btns">
+            <button class="btn-primary sm" id="tl-start-btn" onclick="startTimelapse()">▶ Starten</button>
+            <button class="cam-action-btn" id="tl-stop-btn" onclick="stopTimelapse()" style="display:none">⏹ Stoppen</button>
+            <span class="tl-label" id="tl-count" style="margin-left:auto;color:var(--yellow)"></span>
+          </div>
+        </div>
         <!-- Adjustments inline in settings -->
         <div style="border-top:1px solid rgba(255,255,255,.07);padding-top:10px">
           <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-family:'Fredoka One',cursive">KAMERAEINSTELLUNGEN</div>
@@ -2396,22 +2371,9 @@ textarea.field-input{min-height:80px;line-height:1.5}
             </div>
           </div>
         </div>
-        <!-- Timelapse sub-panel -->
-        <div id="tl-panel-settings" style="display:none;border-top:1px solid rgba(255,255,255,.07);padding-top:10px;margin-top:6px">
-          <div class="tl-row">
-            <span class="tl-label">Intervall:</span>
-            <input type="range" class="tl-slider" id="tl-slider-s" min="1" max="10" value="2" oninput="$('tl-val-s').textContent=this.value+'s';if($('tl-slider'))$('tl-slider').value=this.value"/>
-            <span class="tl-val" id="tl-val-s">2s</span>
-          </div>
-          <div class="tl-btns">
-            <button class="btn-primary sm" onclick="startTimelapse()">▶ Starten</button>
-            <button class="cam-action-btn" id="tl-stop-btn-s" onclick="stopTimelapse()" style="display:none">⏹ Stoppen</button>
-          </div>
-        </div>
       </div>
-    </div>
 
-    <!-- Filmstrip (hidden – permanent timeline used instead) -->
+    </div><!-- end #cam-overlay-bottom -->
     <div id="filmstrip-wrap">
       <div id="filmstrip">
         <span class="strip-empty" id="strip-empty">Noch keine Fotos – drück auf 📷</span>
@@ -4881,7 +4843,9 @@ function renderCamMiniStrip() {
 function togGrid() {
   const el = $('cam-grid');
   el.classList.toggle('on');
-  $('btn-grid').classList.toggle('on', el.classList.contains('on'));
+  const isOn = el.classList.contains('on');
+  try { $('btn-grid').classList.toggle('on', isOn); } catch(e){}
+  try { $('btn-grid-s').classList.toggle('on', isOn); } catch(e){}
 }
 
 /* ── Zwiebelhaut ────────────────────────────── */
@@ -4991,7 +4955,8 @@ function clearOnion() {
 /* ── Timer ──────────────────────────────────── */
 function togTimer() {
   timerOn = !timerOn;
-  $('btn-timer').classList.toggle('on', timerOn);
+  try { $('btn-timer').classList.toggle('on', timerOn); } catch(e){}
+  try { $('btn-timer-s').classList.toggle('on', timerOn); } catch(e){}
 }
 function startCountdown(n, done) {
   const el = $('cam-countdown');
@@ -5011,7 +4976,10 @@ function startCountdown(n, done) {
 function togTimelapse() {
   const panel = $('tl-panel');
   const isOpen = panel.classList.toggle('open');
-  $('btn-tl').classList.toggle('on', isOpen);
+  try { $('btn-tl').classList.toggle('on', isOpen); } catch(e){}
+  try { $('btn-tl-s').classList.toggle('on', isOpen); } catch(e){}
+  // Show/hide panel inside the settings menu
+  panel.style.display = isOpen ? 'block' : 'none';
   if (!isOpen) stopTimelapse();
 }
 function startTimelapse() {
@@ -5040,7 +5008,8 @@ function stopTimelapse() {
 /* ── Bewegungserkennung ─────────────────────── */
 function togMotion() {
   motionOn = !motionOn;
-  $('btn-motion').classList.toggle('on', motionOn);
+  try { $('btn-motion').classList.toggle('on', motionOn); } catch(e){}
+  try { $('btn-motion-s').classList.toggle('on', motionOn); } catch(e){}
   if (motionOn) startMotionDetect(); else stopMotionDetect();
 }
 function startMotionDetect() {
@@ -5287,10 +5256,12 @@ function togExposureLock() {
     applyCamFilter();
     btn.classList.add('on');
     btn.textContent = '🔒 Belichtung';
+    try { const s = $('btn-exp-s'); s.classList.add('on'); s.textContent = '🔒 Belichtung'; } catch(e){}
   } else {
     applyCamFilter();
     btn.classList.remove('on');
     btn.textContent = '🔓 Belichtung';
+    try { const s = $('btn-exp-s'); s.classList.remove('on'); s.textContent = '🔓 Belichtung'; } catch(e){}
   }
 }
 
@@ -7252,13 +7223,22 @@ function musDeleteCustom(key) {
 }
 
 function autoLoadMusicLib() {
+  let pending = MUSIC_LIB.length;
+  if (pending === 0) return;
   MUSIC_LIB.forEach(track => {
     idbHasMusic(track.key, has => {
       if (!has) {
         fetch(track.file)
           .then(r => { if (!r.ok) throw new Error(); return r.arrayBuffer(); })
           .then(buf => idbSaveMusic(track.key, buf, () => renderMusLib()))
-          .catch(() => {}); // silent fail – kein Netz kein Fehler
+          .catch(() => {
+            // Datei nicht auf Server – Laden-Button bleibt sichtbar
+            pending--;
+            if (pending === 0) renderMusLib();
+          });
+      } else {
+        pending--;
+        if (pending === 0) renderMusLib();
       }
     });
   });
