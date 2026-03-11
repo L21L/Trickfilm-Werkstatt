@@ -219,7 +219,121 @@ textarea{resize:vertical}
 #ck-cam{display:none!important;flex-direction:column;overflow:hidden;position:absolute;inset:0;background:#000}
 #ck-cam.active{display:flex!important}
 
-/* ── Placeholder ── */
+/* ══════════════════════════════════════
+   NEUE KAMERA-SHOOT-ROW STYLES
+══════════════════════════════════════ */
+#cam-shoot-row-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 8px 12px;
+  position: relative;
+}
+.cam-shoot-left, .cam-shoot-right {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+.cam-shoot-left { justify-content: flex-end; margin-right: 16px; }
+.cam-shoot-right { justify-content: flex-start; margin-left: 16px; }
+.cam-side-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.1);
+  color: var(--text);
+  cursor: pointer;
+  transition: all .2s;
+  min-width: 58px;
+  font-family: 'Fredoka One', cursive;
+}
+.cam-side-btn:hover { background: rgba(255,255,255,.13); border-color: rgba(255,255,255,.2); }
+.cam-side-btn.active { background: rgba(251,191,36,.18); border-color: rgba(251,191,36,.45); color: var(--yellow); }
+.cam-side-label { font-size: 10px; line-height: 1; color: var(--muted); }
+
+/* Onion skin toggle switch */
+.onion-toggle-switch { position:relative; display:inline-block; width:44px; height:24px; }
+.onion-toggle-switch input { opacity:0; width:0; height:0; }
+.onion-slider-sw {
+  position:absolute; cursor:pointer; inset:0;
+  background:rgba(255,255,255,.1); border-radius:24px; border:1px solid rgba(255,255,255,.15);
+  transition:.2s;
+}
+.onion-slider-sw:before {
+  content:''; position:absolute; height:16px; width:16px; left:3px; bottom:3px;
+  background:var(--muted); border-radius:50%; transition:.2s;
+}
+.onion-toggle-switch input:checked + .onion-slider-sw { background:rgba(45,212,191,.3); border-color:var(--teal); }
+.onion-toggle-switch input:checked + .onion-slider-sw:before { transform:translateX(20px); background:var(--teal); }
+
+/* Onion frames buttons */
+.onion-frames-btn {
+  flex:1; padding:6px 0; border-radius:8px; font-family:'Fredoka One',cursive; font-size:14px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+  color:var(--muted); cursor:pointer; transition:all .2s;
+}
+.onion-frames-btn.active { background:rgba(45,212,191,.2); border-color:var(--teal); color:var(--teal); }
+
+/* ══ end new cam styles ══ */
+
+/* ══════════════════════════════════════
+   AUDIO EDITOR STYLES
+══════════════════════════════════════ */
+.audio-fx-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 13px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+}
+.audio-fx-btn.active {
+  background: rgba(45,212,191,.18);
+  border-color: rgba(45,212,191,.5);
+  color: var(--teal);
+}
+.audio-track {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.audio-track-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.audio-track-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 13px;
+  color: var(--teal);
+  flex: 1;
+}
+.audio-track-vol {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.audio-track-frame-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+/* ══ end audio styles ══ */
 .placeholder-card{display:flex;flex-direction:column;align-items:center;
   justify-content:center;min-height:100%;padding:40px 24px;text-align:center;gap:12px}
 .ph-icon{font-size:72px;animation:phFloat 4s ease-in-out infinite;
@@ -998,10 +1112,26 @@ textarea.field-input{min-height:80px;line-height:1.5}
 .tl-slider{flex:1;min-width:80px;accent-color:var(--yellow)}
 .tl-val{font-family:'Fredoka One',cursive;font-size:14px;color:var(--yellow);min-width:30px;text-align:right}
 .tl-btns{display:flex;gap:8px}
-#gs-panel{background:rgba(6,9,20,.75);border:1px solid rgba(255,255,255,.12);
-  border-radius:var(--r);padding:10px 12px;margin:6px 8px 0;display:none;flex-shrink:0;
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-#gs-panel.open{display:block}
+/* ── Greenscreen floating overlay panel ── */
+#gs-overlay-panel {
+  position: absolute;
+  top: 8px; left: 8px; right: 8px;
+  z-index: 120;
+  background: rgba(6,9,20,.88);
+  border: 1px solid rgba(0,220,100,.35);
+  border-radius: 12px;
+  padding: 12px 14px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 4px 24px rgba(0,0,0,.5);
+  display: none;
+}
+#gs-overlay-panel.open { display: block; }
+#gs-overlay-panel .gs-panel-title {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+  font-family: 'Fredoka One', cursive; color: #2dd4bf; font-size: 14px;
+}
 .gs-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
 .gs-label{font-size:12px;color:rgba(255,255,255,.7);flex-shrink:0}
 .gs-preset{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:border-color .2s;flex-shrink:0}
@@ -1640,6 +1770,8 @@ textarea.field-input{min-height:80px;line-height:1.5}
       <button class="draw-bg-btn" data-bg="black">Schwarz</button>
       <button class="draw-bg-btn" data-bg="project" id="draw-bg-project" style="display:none">🌄 Projekt</button>
     </div>
+    <!-- Custom backgrounds in draw mode -->
+    <div id="draw-custom-bgs-row" style="display:flex;gap:6px;overflow-x:auto;padding:0 0 6px;scrollbar-width:none;margin-bottom:2px"></div>
     <div class="draw-colors" id="draw-colors"></div>
     <div class="draw-size-row">
       <span class="draw-size-label">Größe:</span>
@@ -1752,8 +1884,8 @@ textarea.field-input{min-height:80px;line-height:1.5}
     <button class="mode-btn" data-mode="edit" onclick="ckGoMode('edit')">
       <span class="mode-icon">✂️</span><span>Editor</span>
     </button>
-    <button class="mode-btn" data-mode="exp" onclick="ckGoMode('exp')">
-      <span class="mode-icon">🎬</span><span>Export</span>
+    <button class="mode-btn" data-mode="mus" onclick="ckGoMode('mus')">
+      <span class="mode-icon">🎵</span><span>Audio</span>
     </button>
     <div class="mode-bar-spacer"></div>
     <div id="mode-bar-panel-btns">
@@ -1761,7 +1893,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
         <span>📋</span><span>Planen</span>
       </button>
       <button class="panel-toggle-btn" id="right-panel-btn" onclick="ckTogglePanel('right')">
-        <span>🎵</span><span>Audio &amp; FX</span>
+        <span>🎬</span><span>Export</span>
       </button>
     </div>
   </div>
@@ -1804,7 +1936,12 @@ textarea.field-input{min-height:80px;line-height:1.5}
           <!-- Content moved here from pg-edit by JS -->
         </section>
 
-        <!-- EXPORT MODE -->
+        <!-- AUDIO/MUSIK MODE -->
+        <section id="ck-mus" class="ck-page" aria-label="Audio">
+          <!-- Content moved here from pg-mus by JS -->
+        </section>
+
+        <!-- EXPORT MODE (kept for compatibility) -->
         <section id="ck-exp" class="ck-page" aria-label="Export">
           <!-- Content moved here from pg-exp by JS -->
         </section>
@@ -1843,11 +1980,11 @@ textarea.field-input{min-height:80px;line-height:1.5}
 
     </div>
 
-    <!-- RIGHT PANEL: Audio & FX -->
+    <!-- RIGHT PANEL: Export -->
     <div class="side-panel" id="right-panel">
       <div class="side-panel-inner">
         <div class="panel-header">
-          <span class="panel-title">🎵 Audio &amp; FX</span>
+          <span class="panel-title">🎬 Export</span>
           <button class="panel-close-btn" onclick="ckTogglePanel('right')">✕</button>
         </div>
         <div class="panel-body" id="audio-panel-body"></div>
@@ -2013,6 +2150,34 @@ textarea.field-input{min-height:80px;line-height:1.5}
         <div id="cam-flash"></div>
         <div id="cam-countdown"></div>
         <div id="motion-warn">⚠️ Zu viel Bewegung!</div>
+        <!-- Greenscreen floating overlay (above camera image) -->
+        <div id="gs-overlay-panel">
+          <div class="gs-panel-title">
+            <span>🟢 Greenscreen</span>
+            <button onclick="closeGsPanel()" title="Panel schließen (GS bleibt aktiv)" style="color:var(--muted);font-size:16px;background:none;border:none;cursor:pointer">✕</button>
+          </div>
+          <div class="gs-row">
+            <span class="gs-label">Farbe:</span>
+            <div class="gs-preset active" id="gs-green" style="background:#00ff00" title="Grün" onclick="setGsColor('green')"></div>
+            <div class="gs-preset" id="gs-blue" style="background:#0000ff" title="Blau" onclick="setGsColor('blue')"></div>
+            <input type="color" id="gs-custom" value="#00ff00" style="width:28px;height:28px;border:none;border-radius:50%;cursor:pointer;padding:0" onchange="setGsColorHex(this.value)"/>
+            <button id="gs-eyedropper" onclick="startGsEyedropper()" style="background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.5);color:var(--yellow);border-radius:18px;padding:5px 11px;font-size:12px;font-family:'Fredoka One',cursive;cursor:pointer">💉 Pick</button>
+          </div>
+          <div class="gs-row">
+            <span class="gs-label">Toleranz:</span>
+            <input type="range" class="gs-thresh-slider" id="gs-thresh" min="0" max="100" value="40" oninput="document.getElementById('gs-thresh-val').textContent=this.value"/>
+            <span class="tl-val" id="gs-thresh-val">40</span>
+          </div>
+          <div class="gs-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+            <span class="gs-label">Hintergrund:</span>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+              <button class="cam-action-btn" onclick="pickGsBg()" style="font-size:11px;padding:5px 10px">📁 Eigenes Bild</button>
+              <input type="file" id="gs-bg-input" accept="image/*" style="display:none" onchange="loadGsBg(this)"/>
+            </div>
+            <div id="gs-bg-lib" style="display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;width:100%"></div>
+            <span class="tl-label" id="gs-bg-label" style="color:var(--green);font-size:11px"></span>
+          </div>
+        </div>
         <div id="cam-fallback" style="display:none">
           <div class="cam-fallback-icon">📷</div>
           <div class="cam-fallback-title">Keine Kamera verfügbar</div>
@@ -2024,8 +2189,8 @@ textarea.field-input{min-height:80px;line-height:1.5}
           <span id="spb-label">Szene 1 · 0/12</span>
           <div class="spb-track"><div class="spb-fill" id="spb-fill" style="width:0%"></div></div>
         </div>
-        <!-- Toggle chips overlay (top) -->
-        <div id="cam-overlay-top">
+        <!-- Toggle chips overlay (top) – hidden, controls moved to settings menu -->
+        <div id="cam-overlay-top" style="display:none!important">
           <div class="cam-controls">
             <div class="cam-row1">
               <button class="cch" id="btn-swcam"  onclick="swCam()">🔄 Wechseln</button>
@@ -2081,11 +2246,11 @@ textarea.field-input{min-height:80px;line-height:1.5}
       </div>
     </div><!-- end #cam-vf-wrap -->
 
-    <!-- ── Portrait toggle tab (flex sibling, shown only in portrait via CSS/JS) ── -->
-    <button id="cam-adj-toggle" onclick="toggleCamAdj()">⚙️ Regler ▾</button>
+    <!-- ── Portrait toggle tab (hidden – controls now in settings menu) ── -->
+    <button id="cam-adj-toggle" onclick="toggleCamAdj()" style="display:none!important">⚙️ Regler ▾</button>
 
-    <!-- ── Adjustment panel ── -->
-    <div id="cam-adj-panel">
+    <!-- ── Adjustment panel (hidden – controls now in settings menu) ── -->
+    <div id="cam-adj-panel" style="display:none!important">
       <!-- Mini filmstrip: last shots -->
       <div id="cam-mini-strip"></div>
       <div id="cam-adj-inner">
@@ -2130,8 +2295,119 @@ textarea.field-input{min-height:80px;line-height:1.5}
         <button class="cam-action-btn" onclick="clearAllShots()">🗑 Alle löschen</button>
         <input type="file" id="ph-inp" multiple accept="image/*" style="display:none" onchange="onImport(event)"/>
       </div>
-      <div class="cam-shoot-row">
+      <div class="cam-shoot-row" id="cam-shoot-row-main">
+        <!-- LEFT: Format + Camera switch -->
+        <div class="cam-shoot-left">
+          <button class="cam-side-btn" onclick="togFormat()" id="btn-format-side" title="Format wechseln">
+            <span style="font-size:18px">📐</span>
+            <span class="cam-side-label">Format</span>
+          </button>
+          <button class="cam-side-btn" onclick="swCam()" id="btn-swcam-side" title="Kamera wechseln">
+            <span style="font-size:18px">🔄</span>
+            <span class="cam-side-label">Kamera</span>
+          </button>
+        </div>
+        <!-- CENTER: Shutter -->
         <button id="shoot-btn" onclick="takeShot()">📷</button>
+        <!-- RIGHT: Onion skin + Settings -->
+        <div class="cam-shoot-right">
+          <button class="cam-side-btn" onclick="togOnionNew()" id="btn-onion-side" title="Zwiebelhaut">
+            <span style="font-size:18px">🧅</span>
+            <span class="cam-side-label">Zwiebelhaut</span>
+          </button>
+          <button class="cam-side-btn" onclick="toggleCamSettingsMenu()" id="btn-settings-side" title="Einstellungen">
+            <span style="font-size:18px">⚙️</span>
+            <span class="cam-side-label">Einstellungen</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Onion Skin Panel (closeable) -->
+      <div id="onion-settings-panel" style="display:none;background:rgba(13,17,23,.95);border:1px solid rgba(45,212,191,.3);border-radius:12px;margin:6px 8px;padding:12px;backdrop-filter:blur(20px)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="font-family:'Fredoka One',cursive;color:var(--teal);font-size:15px">🧅 Zwiebelhaut</span>
+          <button onclick="closeOnionPanel()" style="color:var(--muted);font-size:16px;background:none;border:none;cursor:pointer">✕</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:12px;color:var(--muted)">Aktiv</span>
+          <label class="onion-toggle-switch">
+            <input type="checkbox" id="onion-toggle-check" onchange="onionToggleFromCheck(this)"/>
+            <span class="onion-slider-sw"></span>
+          </label>
+        </div>
+        <div style="margin-bottom:8px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-family:'Fredoka One',cursive">TRANSPARENZ</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input type="range" id="onion-opacity-slider" min="10" max="80" value="40" oninput="updateOnionOpacity(this.value)" style="flex:1;accent-color:var(--teal)"/>
+            <span id="onion-opacity-val" style="font-family:'Fredoka One',cursive;color:var(--teal);min-width:32px;font-size:13px">40%</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-family:'Fredoka One',cursive">ANZAHL FRAMES</div>
+          <div style="display:flex;gap:6px">
+            <button class="onion-frames-btn active" data-frames="1" onclick="setOnionFrames(1,this)">1</button>
+            <button class="onion-frames-btn" data-frames="2" onclick="setOnionFrames(2,this)">2</button>
+            <button class="onion-frames-btn" data-frames="3" onclick="setOnionFrames(3,this)">3</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Camera Settings Menu (closeable overlay) -->
+      <div id="cam-settings-menu" style="display:none;background:rgba(13,17,23,.95);border:1px solid rgba(251,191,36,.25);border-radius:12px;margin:6px 8px;padding:12px;backdrop-filter:blur(20px)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="font-family:'Fredoka One',cursive;color:var(--yellow);font-size:15px">⚙️ Einstellungen</span>
+          <button onclick="closeCamSettings()" style="color:var(--muted);font-size:16px;background:none;border:none;cursor:pointer">✕</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+          <button class="cch" id="btn-grid-s"   onclick="togGrid()">⊞ Raster</button>
+          <button class="cch" id="btn-timer-s"  onclick="togTimer()">⏱ Timer</button>
+          <button class="cch" id="btn-tl-s"     onclick="togTimelapse()">⚡ Zeitraffer</button>
+          <button class="cch" id="btn-motion-s" onclick="togMotion()">👁 Bewegung</button>
+          <button class="cch" id="btn-gs-s"     onclick="togGreenScreen()">🟢 Greenscreen</button>
+          <button class="cch" id="btn-exp-s"    onclick="togExposureLock()">🔓 Belichtung</button>
+        </div>
+        <!-- Adjustments inline in settings -->
+        <div style="border-top:1px solid rgba(255,255,255,.07);padding-top:10px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-family:'Fredoka One',cursive">KAMERAEINSTELLUNGEN</div>
+          <div class="adj-grid" id="cam-adj-inner-settings">
+            <div class="adj-row">
+              <span class="adj-icon">☀️</span>
+              <span class="adj-label">Helligkeit</span>
+              <input type="range" class="adj-slider" id="adj-bri-s" min="-100" max="100" value="0" oninput="syncAdjSettings('bri',this.value)"/>
+              <span class="adj-val" id="adj-bri-val-s">0</span>
+            </div>
+            <div class="adj-row">
+              <span class="adj-icon">◑</span>
+              <span class="adj-label">Kontrast</span>
+              <input type="range" class="adj-slider" id="adj-con-s" min="-100" max="100" value="0" oninput="syncAdjSettings('con',this.value)"/>
+              <span class="adj-val" id="adj-con-val-s">0</span>
+            </div>
+            <div class="adj-row">
+              <span class="adj-icon">🔍</span>
+              <span class="adj-label">Zoom</span>
+              <input type="range" class="adj-slider" id="adj-zoom-s" min="100" max="300" value="100" oninput="syncAdjSettings('zoom',this.value)"/>
+              <span class="adj-val" id="adj-zoom-val-s">1×</span>
+            </div>
+            <div class="adj-row">
+              <span class="adj-icon">🌡️</span>
+              <span class="adj-label">Weißabgl.</span>
+              <input type="range" class="adj-slider" id="adj-wb-s" min="-50" max="50" value="0" oninput="syncAdjSettings('wb',this.value)"/>
+              <span class="adj-val" id="adj-wb-val-s">0</span>
+            </div>
+          </div>
+        </div>
+        <!-- Timelapse sub-panel -->
+        <div id="tl-panel-settings" style="display:none;border-top:1px solid rgba(255,255,255,.07);padding-top:10px;margin-top:6px">
+          <div class="tl-row">
+            <span class="tl-label">Intervall:</span>
+            <input type="range" class="tl-slider" id="tl-slider-s" min="1" max="10" value="2" oninput="$('tl-val-s').textContent=this.value+'s';if($('tl-slider'))$('tl-slider').value=this.value"/>
+            <span class="tl-val" id="tl-val-s">2s</span>
+          </div>
+          <div class="tl-btns">
+            <button class="btn-primary sm" onclick="startTimelapse()">▶ Starten</button>
+            <button class="cam-action-btn" id="tl-stop-btn-s" onclick="stopTimelapse()" style="display:none">⏹ Stoppen</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2153,49 +2429,71 @@ textarea.field-input{min-height:80px;line-height:1.5}
       <button id="prev-play" onclick="togglePrev()">▶</button>
     </div>
 
-    <!-- Preview Controls -->
+    <!-- Preview Controls: nur FPS sichtbar, rest einklappbar -->
     <div class="prev-controls">
       <div class="prev-row">
         <span class="prev-label">⚡ FPS</span>
         <input type="range" class="prev-slider" id="fps-slider" min="2" max="24" value="8"/>
         <span class="prev-val" id="fps-val">8 fps</span>
       </div>
-      <div class="prev-row">
-        <span class="prev-label">☀️ Helligkeit</span>
-        <input type="range" class="prev-slider" id="bright-slider" min="-100" max="100" value="0"/>
-        <span class="prev-val" id="bright-val">0</span>
-      </div>
-      <div class="prev-row">
-        <span class="prev-label">◑ Kontrast</span>
-        <input type="range" class="prev-slider" id="contrast-slider" min="-100" max="100" value="0"/>
-        <span class="prev-val" id="contrast-val">0</span>
-      </div>
-      <div class="prev-row">
-        <div class="prev-toggles">
-          <button class="prev-tog" id="tog-fadein"  onclick="togFade('in')">⬛→🌅 Fade in</button>
-          <button class="prev-tog" id="tog-fadeout" onclick="togFade('out')">🌅→⬛ Fade out</button>
+      <!-- Erweiterte Optionen (eingeklappt) -->
+      <div style="border-top:1px solid var(--glass-border);margin-top:2px">
+        <button onclick="toggleEditAdvanced()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 0;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Fredoka One',cursive;font-size:12px">
+          <span>Mehr Einstellungen</span>
+          <span id="edit-adv-arrow" style="font-size:11px;transition:transform .2s">▼</span>
+        </button>
+        <div id="edit-advanced-body" style="display:none">
+          <div class="prev-row">
+            <span class="prev-label">☀️ Helligkeit</span>
+            <input type="range" class="prev-slider" id="bright-slider" min="-100" max="100" value="0"/>
+            <span class="prev-val" id="bright-val">0</span>
+          </div>
+          <div class="prev-row">
+            <span class="prev-label">◑ Kontrast</span>
+            <input type="range" class="prev-slider" id="contrast-slider" min="-100" max="100" value="0"/>
+            <span class="prev-val" id="contrast-val">0</span>
+          </div>
+          <div class="prev-row">
+            <div class="prev-toggles">
+              <button class="prev-tog" id="tog-fadein"  onclick="togFade('in')">⬛→🌅 Fade in</button>
+              <button class="prev-tog" id="tog-fadeout" onclick="togFade('out')">🌅→⬛ Fade out</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Toolbar -->
+    <!-- Toolbar: aufgeräumt mit Hauptaktionen oben, Extras einklappbar -->
     <div class="edit-toolbar">
+      <!-- Primäre Aktionen immer sichtbar -->
       <div class="edit-tool-row">
         <button class="etb" onclick="selAll()">☑ Alle</button>
         <button class="etb" onclick="deselAll()">☐ Keine</button>
         <button class="etb danger" onclick="delSel()">🗑 Löschen</button>
-        <button class="etb" onclick="dupSel()">📋 Duplizieren</button>
-        <button class="etb" onclick="revFrames()">↔ Umkehren</button>
+        <button class="etb" onclick="dupSel()">📋 Kopieren</button>
         <button class="etb" onclick="undoLastFrame()">↩ Rückgängig</button>
-        <button class="etb" onclick="rotSel()">🔄 Drehen</button>
       </div>
-      <div class="edit-tool-row">
-        <button class="etb" onclick="createGroup()">📁 Gruppe erstellen</button>
-        <button class="etb" onclick="dissolveGroup()">📂 Gruppe auflösen</button>
-        <button class="etb" onclick="openVoiceoverModal()">🎙 Voiceover</button>
-        <button class="etb" onclick="insertTitleCard()">🖼 Titelkarte</button>
-        <button class="etb" onclick="openFxModal()" style="background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(45,212,191,.15));border-color:rgba(168,85,247,.5);color:#c084fc">✨ FX</button>
-        <button class="etb" onclick="goPage('pg-exp')">📤 Exportieren</button>
+      <!-- Szenen & Extras einklappbar -->
+      <div style="border-top:1px solid rgba(255,255,255,.05)">
+        <button onclick="toggleEditToolsExtra()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:7px 4px;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Fredoka One',cursive;font-size:12px">
+          <span>Gruppen &amp; Extras</span>
+          <span id="edit-tools-arrow" style="font-size:11px;transition:transform .2s">▼</span>
+        </button>
+        <div id="edit-tools-extra" style="display:none">
+          <div class="edit-tool-row">
+            <button class="etb" onclick="revFrames()">↔ Umkehren</button>
+            <button class="etb" onclick="rotSel()">🔄 Drehen</button>
+            <button class="etb" onclick="createGroup()">📁 Gruppe</button>
+            <button class="etb" onclick="dissolveGroup()">📂 Auflösen</button>
+          </div>
+          <div class="edit-tool-row">
+            <button class="etb" onclick="openVoiceoverModal()">🎙 Voiceover</button>
+            <button class="etb" onclick="insertTitleCard()">🖼 Titelkarte</button>
+            <button class="etb" onclick="openFxModal()" style="background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(45,212,191,.15));border-color:rgba(168,85,247,.5);color:#c084fc">✨ FX</button>
+            <button class="etb" onclick="openFreistellenModal()" style="background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(45,212,191,.15));border-color:rgba(34,197,94,.5);color:#4ade80">✂️ Freistellen</button>
+            <button class="etb" onclick="ckTogglePanel('right',true)">📤 Export</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2331,56 +2629,61 @@ textarea.field-input{min-height:80px;line-height:1.5}
     <img id="frm-modal-img" src="" alt=""/>
   </div>
 
-  <!-- MUSIK -->
+  <!-- MUSIK / AUDIO EDITOR -->
   <section id="pg-mus" class="page" aria-label="Musik">
-    <div style="padding:14px;display:flex;flex-direction:column;gap:16px">
+    <div style="padding:14px;display:flex;flex-direction:column;gap:14px">
 
-      <!-- ── Aktuelle Auswahl ── -->
-      <div id="sel-bar" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px">
-        <div id="sel-bar-empty" style="color:var(--muted);font-size:14px;text-align:center;padding:4px 0">
-          Kein Track ausgewählt – wähle einen Track aus der Bibliothek
+      <!-- ── MULTITRACK TIMELINE ── -->
+      <div style="background:var(--surface);border:1px solid rgba(45,212,191,.3);border-radius:var(--r);padding:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="sec-title" style="margin-bottom:0">🎚️ Mehrspurige Timeline</div>
+          <div style="display:flex;gap:6px">
+            <button onclick="addAudioTrack('music')" style="background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.4);color:var(--teal);font-family:'Fredoka One',cursive;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer">🎵 Musik-Spur</button>
+            <button onclick="addAudioTrack('voiceover')" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#c084fc;font-family:'Fredoka One',cursive;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer">🎙 Voiceover</button>
+          </div>
         </div>
-        <div id="sel-bar-active" style="display:none">
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <span style="font-size:20px">🎵</span>
-            <div style="flex:1;min-width:0">
-              <div id="sel-track-name" style="font-family:'Fredoka One',cursive;font-size:16px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-              <div id="sel-track-artist" style="font-size:12px;color:var(--muted)"></div>
-            </div>
-            <button id="sel-play-btn" onclick="musTogglePlay()" style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--yellow);font-family:'Fredoka One',cursive;font-size:13px;padding:7px 14px;border-radius:var(--r-sm);transition:all .2s">▶ Play</button>
-            <button onclick="musRemove()" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red);font-family:'Fredoka One',cursive;font-size:13px;padding:7px 12px;border-radius:var(--r-sm)">✕ Entfernen</button>
-          </div>
-          <div style="margin-top:12px;display:flex;align-items:center;gap:10px">
-            <span style="font-size:12px;color:var(--muted);flex-shrink:0">🔊 Lautstärke</span>
-            <input type="range" id="mus-vol-slider" min="0" max="100" value="80"
-              oninput="musSetVol(this.value)"
-              style="flex:1;accent-color:var(--yellow)"/>
-            <span id="mus-vol-val" style="font-family:'Fredoka One',cursive;font-size:13px;color:var(--yellow);min-width:34px;text-align:right">80%</span>
-          </div>
+        <div id="audio-tracks-container" style="display:flex;flex-direction:column;gap:8px">
+          <!-- Tracks injected by JS -->
+        </div>
+        <div id="audio-no-tracks" style="color:var(--muted);text-align:center;padding:16px;font-size:13px">
+          Keine Spuren – klicke „+ Spur" um eine Audio-Spur hinzuzufügen
         </div>
       </div>
 
-      <!-- ── Bibliothek ── -->
+      <!-- ── EFFEKTE ── -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+        <div class="sec-title" style="margin-bottom:10px">✨ Effekte</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="audio-fx-btn" id="afx-fadein"  onclick="toggleAudioFx('fadein')" >⬛→🌅 Fade In</button>
+          <button class="audio-fx-btn" id="afx-fadeout" onclick="toggleAudioFx('fadeout')">🌅→⬛ Fade Out</button>
+          <button class="audio-fx-btn" id="afx-loop"    onclick="toggleAudioFx('loop')"   >🔁 Wiederholen</button>
+        </div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;color:var(--muted)">🔊 Master-Lautstärke</span>
+          <input type="range" id="mus-vol-slider" min="0" max="100" value="80" oninput="musSetVol(this.value)" style="flex:1;accent-color:var(--teal)"/>
+          <span id="mus-vol-val" style="font-family:'Fredoka One',cursive;font-size:13px;color:var(--teal);min-width:34px;text-align:right">80%</span>
+        </div>
+      </div>
+
+      <!-- ── BIBLIOTHEK ── -->
       <div>
-        <div class="sec-title">📚 Bibliothek</div>
+        <div class="sec-title">📚 Musikbibliothek</div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
-          Klicke auf „Laden" um einen Track zu laden – danach kannst du ihn direkt auswählen und abspielen.
+          Wähle einen Track und weise ihn einer Spur zu oder setze ihn auf einen bestimmten Frame.
         </p>
         <div id="mus-lib-list" style="display:flex;flex-direction:column;gap:10px"></div>
-      <div style="margin-top:12px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);display:flex;align-items:center;gap:10px">
-        <span style="font-size:18px">🎼</span>
-        <span style="font-size:12px;color:var(--muted);line-height:1.5">
-          Musik von <a href="https://www.musicfox.com" target="_blank" rel="noopener"
-            style="color:var(--yellow);text-decoration:none;font-family:'Fredoka One',cursive">musicfox.com</a>
-          – lizenzfreie Musik für kreative Projekte.
-        </span>
-      </div>
+        <div style="margin-top:12px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">🎼</span>
+          <span style="font-size:12px;color:var(--muted);line-height:1.5">
+            Musik von <a href="https://www.musicfox.com" target="_blank" rel="noopener" style="color:var(--yellow);text-decoration:none;font-family:'Fredoka One',cursive">musicfox.com</a>
+            – lizenzfreie Musik für kreative Projekte.
+          </span>
+        </div>
       </div>
 
-      <!-- ── Eigene Musik ── -->
+      <!-- ── EIGENE MUSIK ── -->
       <div>
-        <div class="sec-title">🎤 Eigene Musik</div>
-        <!-- Drop Zone -->
+        <div class="sec-title">🎤 Eigene Musik hochladen</div>
         <div id="mus-drop-zone"
           style="border:2px dashed var(--border);border-radius:var(--r);padding:28px 16px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px"
           ondragover="musDragOver(event)" ondragleave="musDragLeave(event)" ondrop="musDrop(event)"
@@ -2390,10 +2693,19 @@ textarea.field-input{min-height:80px;line-height:1.5}
           <div style="font-size:12px;color:var(--border);margin-top:4px">MP3, WAV, OGG</div>
           <input type="file" id="mus-file-input" accept="audio/mp3,audio/mpeg,audio/wav,audio/ogg" multiple style="display:none" onchange="musUploadFiles(this.files)"/>
         </div>
-        <!-- Eigene Track-Liste -->
         <div id="mus-custom-list" style="display:flex;flex-direction:column;gap:10px"></div>
         <div id="mus-custom-empty" style="color:var(--muted);font-size:13px;text-align:center;padding:10px 0;display:none">
           Noch keine eigenen Tracks hochgeladen.
+        </div>
+      </div>
+
+      <!-- ── LEGACY: hidden sel-bar for compatibility ── -->
+      <div id="sel-bar" style="display:none">
+        <div id="sel-bar-empty"></div>
+        <div id="sel-bar-active" style="display:none">
+          <div id="sel-track-name"></div>
+          <div id="sel-track-artist"></div>
+          <button id="sel-play-btn" onclick="musTogglePlay()"></button>
         </div>
       </div>
 
@@ -2404,20 +2716,86 @@ textarea.field-input{min-height:80px;line-height:1.5}
   <section id="pg-exp" class="page" aria-label="Export">
     <div style="padding:14px;display:flex;flex-direction:column;gap:14px">
 
-      <!-- ══ PROJEKT SPEICHERN & LADEN ══ -->
-      <div id="project-io" style="background:var(--surface);border:2px solid rgba(251,191,36,.35);border-radius:var(--r);padding:16px">
-        <div class="sec-title" style="margin-bottom:12px">💾 Projekt speichern &amp; laden</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-          <button class="btn-primary" onclick="exportProject()" style="font-size:13px;padding:10px 10px;display:flex;align-items:center;justify-content:center;gap:6px">
-            💾 Exportieren (.json)
-          </button>
-          <button class="btn-outline" onclick="importProject()" style="font-size:13px;padding:10px 10px;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--teal);border-color:var(--teal)">
-            📂 Importieren (.json)
-          </button>
+      <!-- ══ HAUPT-EXPORT-BUTTON ══ -->
+      <div style="background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(45,212,191,.08));border:2px solid rgba(251,191,36,.4);border-radius:var(--r);padding:18px">
+        <div style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--yellow);margin-bottom:6px">🎬 Film exportieren</div>
+        <div id="exp-current-config" style="font-size:12px;color:var(--muted);margin-bottom:14px">
+          Standard: MP4 · Full HD (1080p) · 8 fps
         </div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);padding-top:10px">
-          <div>📦 Enthält: alle Fotos, Gruppen, Voiceover, Musik, Storyboard, Figuren, Geschichte</div>
-          <div id="project-size-hint" style="margin-top:4px;color:var(--yellow);font-family:'Fredoka One',cursive;font-size:13px"></div>
+        <button onclick="startExport(window.expFormat||'mp4')"
+          style="width:100%;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#060914;font-family:'Fredoka One',cursive;font-size:18px;padding:14px;border-radius:var(--r);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(251,191,36,.4);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px"
+          onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 24px rgba(251,191,36,.55)'"
+          onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(251,191,36,.4)'">
+          ▶ Jetzt exportieren
+        </button>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button onclick="startExport('webm')" style="flex:1;background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.35);color:var(--teal);font-family:'Fredoka One',cursive;font-size:12px;padding:8px;border-radius:var(--r-sm);cursor:pointer">🎬 WebM</button>
+          <button onclick="startExport('gif')"  style="flex:1;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:var(--yellow);font-family:'Fredoka One',cursive;font-size:12px;padding:8px;border-radius:var(--r-sm);cursor:pointer">🎨 GIF</button>
+          <button onclick="startExport('zip')"  style="flex:1;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:var(--green);font-family:'Fredoka One',cursive;font-size:12px;padding:8px;border-radius:var(--r-sm);cursor:pointer">🖼 ZIP</button>
+        </div>
+      </div>
+
+      <!-- ══ KLAPPMENÜ EINSTELLUNGEN ══ -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r)">
+        <button onclick="toggleExpSettings()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;cursor:pointer;font-family:'Fredoka One',cursive;color:var(--text);font-size:15px">
+          <span>⚙️ Einstellungen</span>
+          <span id="exp-settings-arrow" style="color:var(--muted);font-size:12px;transition:transform .2s">▼</span>
+        </button>
+        <div id="exp-settings-body" style="display:none;padding:0 16px 16px">
+
+          <!-- Auflösung -->
+          <div style="margin-bottom:14px">
+            <label class="field-label">AUFLÖSUNG</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap" id="quality-btns"></div>
+          </div>
+
+          <!-- Format -->
+          <div style="margin-bottom:14px">
+            <label class="field-label">FORMAT</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap" id="format-btns"></div>
+          </div>
+
+          <!-- FPS -->
+          <div style="margin-bottom:14px">
+            <label class="field-label">GESCHWINDIGKEIT (FPS)</label>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="range" id="exp-fps-slider" min="4" max="24" step="1" value="8"
+                oninput="S.fps=+this.value;$('exp-fps-val').textContent=this.value+' fps';persist();updExpSum();updateExpCurrentConfig()"
+                style="flex:1;accent-color:var(--yellow)"/>
+              <span id="exp-fps-val" style="font-family:'Fredoka One',cursive;color:var(--yellow);min-width:50px">8 fps</span>
+            </div>
+          </div>
+
+          <!-- Fade -->
+          <div style="margin-bottom:14px">
+            <label class="field-label">ÜBERGÄNGE</label>
+            <div style="display:flex;gap:12px">
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);cursor:pointer">
+                <input type="checkbox" id="exp-fadein" onchange="fadeIn=this.checked" style="accent-color:var(--yellow)"/> Einblenden
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);cursor:pointer">
+                <input type="checkbox" id="exp-fadeout" onchange="fadeOut=this.checked" style="accent-color:var(--yellow)"/> Ausblenden
+              </label>
+            </div>
+          </div>
+
+          <!-- Helligkeit / Kontrast -->
+          <div style="margin-bottom:4px">
+            <label class="field-label">HELLIGKEIT</label>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <input type="range" id="exp-bri" min="-50" max="50" value="0"
+                oninput="brightnessVal=+this.value;$('exp-bri-val').textContent=this.value"
+                style="flex:1;accent-color:var(--yellow)"/>
+              <span id="exp-bri-val" style="font-family:'Fredoka One',cursive;color:var(--yellow);min-width:30px;text-align:right">0</span>
+            </div>
+            <label class="field-label">KONTRAST</label>
+            <div style="display:flex;align-items:center;gap:10px">
+              <input type="range" id="exp-con" min="-50" max="50" value="0"
+                oninput="contrastVal=+this.value;$('exp-con-val').textContent=this.value"
+                style="flex:1;accent-color:var(--yellow)"/>
+              <span id="exp-con-val" style="font-family:'Fredoka One',cursive;color:var(--yellow);min-width:30px;text-align:right">0</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2434,62 +2812,20 @@ textarea.field-input{min-height:80px;line-height:1.5}
         ⚠️ WebM/MP4 werden von deinem Browser nicht unterstützt. Nutze Chrome oder Firefox, oder exportiere als ZIP.
       </div>
 
-      <!-- ══ EINSTELLUNGEN ══ -->
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px">
-        <div class="sec-title" style="margin-bottom:12px">⚙️ Einstellungen</div>
-
-        <!-- Auflösung -->
-        <div style="margin-bottom:14px">
-          <label class="field-label">AUFLÖSUNG</label>
-          <div style="display:flex;gap:8px;flex-wrap:wrap" id="quality-btns"></div>
+      <!-- ══ PROJEKT SPEICHERN & LADEN ══ -->
+      <div id="project-io" style="background:var(--surface);border:2px solid rgba(251,191,36,.25);border-radius:var(--r);padding:16px">
+        <div class="sec-title" style="margin-bottom:12px">💾 Projekt speichern &amp; laden</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <button class="btn-primary" onclick="exportProject()" style="font-size:13px;padding:10px 10px;display:flex;align-items:center;justify-content:center;gap:6px">
+            💾 Exportieren (.json)
+          </button>
+          <button class="btn-outline" onclick="importProject()" style="font-size:13px;padding:10px 10px;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--teal);border-color:var(--teal)">
+            📂 Importieren (.json)
+          </button>
         </div>
-
-        <!-- Format -->
-        <div style="margin-bottom:14px">
-          <label class="field-label">FORMAT</label>
-          <div style="display:flex;gap:8px;flex-wrap:wrap" id="format-btns"></div>
-        </div>
-
-        <!-- FPS -->
-        <div style="margin-bottom:14px">
-          <label class="field-label">GESCHWINDIGKEIT (FPS)</label>
-          <div style="display:flex;align-items:center;gap:10px">
-            <input type="range" id="exp-fps-slider" min="4" max="24" step="1" value="8"
-              oninput="S.fps=+this.value;$('exp-fps-val').textContent=this.value+' fps';persist();updExpSum()"
-              style="flex:1;accent-color:var(--yellow)"/>
-            <span id="exp-fps-val" style="font-family:'Fredoka One',cursive;color:var(--yellow);min-width:50px">8 fps</span>
-          </div>
-        </div>
-
-        <!-- Fade -->
-        <div style="margin-bottom:14px">
-          <label class="field-label">ÜBERGÄNGE</label>
-          <div style="display:flex;gap:12px">
-            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);cursor:pointer">
-              <input type="checkbox" id="exp-fadein" onchange="fadeIn=this.checked" style="accent-color:var(--yellow)"/> Einblenden
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);cursor:pointer">
-              <input type="checkbox" id="exp-fadeout" onchange="fadeOut=this.checked" style="accent-color:var(--yellow)"/> Ausblenden
-            </label>
-          </div>
-        </div>
-
-        <!-- Helligkeit / Kontrast -->
-        <div style="margin-bottom:4px">
-          <label class="field-label">HELLIGKEIT</label>
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-            <input type="range" id="exp-bri" min="-50" max="50" value="0"
-              oninput="brightnessVal=+this.value;$('exp-bri-val').textContent=this.value"
-              style="flex:1;accent-color:var(--yellow)"/>
-            <span id="exp-bri-val" style="font-family:'Fredoka One',cursive;color:var(--yellow);min-width:30px;text-align:right">0</span>
-          </div>
-          <label class="field-label">KONTRAST</label>
-          <div style="display:flex;align-items:center;gap:10px">
-            <input type="range" id="exp-con" min="-50" max="50" value="0"
-              oninput="contrastVal=+this.value;$('exp-con-val').textContent=this.value"
-              style="flex:1;accent-color:var(--yellow)"/>
-            <span id="exp-con-val" style="font-family:'Fredoka One',cursive;color:var(--yellow);min-width:30px;text-align:right">0</span>
-          </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);padding-top:10px">
+          <div>📦 Enthält: alle Fotos, Gruppen, Voiceover, Musik, Storyboard, Figuren, Geschichte</div>
+          <div id="project-size-hint" style="margin-top:4px;color:var(--yellow);font-family:'Fredoka One',cursive;font-size:13px"></div>
         </div>
       </div>
 
@@ -2501,29 +2837,6 @@ textarea.field-input{min-height:80px;line-height:1.5}
         </div>
         <div id="sub-list" style="display:flex;flex-direction:column;gap:8px">
           <div id="sub-empty" style="font-size:13px;color:var(--muted);text-align:center;padding:8px 0">Keine Untertitel</div>
-        </div>
-      </div>
-
-      <!-- ══ EXPORT BUTTONS ══ -->
-      <div>
-        <div class="sec-title" style="margin-bottom:12px">🎬 Exportieren</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <button class="exp-btn" onclick="startExport('webm')" style="background:linear-gradient(135deg,rgba(45,212,191,.2),rgba(45,212,191,.05));border:1px solid rgba(45,212,191,.4);color:var(--teal);border-radius:var(--r);padding:14px 10px;font-family:'Fredoka One',cursive;font-size:14px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
-            🎬 Als WebM
-            <span style="font-size:10px;color:var(--muted);font-family:inherit">Chrome/Firefox</span>
-          </button>
-          <button class="exp-btn" onclick="startExport('mp4')" style="background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(168,85,247,.05));border:1px solid rgba(168,85,247,.4);color:var(--purple);border-radius:var(--r);padding:14px 10px;font-family:'Fredoka One',cursive;font-size:14px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
-            🎥 Als MP4
-            <span style="font-size:10px;color:var(--muted);font-family:inherit">via FFmpeg</span>
-          </button>
-          <button class="exp-btn" onclick="startExport('gif')" style="background:linear-gradient(135deg,rgba(251,191,36,.2),rgba(251,191,36,.05));border:1px solid rgba(251,191,36,.4);color:var(--yellow);border-radius:var(--r);padding:14px 10px;font-family:'Fredoka One',cursive;font-size:14px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
-            🎨 Als GIF
-            <span style="font-size:10px;color:var(--muted);font-family:inherit">320×240px</span>
-          </button>
-          <button class="exp-btn" onclick="startExport('zip')" style="background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(34,197,94,.05));border:1px solid rgba(34,197,94,.4);color:var(--green);border-radius:var(--r);padding:14px 10px;font-family:'Fredoka One',cursive;font-size:14px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
-            🖼 Als ZIP
-            <span style="font-size:10px;color:var(--muted);font-family:inherit">Einzelbilder</span>
-          </button>
         </div>
       </div>
 
@@ -2612,7 +2925,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
    STATE
    ═══════════════════════════════════════════════ */
 const S = {
-  shots:[], fps:8, quality:'480p', format:'webm', vol:0.8, music:null,
+  shots:[], fps:8, quality:'1080p', format:'mp4', vol:0.8, music:null,
   groups:[],
   project:{
     title:'Mein Film', about:'', beg:'', ten:'', end:'',
@@ -2688,15 +3001,35 @@ const STORIES = [
    FIGUREN TEMPLATES
    ═══════════════════════════════════════════════ */
 const FIG_TEMPLATES = [
-  {e:'🦸',n:'Held·in',    r:'🦸 Held·in'},
-  {e:'😈',n:'Bösewicht',  r:'😈 Bösewicht'},
-  {e:'🤝',n:'Freund·in',  r:'🤝 Freund·in'},
-  {e:'👴',n:'Großelternteil',r:'👴 Weise Person'},
-  {e:'🐉',n:'Drache',     r:'🐉 Drache'},
-  {e:'🤖',n:'Roboter',    r:'🤖 Roboter'},
-  {e:'🧙',n:'Zauberer·in',r:'🧙 Zauberer·in'},
-  {e:'🦊',n:'Fuchs',      r:'🦊 Tier'},
+  {e:'🦸',n:'Held·in',      r:'🦸 Held·in',      svg:'hero'},
+  {e:'🦹',n:'Bösewicht',    r:'🦹 Bösewicht',    svg:'villain'},
+  {e:'😊',n:'Freund·in',    r:'😊 Freund·in',    svg:'friend'},
+  {e:'🧙',n:'Weise Person', r:'🧙 Weise Person', svg:'wise'},
+  {e:'🔮',n:'Zauberer·in',  r:'🔮 Zauberer·in',  svg:'wizard'},
+  {e:'🏆',n:'Sieger·in',    r:'🏆 Sieger·in',    svg:'winner'},
+  {e:'🐾',n:'Tier',         r:'🐾 Tier',         svg:'animal'},
+  {e:'🗺️',n:'Abenteurer·in',r:'🗺️ Abenteurer·in',svg:'adventurer'},
+  {e:'👑',n:'König·in',     r:'👑 König·in',     svg:'royal'},
+  {e:'🤖',n:'Roboter',      r:'🤖 Roboter',      svg:'robot'},
+  {e:'👻',n:'Geist',        r:'👻 Geist',        svg:'ghost'},
+  {e:'🧑‍🎤',n:'Rockstar',    r:'🧑‍🎤 Rockstar',    svg:'rockstar'},
 ];
+
+// Custom SVG icons for figure chips (gold & teal themed)
+const FIG_SVG_ICONS = {
+  hero:       `<svg width="20" height="20" viewBox="0 0 20 20"><polygon points="10,2 12.9,7.4 19,8.3 14.5,12.7 15.6,18.8 10,15.7 4.4,18.8 5.5,12.7 1,8.3 7.1,7.4" fill="#fbbf24" stroke="#f59e0b" stroke-width="0.5"/></svg>`,
+  villain:    `<svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2 L18 6 L18 14 L10 18 L2 14 L2 6 Z" fill="#2dd4bf" stroke="#0d9488" stroke-width="0.5"/><path d="M7 8 L13 8 M7 11 L13 11" stroke="#060914" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  friend:     `<svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#fbbf24" stroke="#f59e0b" stroke-width="0.5"/><path d="M7 9 Q10 13 13 9" fill="none" stroke="#060914" stroke-width="1.5" stroke-linecap="round"/><circle cx="7.5" cy="7.5" r="1.2" fill="#060914"/><circle cx="12.5" cy="7.5" r="1.2" fill="#060914"/></svg>`,
+  wise:       `<svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2 L18 18 L2 18 Z" fill="#2dd4bf" stroke="#0d9488" stroke-width="0.5"/><line x1="10" y1="8" x2="10" y2="14" stroke="#060914" stroke-width="1.5"/><circle cx="10" cy="16" r="1" fill="#060914"/></svg>`,
+  wizard:     `<svg width="20" height="20" viewBox="0 0 20 20"><polygon points="10,1 14,10 19,10 15,14 17,19 10,15 3,19 5,14 1,10 6,10" fill="#fbbf24" stroke="#f59e0b" stroke-width="0.5" opacity="0.9"/><circle cx="10" cy="10" r="3" fill="#2dd4bf"/></svg>`,
+  winner:     `<svg width="20" height="20" viewBox="0 0 20 20"><rect x="7" y="1" width="6" height="8" rx="1" fill="#fbbf24" stroke="#f59e0b" stroke-width="0.5"/><path d="M4 1 L7 1 L7 7 Z" fill="#fbbf24"/><path d="M16 1 L13 1 L13 7 Z" fill="#fbbf24"/><rect x="6" y="9" width="8" height="2" rx="1" fill="#2dd4bf"/><rect x="8" y="11" width="4" height="5" rx="1" fill="#2dd4bf"/><rect x="5" y="16" width="10" height="2" rx="1" fill="#fbbf24"/></svg>`,
+  animal:     `<svg width="20" height="20" viewBox="0 0 20 20"><ellipse cx="10" cy="12" rx="7" ry="5" fill="#2dd4bf" stroke="#0d9488" stroke-width="0.5"/><circle cx="7" cy="5" r="3" fill="#2dd4bf" stroke="#0d9488" stroke-width="0.5"/><circle cx="13" cy="5" r="3" fill="#2dd4bf" stroke="#0d9488" stroke-width="0.5"/><circle cx="8" cy="12" r="1" fill="#060914"/><circle cx="12" cy="12" r="1" fill="#060914"/></svg>`,
+  adventurer: `<svg width="20" height="20" viewBox="0 0 20 20"><path d="M2 10 Q10 2 18 10 Q10 18 2 10 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="0.5"/><circle cx="10" cy="10" r="3" fill="#2dd4bf" stroke="#0d9488" stroke-width="0.5"/><circle cx="10" cy="10" r="1.2" fill="#060914"/></svg>`,
+  royal:      `<svg width="20" height="20" viewBox="0 0 20 20"><path d="M4 14 L4 8 L7 11 L10 4 L13 11 L16 8 L16 14 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="0.5"/><rect x="4" y="14" width="12" height="3" rx="1" fill="#2dd4bf"/><circle cx="10" cy="4" r="1.5" fill="#fbbf24"/><circle cx="4" cy="8" r="1.5" fill="#fbbf24"/><circle cx="16" cy="8" r="1.5" fill="#fbbf24"/></svg>`,
+  robot:      `<svg width="20" height="20" viewBox="0 0 20 20"><rect x="5" y="7" width="10" height="9" rx="2" fill="#2dd4bf" stroke="#0d9488" stroke-width="0.5"/><rect x="7" y="4" width="6" height="4" rx="1" fill="#2dd4bf" stroke="#0d9488" stroke-width="0.5"/><circle cx="8" cy="11" r="1.5" fill="#060914"/><circle cx="12" cy="11" r="1.5" fill="#060914"/><rect x="8" y="13" width="4" height="1.5" rx="0.75" fill="#060914"/><line x1="3" y1="10" x2="5" y2="10" stroke="#fbbf24" stroke-width="1.5"/><line x1="15" y1="10" x2="17" y2="10" stroke="#fbbf24" stroke-width="1.5"/><line x1="10" y1="2" x2="10" y2="4" stroke="#fbbf24" stroke-width="1.5"/></svg>`,
+  ghost:      `<svg width="20" height="20" viewBox="0 0 20 20"><path d="M5 18 L5 8 Q5 2 10 2 Q15 2 15 8 L15 18 L12.5 15.5 L10 18 L7.5 15.5 Z" fill="#f3f4f6" stroke="#d1d5db" stroke-width="0.5"/><circle cx="8" cy="9" r="1.5" fill="#060914"/><circle cx="12" cy="9" r="1.5" fill="#060914"/><path d="M8 12 Q10 14 12 12" fill="none" stroke="#060914" stroke-width="1" stroke-linecap="round"/></svg>`,
+  rockstar:   `<svg width="20" height="20" viewBox="0 0 20 20"><polygon points="10,2 11.5,7 17,7 12.5,10.5 14,16 10,12.5 6,16 7.5,10.5 3,7 8.5,7" fill="#fbbf24" stroke="#f59e0b" stroke-width="0.5"/><circle cx="10" cy="10" r="2.5" fill="#2dd4bf"/></svg>`,
+};
 
 /* ═══════════════════════════════════════════════
    BACKGROUNDS (24 SVGs)
@@ -2761,8 +3094,28 @@ const Draw = {
   drawing: false, history:[], ctx:null, canvas:null,
   target:null,  // {type:'figure'|'scene', index:Number}
 };
-const DRAW_COLORS = ['#222222','#FFFFFF','#EF4444','#F97316','#EAB308',
-                     '#22C55E','#3B82F6','#8B5CF6','#EC4899','#6B7280'];
+const DRAW_COLORS = [
+  // Schwarz/Weiß/Grau
+  '#000000','#333333','#666666','#999999','#CCCCCC','#FFFFFF',
+  // Rot-Töne
+  '#EF4444','#DC2626','#B91C1C','#FF6B6B','#FF9999','#FF0040',
+  // Orange/Braun
+  '#F97316','#EA580C','#C2410C','#D97706','#92400E','#B45309',
+  // Gelb/Gold
+  '#EAB308','#FBBF24','#FDE047','#FACC15','#FFE566','#CA8A04',
+  // Grün
+  '#22C55E','#16A34A','#15803D','#86EFAC','#4ADE80','#065F46',
+  // Türkis/Cyan
+  '#2DD4BF','#0D9488','#06B6D4','#22D3EE','#67E8F9','#164E63',
+  // Blau
+  '#3B82F6','#2563EB','#1D4ED8','#60A5FA','#BFDBFE','#1E3A5F',
+  // Lila/Violett
+  '#8B5CF6','#7C3AED','#6D28D9','#A78BFA','#DDD6FE','#4C1D95',
+  // Pink/Magenta
+  '#EC4899','#DB2777','#BE185D','#F9A8D4','#FF66CC','#831843',
+  // Sonderfarben
+  '#6B7280','#4B5563','#374151','#1F2937','#111827','#F3F4F6',
+];
 
 /* ═══════════════════════════════════════════════
    DOM HELPERS
@@ -2845,11 +3198,11 @@ function goPage(pageId) {
     'pg-plan': null,      // opens left panel
     'pg-cam':  'cam',
     'pg-edit': 'edit',
-    'pg-mus':  'right',   // opens right panel
-    'pg-exp':  'exp',
+    'pg-mus':  'mus',    // now a main tab
+    'pg-exp':  'exp',    // opens right panel (export panel)
   };
   if (pageId === 'pg-plan') { ckTogglePanel('left', true); return; }
-  if (pageId === 'pg-mus')  { ckTogglePanel('right', true); return; }
+  if (pageId === 'pg-exp')  { ckTogglePanel('right', true); return; }
   const mode = pageToMode[pageId];
   if (mode) ckGoMode(mode);
   playSwoosh();
@@ -2936,11 +3289,28 @@ function showFrameCtx(e, idx) {
   ckCtxIdx = idx;
   const ctx = $('frame-ctx');
   if (!ctx) return;
-  // Position above the clicked thumb
-  const rect = e.currentTarget.getBoundingClientRect();
-  ctx.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
-  ctx.style.left = Math.max(4, rect.left - 20) + 'px';
+  // First show briefly to measure width
+  ctx.style.visibility = 'hidden';
   ctx.classList.add('show');
+  const menuW = ctx.offsetWidth || 220;
+  const menuH = ctx.offsetHeight || 80;
+  ctx.style.visibility = '';
+  const rect = e.currentTarget.getBoundingClientRect();
+  // Clamp left so menu never goes off-screen
+  let left = rect.left + rect.width / 2 - menuW / 2;
+  left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
+  // Position above thumb, but if not enough space above, show below
+  let bottom = window.innerHeight - rect.top + 8;
+  if (rect.top - menuH - 8 < 0) {
+    // Not enough space above – use top instead
+    ctx.style.bottom = '';
+    ctx.style.top = (rect.bottom + 8) + 'px';
+  } else {
+    ctx.style.top = '';
+    ctx.style.bottom = bottom + 'px';
+  }
+  ctx.style.left = left + 'px';
+  ctx.style.right = 'auto';
   e.stopPropagation();
 }
 function hideFrameCtx() {
@@ -2954,8 +3324,6 @@ function initCockpit() {
   const planBody = $('plan-panel-body');
   const pgPlan = $('pg-plan');
   if (planBody && pgPlan) {
-    // Move children of pg-plan (except subtabs row) to panel body
-    // The subtabs stay in the panel header area
     Array.from(pgPlan.children).forEach(child => {
       if (!child.classList.contains('plan-subtabs')) {
         planBody.appendChild(child);
@@ -2977,18 +3345,18 @@ function initCockpit() {
     Array.from(pgEdit.children).forEach(child => ckEdit.appendChild(child));
   }
 
-  // Move music content into right panel audio body
-  const audioBody = $('audio-panel-body');
+  // Move music content into ck-mus (now a main tab)
+  const ckMus = $('ck-mus');
   const pgMus = $('pg-mus');
-  if (audioBody && pgMus) {
-    Array.from(pgMus.children).forEach(child => audioBody.appendChild(child));
+  if (ckMus && pgMus) {
+    Array.from(pgMus.children).forEach(child => ckMus.appendChild(child));
   }
 
-  // Move export content into ck-exp
-  const ckExp = $('ck-exp');
+  // Move export content into right panel audio body (Export now in right panel)
+  const audioBody = $('audio-panel-body');
   const pgExp = $('pg-exp');
-  if (ckExp && pgExp) {
-    Array.from(pgExp.children).forEach(child => ckExp.appendChild(child));
+  if (audioBody && pgExp) {
+    Array.from(pgExp.children).forEach(child => audioBody.appendChild(child));
   }
 
   // Frame context actions
@@ -3327,11 +3695,15 @@ function initFigures() {
   FIG_TEMPLATES.forEach(t => {
     const chip = document.createElement('button');
     chip.className = 'fig-chip';
-    chip.textContent = `${t.e} ${t.n}`;
+    const svgHtml = FIG_SVG_ICONS[t.svg] || '';
+    chip.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px">${svgHtml}${t.n}</span>`;
+    chip.style.cssText = 'display:inline-flex;align-items:center;padding:7px 12px;border-radius:10px;border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.08);color:var(--yellow);font-family:"Fredoka One",cursive;font-size:13px;cursor:pointer;transition:all .2s;gap:4px';
+    chip.addEventListener('mouseover', () => { chip.style.background = 'rgba(251,191,36,.18)'; chip.style.borderColor = 'rgba(251,191,36,.6)'; });
+    chip.addEventListener('mouseout', () => { chip.style.background = 'rgba(251,191,36,.08)'; chip.style.borderColor = 'rgba(251,191,36,.3)'; });
     chip.addEventListener('click', () => {
       S.project.figures.push({name:t.n, role:t.r, drawing:null});
       scheduleSave(); renderFigures();
-      showToast(`${t.e} ${t.n} hinzugefügt!`);
+      showToast(`✨ ${t.n} hinzugefügt!`);
       playPop();
       try { checkBadge('casting'); } catch(e) {}
     });
@@ -3534,17 +3906,46 @@ function updateDrawBgProjectButton() {
   const btn = $('draw-bg-project');
   if (!btn) return;
   const bg = S.project.background;
-  if (bg === null || bg === undefined) { btn.style.display = 'none'; return; }
-  btn.style.display = 'inline-block';
-  if (typeof bg === 'string' && bg.startsWith('custom:')) {
-    const id = bg.replace('custom:', '');
-    const item = getCustomBgs().find(b => b.id === id);
-    btn.textContent = `🌄 ${item?.name || 'Eigener Hintergrund'}`;
-  } else if (bg === 'custom') {
-    btn.textContent = '🌄 Eigenes Bild';
-  } else {
-    btn.textContent = `🌄 ${BG_LIB[bg]?.name || 'Hintergrund'}`;
+  if (bg === null || bg === undefined) { btn.style.display = 'none'; }
+  else {
+    btn.style.display = 'inline-block';
+    if (typeof bg === 'string' && bg.startsWith('custom:')) {
+      const id = bg.replace('custom:', '');
+      const item = getCustomBgs().find(b => b.id === id);
+      btn.textContent = `🌄 ${item?.name || 'Eigener Hintergrund'}`;
+    } else if (bg === 'custom') {
+      btn.textContent = '🌄 Eigenes Bild';
+    } else {
+      btn.textContent = `🌄 ${BG_LIB[bg]?.name || 'Hintergrund'}`;
+    }
   }
+  // Also render custom bg thumbnails for selection in draw modal
+  const row = $('draw-custom-bgs-row');
+  if (!row) return;
+  row.innerHTML = '';
+  const list = getCustomBgs();
+  list.forEach(item => {
+    const thumb = document.createElement('img');
+    thumb.src = item.dataUrl;
+    thumb.title = item.name;
+    thumb.style.cssText = 'width:48px;height:36px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent;flex-shrink:0;transition:border-color .15s';
+    thumb.addEventListener('click', () => {
+      // Set as draw background
+      Draw.bg = 'custom';
+      Draw._customBgDataUrl = item.dataUrl;
+      $all('.draw-bg-btn').forEach(b => b.classList.remove('active'));
+      row.querySelectorAll('img').forEach(i => i.style.borderColor = 'transparent');
+      thumb.style.borderColor = 'var(--teal)';
+      // Fill canvas with this image
+      const img = new Image();
+      img.onload = () => {
+        Draw.ctx.drawImage(img, 0, 0, Draw.canvas.width, Draw.canvas.height);
+        drawSnapshot();
+      };
+      img.src = item.dataUrl;
+    });
+    row.appendChild(thumb);
+  });
 }
 
 // ── Hintergrund im Zeichenmodus öffnen ──
@@ -4486,8 +4887,72 @@ function togGrid() {
 /* ── Zwiebelhaut ────────────────────────────── */
 function togOnion() {
   onionOn = !onionOn;
-  $('btn-onion').classList.toggle('on', onionOn);
+  try { $('btn-onion').classList.toggle('on', onionOn); } catch(e){}
   if (onionOn) drawOnion(); else clearOnion();
+  // Sync new side button
+  try {
+    $('btn-onion-side').classList.toggle('active', onionOn);
+    const check = $('onion-toggle-check');
+    if (check) check.checked = onionOn;
+  } catch(e) {}
+}
+// New: togOnionNew opens the onion panel
+function togOnionNew() {
+  const panel = $('onion-settings-panel');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  $('btn-onion-side').classList.toggle('active', !isOpen);
+  if (!isOpen) {
+    // Sync checkbox with current state
+    const check = $('onion-toggle-check');
+    if (check) check.checked = onionOn;
+  }
+}
+function closeOnionPanel() {
+  const panel = $('onion-settings-panel');
+  if (panel) panel.style.display = 'none';
+}
+function onionToggleFromCheck(cb) {
+  onionOn = cb.checked;
+  if (onionOn) drawOnion(); else clearOnion();
+}
+function updateOnionOpacity(val) {
+  $('onion-opacity-val').textContent = val + '%';
+  window._onionOpacity = val / 100;
+  if (onionOn) drawOnion();
+}
+function setOnionFrames(n, btn) {
+  document.querySelectorAll('.onion-frames-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  window._onionFrames = n;
+  if (onionOn) drawOnion();
+}
+
+function toggleCamSettingsMenu() {
+  const menu = $('cam-settings-menu');
+  if (!menu) return;
+  const isOpen = menu.style.display !== 'none';
+  menu.style.display = isOpen ? 'none' : 'block';
+  $('btn-settings-side').classList.toggle('active', !isOpen);
+}
+function closeCamSettings() {
+  const menu = $('cam-settings-menu');
+  if (menu) menu.style.display = 'none';
+  $('btn-settings-side').classList.remove('active');
+  // GS is intentionally NOT closed here – it stays active independently
+}
+function syncAdjSettings(key, val) {
+  // Sync settings sliders with main adj sliders
+  const main = $('adj-' + key);
+  const mainVal = $('adj-' + key + '-val');
+  const sVal = $('adj-' + key + '-val-s');
+  if (main) main.value = val;
+  let display = val;
+  if (key === 'zoom') display = (val / 100).toFixed(1) + '×';
+  if (mainVal) mainVal.textContent = display;
+  if (sVal) sVal.textContent = display;
+  updateCamAdj();
 }
 function drawOnion() {
   if (!onionOn || S.shots.length === 0) { clearOnion(); return; }
@@ -4496,20 +4961,27 @@ function drawOnion() {
   cv.width  = box.offsetWidth;
   cv.height = box.offsetHeight;
   const ctx = cv.getContext('2d');
-  const img = new Image();
-  img.onload = () => {
-    ctx.clearRect(0,0,cv.width,cv.height);
-    ctx.globalAlpha = 0.35;
-    // cover-fit like video
-    const iR = img.width / img.height;
-    const bR = cv.width  / cv.height;
-    let sw, sh, sx=0, sy=0;
-    if (iR > bR) { sh=cv.height; sw=sh*iR; sx=(cv.width-sw)/2; }
-    else          { sw=cv.width;  sh=sw/iR; sy=(cv.height-sh)/2; }
-    ctx.drawImage(img, sx, sy, sw, sh);
-    ctx.globalAlpha = 1;
-  };
-  img.src = (S.shots[S.shots.length - 1].data || S.shots[S.shots.length - 1]);
+  const opacity = window._onionOpacity !== undefined ? window._onionOpacity : 0.35;
+  const frames = window._onionFrames || 1;
+  const total = S.shots.length;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  for (let f = 0; f < Math.min(frames, total); f++) {
+    const shotIdx = total - 1 - f;
+    const shot = S.shots[shotIdx];
+    const alpha = opacity * (1 - f * 0.3);
+    const img = new Image();
+    img.onload = () => {
+      ctx.globalAlpha = Math.max(0.05, alpha);
+      const iR = img.width / img.height;
+      const bR = cv.width  / cv.height;
+      let sw, sh, sx=0, sy=0;
+      if (iR > bR) { sh=cv.height; sw=sh*iR; sx=(cv.width-sw)/2; }
+      else          { sw=cv.width;  sh=sw/iR; sy=(cv.height-sh)/2; }
+      ctx.drawImage(img, sx, sy, sw, sh);
+      ctx.globalAlpha = 1;
+    };
+    img.src = (shot.data || shot);
+  }
 }
 function clearOnion() {
   const cv = $('onion-cv');
@@ -4544,6 +5016,7 @@ function togTimelapse() {
 }
 function startTimelapse() {
   if (tlActive) return;
+  S.project.usedTimelapse = true; try { persist(); checkBadge('zeitraffer'); } catch(e){}
   tlActive = true; tlCount = 0;
   $('tl-start-btn').style.display = 'none';
   $('tl-stop-btn').style.display  = 'inline-block';
@@ -4607,18 +5080,28 @@ function stopMotionDetect() {
 
 /* ── Grünscreen ─────────────────────────────── */
 function togGreenScreen() {
-  const panel = $('gs-panel');
-  const isOpen = panel.classList.toggle('open');
-  gsOn = isOpen;
-  $('btn-gs').classList.toggle('on', isOpen);
-  const gsCv = $('gs-cv');
-  if (isOpen) {
-    gsCv.style.display = 'block';
-    startGsLoop();
-  } else {
-    gsCv.style.display = 'none';
-    cancelAnimationFrame(gsRafId);
+  // Toggle GS on/off + show/hide the overlay panel
+  const overlayPanel = $('gs-overlay-panel');
+  const isNowOn = overlayPanel ? !overlayPanel.classList.contains('open') : false;
+  gsOn = isNowOn;
+  try { $('btn-gs').classList.toggle('on', isNowOn); } catch(e){}
+  try { $('btn-gs-s').classList.toggle('on', isNowOn); } catch(e){}
+  if (overlayPanel) overlayPanel.classList.toggle('open', isNowOn);
+  if (isNowOn) {
+    S.project.usedGreenscreen = true;
+    try { persist(); checkBadge('greenscreen-pro'); } catch(e){}
   }
+  const gsCv = $('gs-cv');
+  if (gsCv) {
+    if (isNowOn) { gsCv.style.display = 'block'; startGsLoop(); }
+    else { gsCv.style.display = 'none'; cancelAnimationFrame(gsRafId); }
+  }
+}
+
+function closeGsPanel() {
+  // Only hides the settings panel UI – GS stays active
+  const overlayPanel = $('gs-overlay-panel');
+  if (overlayPanel) overlayPanel.classList.remove('open');
 }
 function setGsColor(preset) {
   if (preset === 'green') gsColor = {r:0,g:255,b:0};
@@ -5691,6 +6174,8 @@ function startPrev() {
   prevGroupsPlayed = new Set();
   $('prev-play').style.opacity = '0';
   $('prev-play').style.pointerEvents = 'none';
+  // Start audio tracks
+  startPrevAudio();
   prevStep();
 }
 function stopPrev() {
@@ -5702,6 +6187,61 @@ function stopPrev() {
   // Stop any voiceover
   const vp = $('vo-player');
   if (vp) { vp.pause(); vp.currentTime = 0; }
+  // Stop audio tracks
+  stopPrevAudio();
+}
+
+// Preview audio helpers
+window._prevAudioEls = [];
+function startPrevAudio() {
+  stopPrevAudio();
+  if (!window.audioTracks || window.audioTracks.length === 0) return;
+  const fps = S.fps || 8;
+  window.audioTracks.forEach(track => {
+    try {
+      const delayMs = ((track.startFrame || 0) / fps) * 1000;
+      if (track.type === 'voiceover' && track.voiceover) {
+        // Voiceover track – data URL
+        const audio = new Audio(track.voiceover);
+        audio.volume = (track.vol || 80) / 100;
+        if (track.fx && track.fx.loop) audio.loop = true;
+        const el = { audio, timeout: null };
+        if (delayMs > 0) el.timeout = setTimeout(() => { try { audio.play(); } catch(e){} }, delayMs);
+        else try { audio.play(); } catch(e){}
+        window._prevAudioEls.push(el);
+      } else if (track.musicKey) {
+        // Music from IDB
+        idbGetMusic(track.musicKey, buffer => {
+          if (!buffer) return;
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            ctx.decodeAudioData(buffer.slice(0), decoded => {
+              const gain = ctx.createGain();
+              gain.gain.value = (track.vol || 80) / 100;
+              const src = ctx.createBufferSource();
+              src.buffer = decoded;
+              src.loop = !!(track.fx && track.fx.loop);
+              src.connect(gain); gain.connect(ctx.destination);
+              const el = { audio: null, ctx, src, timeout: null };
+              const startFn = () => { try { src.start(); } catch(e){} };
+              if (delayMs > 0) el.timeout = setTimeout(startFn, delayMs);
+              else startFn();
+              window._prevAudioEls.push(el);
+            });
+          } catch(e){}
+        });
+      }
+    } catch(e){}
+  });
+}
+function stopPrevAudio() {
+  (window._prevAudioEls || []).forEach(el => {
+    if (el.timeout) clearTimeout(el.timeout);
+    try { if (el.audio) { el.audio.pause(); el.audio.currentTime = 0; } } catch(e){}
+    try { if (el.src) el.src.stop(); } catch(e){}
+    try { if (el.ctx) el.ctx.close(); } catch(e){}
+  });
+  window._prevAudioEls = [];
 }
 function prevStep() {
   if (!prevRunning || S.shots.length === 0) { stopPrev(); return; }
@@ -5914,10 +6454,27 @@ function voAdjustFrames() {
 }
 function voTrimAudio() { showToast('✂️ Audio wird beim Speichern auf Gruppen-Länge gesetzt'); }
 function saveVoiceover() {
+  // If opened from audio track, save there instead
+  if (window._voTrackId) {
+    const track = window.audioTracks.find(t => t.id === window._voTrackId);
+    if (track && voBlob) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        track.voiceover = e.target.result;
+        track.voiceoverBlob = voBlob;
+        window._voTrackId = null;
+        closeVoModal();
+        renderAudioTracks();
+        showToast('🎙 Voiceover gespeichert!');
+      };
+      reader.readAsDataURL(voBlob);
+      return;
+    }
+    window._voTrackId = null;
+  }
   const grpId = $('vo-group-sel').value;
   const grp   = S.groups.find(g => g.id === grpId);
   if (!grp || !voBlob) return;
-  // Warn if large
   if (voBlob.size > 500000) showToast('⚠️ Voiceover ist groß (>' + Math.round(voBlob.size/1024) + 'KB)');
   const reader = new FileReader();
   reader.onload = e => {
@@ -6210,6 +6767,221 @@ function musRemove() {
   renderMusLib();
 }
 
+/* ═══════════════════════════════════════════════
+   AUDIO TRACKS SYSTEM (Mehrspurige Timeline)
+   ═══════════════════════════════════════════════ */
+if (!window.audioTracks) window.audioTracks = [];
+let audioFxState = { fadein: false, fadeout: false, loop: false };
+
+function addAudioTrack(type) {
+  const id = 'atr_' + Date.now();
+  const isVo = type === 'voiceover';
+  const track = {
+    id,
+    name: isVo ? '🎙 Voiceover ' + (window.audioTracks.filter(t=>t.type==='voiceover').length + 1)
+                : '🎵 Spur ' + (window.audioTracks.filter(t=>t.type!=='voiceover').length + 1),
+    type: isVo ? 'voiceover' : 'music',
+    trackName: '', vol: 80, startFrame: 0, musicKey: null, audio: null,
+    fx: { fadein: false, fadeout: false, loop: false },
+    voiceover: null, voiceoverBlob: null
+  };
+  window.audioTracks.push(track);
+  renderAudioTracks();
+  try { checkBadge('multitrack'); } catch(e){}
+  if (isVo) {
+    showToast('🎙 Voiceover-Spur hinzugefügt!');
+    // Auto-open recording for this track
+    setTimeout(() => openVoiceoverForTrack(id), 200);
+  } else {
+    showToast('🎵 Neue Spur hinzugefügt!');
+  }
+}
+
+function openVoiceoverForTrack(trackId) {
+  const track = window.audioTracks.find(t => t.id === trackId);
+  if (!track) return;
+  window._voTrackId = trackId;
+  // Reuse vo-modal but adapted for track recording
+  const modal = $('vo-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  const title = modal.querySelector('.ed-card-title');
+  if (title) title.childNodes[0].textContent = '🎙 Voiceover aufnehmen – ' + track.name + ' ';
+}
+
+function renderAudioTracks() {
+  const container = $('audio-tracks-container');
+  const noTracks = $('audio-no-tracks');
+  if (!container) return;
+  container.innerHTML = '';
+  if (!window.audioTracks || window.audioTracks.length === 0) {
+    if (noTracks) noTracks.style.display = '';
+    return;
+  }
+  if (noTracks) noTracks.style.display = 'none';
+
+  const scenes = (S.project && S.project.scenes) ? S.project.scenes : [];
+  const sceneOpts = scenes.map((sc, i) =>
+    `<option value="${i}">Szene ${i+1}${sc.title ? ': ' + sc.title : ''}</option>`
+  ).join('');
+  const makeSceneSel = (tid) => scenes.length > 0
+    ? `<select class="vo-group-select" style="flex:1;font-size:12px;padding:5px 8px" onchange="setTrackScene('${tid}',+this.value)"><option value="-1">— Keine Szene —</option>${sceneOpts}</select>`
+    : `<span style="font-size:11px;color:var(--muted);flex:1">Keine Szenen</span>`;
+
+  window.audioTracks.forEach((track) => {
+    const isVo = track.type === 'voiceover';
+    const div = document.createElement('div');
+    div.className = 'audio-track';
+    div.style.borderLeft = isVo ? '3px solid rgba(168,85,247,.6)' : '3px solid rgba(45,212,191,.5)';
+    const fx = track.fx || { fadein: false, fadeout: false, loop: false };
+
+    const musicRow = isVo ? `
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--muted);flex-shrink:0">Aufnahme:</span>
+        <span style="font-family:'Fredoka One',cursive;font-size:12px;color:${track.voiceover ? 'var(--green)' : 'var(--muted)'};flex:1">
+          ${track.voiceover ? '✅ Aufgenommen' : 'Noch keine Aufnahme'}
+        </span>
+        <button onclick="openVoiceoverForTrack('${track.id}')" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.35);color:#c084fc;font-family:'Fredoka One',cursive;font-size:10px;padding:3px 8px;border-radius:6px;cursor:pointer">🎙 Aufnehmen</button>
+      </div>` : `
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(0,0,0,.25);border-radius:8px">
+        <span style="font-size:11px;color:var(--muted);flex-shrink:0">Track:</span>
+        <span style="font-family:'Fredoka One',cursive;font-size:12px;color:${track.trackName ? 'var(--text)' : 'var(--muted)'};flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+          ${track.trackName || 'Keiner – aus Bibliothek zuweisen'}
+        </span>
+        <button onclick="assignCurrentMusicToTrack('${track.id}')" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);color:var(--yellow);font-family:'Fredoka One',cursive;font-size:10px;padding:3px 8px;border-radius:6px;cursor:pointer;flex-shrink:0">📌</button>
+      </div>`;
+
+    div.innerHTML = `
+      <div class="audio-track-header">
+        <span style="font-size:14px">${isVo ? '🎙' : '🎵'}</span>
+        <span class="audio-track-name">${track.name}</span>
+        <button onclick="removeAudioTrack('${track.id}')" style="color:var(--red);background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:'Fredoka One',cursive">✕</button>
+      </div>
+      ${musicRow}
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--muted);flex-shrink:0;white-space:nowrap">🎬 Szene:</span>
+        ${makeSceneSel(track.id)}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--muted);flex-shrink:0;white-space:nowrap">▶ Ab Frame:</span>
+        <input type="number" value="${track.startFrame || 0}" min="0"
+          style="width:64px;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Fredoka One',cursive;font-size:12px"
+          onchange="setTrackFrame('${track.id}',+this.value)"/>
+      </div>
+      <div class="audio-track-vol">
+        <span>🔊</span>
+        <input type="range" min="0" max="100" value="${track.vol}" style="flex:1;accent-color:var(--teal)"
+          oninput="setTrackVol('${track.id}',+this.value);this.nextElementSibling.textContent=this.value+'%'"/>
+        <span style="min-width:32px;font-family:'Fredoka One',cursive;color:var(--teal);font-size:12px">${track.vol}%</span>
+      </div>
+      <!-- Per-track FX -->
+      <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="audio-fx-btn${fx.fadein?' active':''}" onclick="toggleTrackFx('${track.id}','fadein')">⬛→🌅 Fade In</button>
+        <button class="audio-fx-btn${fx.fadeout?' active':''}" onclick="toggleTrackFx('${track.id}','fadeout')">🌅→⬛ Fade Out</button>
+        <button class="audio-fx-btn${fx.loop?' active':''}" onclick="toggleTrackFx('${track.id}','loop')">🔁 Loop</button>
+      </div>
+    `;
+    if (track.sceneIdx !== undefined && track.sceneIdx >= 0) {
+      const sel = div.querySelector('select');
+      if (sel) sel.value = track.sceneIdx;
+    }
+    container.appendChild(div);
+  });
+}
+
+function toggleTrackFx(trackId, fx) {
+  const track = window.audioTracks.find(t => t.id === trackId);
+  if (!track) return;
+  if (!track.fx) track.fx = { fadein: false, fadeout: false, loop: false };
+  track.fx[fx] = !track.fx[fx];
+  renderAudioTracks();
+  showToast((track.fx[fx] ? '✅' : '❌') + ' ' + fx + ' für ' + track.name);
+}
+
+function setTrackScene(id, sceneIdx) {
+  const track = window.audioTracks.find(t => t.id === id);
+  if (!track) return;
+  track.sceneIdx = sceneIdx;
+  // Auto-set start frame based on scene index (approximate: frames before this scene)
+  if (sceneIdx >= 0) {
+    // Count approximate frames: each scene = ~12 frames by default
+    track.startFrame = sceneIdx * 12;
+    // Re-render to update frame input
+    renderAudioTracks();
+  }
+}
+
+function removeAudioTrack(id) {
+  window.audioTracks = window.audioTracks.filter(t => t.id !== id);
+  renderAudioTracks();
+}
+
+function setTrackFrame(id, frame) {
+  const track = window.audioTracks.find(t => t.id === id);
+  if (track) track.startFrame = frame;
+}
+
+function setTrackVol(id, vol) {
+  const track = window.audioTracks.find(t => t.id === id);
+  if (track) track.vol = vol;
+}
+
+function assignCurrentMusicToTrack(id) {
+  const track = window.audioTracks.find(t => t.id === id);
+  if (!track) return;
+  if (!S.music) { showToast('⚠️ Wähle erst einen Track aus der Bibliothek aus!'); return; }
+  track.trackName = S.music.name || S.music.key;
+  track.musicKey = S.music.key;
+  renderAudioTracks();
+  showToast('📌 Track zugewiesen: ' + track.trackName);
+}
+
+function assignLibTrackToNewTrack(name, key) {
+  // Quick assign: create a new track with this music
+  const id = 'atr_' + Date.now();
+  const track = {
+    id, name: 'Spur ' + (window.audioTracks.length + 1),
+    trackName: name, musicKey: key, vol: 80, startFrame: 0, audio: null
+  };
+  window.audioTracks.push(track);
+  renderAudioTracks();
+  showToast('🎵 ' + name + ' als neue Spur hinzugefügt!');
+}
+
+function toggleEditAdvanced() {
+  const body = $('edit-advanced-body');
+  const arrow = $('edit-adv-arrow');
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+}
+function toggleEditToolsExtra() {
+  const body = $('edit-tools-extra');
+  const arrow = $('edit-tools-arrow');
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function toggleAudioFx(fx) {
+  audioFxState[fx] = !audioFxState[fx];
+  const btn = $('afx-' + fx);
+  if (btn) btn.classList.toggle('active', audioFxState[fx]);
+  // Apply to S state
+  if (fx === 'fadein')  { S.fadeIn  = audioFxState.fadein;  try { togFade('in'); } catch(e){} }
+  if (fx === 'fadeout') { S.fadeOut = audioFxState.fadeout; try { togFade('out'); } catch(e){} }
+  showToast((audioFxState[fx] ? '✅' : '❌') + ' Effekt: ' + fx);
+}
+
+// Init tracks on load
+function initAudioTracks() {
+  if (!window.audioTracks) window.audioTracks = [];
+  renderAudioTracks();
+}
+setTimeout(() => { try { initAudioTracks(); } catch(e) {} }, 400);
+
 function musSelectTrack(key, name, artist) {
   musStop();
   musStopPreview();
@@ -6313,6 +7085,10 @@ function renderMusLib() {
             <button class="btn-outline" onclick="musSelectTrack('${track.key}','${track.name}','${track.artist}')"
               style="font-size:12px;padding:6px 12px;${isSelected?'border-color:var(--yellow);color:var(--yellow)':''}">
               ${isSelected ? '✅ Ausgewählt' : '✅ Auswählen'}
+            </button>
+            <button class="btn-outline" onclick="assignLibTrackToNewTrack('${track.name}','${track.key}')"
+              style="font-size:12px;padding:6px 10px;border-color:rgba(45,212,191,.35);color:var(--teal)">
+              + Spur
             </button>
           ` : `
             <button class="btn-outline" onclick="musLoadFromRepo('${track.key}','${track.name}','${track.artist}','${track.file}',this)"
@@ -6523,7 +7299,9 @@ const QM = {
   '480p':  { w: 854,  h: 480  },
   '720p':  { w: 1280, h: 720  },
   '1080p': { w: 1920, h: 1080 },
+  '4K':    { w: 3840, h: 2160 },
 };
+window.expFormat = 'mp4'; // Default export format
 
 // ── Helpers ─────────────────────────────────────
 function setExpStatus(msg) {
@@ -6682,6 +7460,11 @@ function updExpSum() {
   // Sync quality & format buttons
   renderQualityBtns();
   renderFormatBtns();
+  updateExpCurrentConfig();
+  // Set default format
+  if (!S.format) S.format = 'mp4';
+  if (!S.quality) S.quality = '1080p';
+  window.expFormat = S.format;
 }
 
 function estimateProjectSize() {
@@ -6694,13 +7477,15 @@ function renderQualityBtns() {
   const el = $('quality-btns');
   if (!el) return;
   el.innerHTML = '';
-  ['360p','480p','720p','1080p'].forEach(q => {
+  ['360p','480p','720p','1080p','4K'].forEach(q => {
     const btn = document.createElement('button');
     btn.className = 'btn-outline';
-    btn.textContent = q;
-    if (S.quality === q) btn.style.cssText = 'border-color:var(--yellow);color:var(--yellow)';
+    btn.textContent = q === '4K' ? '🔬 4K' : q;
+    if ((S.quality || '1080p') === q) btn.style.cssText = 'border-color:var(--yellow);color:var(--yellow)';
     btn.style.fontFamily = "'Fredoka One',cursive";
-    btn.onclick = () => { S.quality = q; persist(); renderQualityBtns(); updExpSum(); };
+    if (q === '4K') btn.style.cssText += ';background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.4);color:#c084fc';
+    if ((S.quality || '1080p') === q && q !== '4K') btn.style.cssText = 'border-color:var(--yellow);color:var(--yellow)';
+    btn.onclick = () => { S.quality = q; persist(); renderQualityBtns(); updExpSum(); updateExpCurrentConfig(); };
     el.appendChild(btn);
   });
 }
@@ -6712,11 +7497,28 @@ function renderFormatBtns() {
     const btn = document.createElement('button');
     btn.className = 'btn-outline';
     btn.textContent = label;
-    if ((S.format || 'webm') === f) btn.style.cssText = 'border-color:var(--yellow);color:var(--yellow)';
+    const curFmt = S.format || 'mp4';
+    if (curFmt === f) btn.style.cssText = 'border-color:var(--yellow);color:var(--yellow)';
     btn.style.fontFamily = "'Fredoka One',cursive";
-    btn.onclick = () => { S.format = f; persist(); renderFormatBtns(); };
+    btn.onclick = () => { S.format = f; window.expFormat = f; persist(); renderFormatBtns(); updateExpCurrentConfig(); };
     el.appendChild(btn);
   });
+}
+function toggleExpSettings() {
+  const body = $('exp-settings-body');
+  const arrow = $('exp-settings-arrow');
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+}
+function updateExpCurrentConfig() {
+  const el = $('exp-current-config');
+  if (!el) return;
+  const fmt = (S.format || 'mp4').toUpperCase();
+  const q = S.quality || '1080p';
+  const fps = S.fps || 8;
+  el.textContent = `${fmt} · ${q === '1080p' ? 'Full HD (1080p)' : q} · ${fps} fps`;
 }
 
 // ── Subtitle UI ──────────────────────────────────
@@ -7723,9 +8525,14 @@ document.addEventListener('DOMContentLoaded', () => {
       <button onclick="closeHelp()">✕</button>
     </div>
     <div class="help-tabs">
-      <button class="help-tab active" onclick="showHelpSection('stopmotion',this)">🎬 Was ist Stop-Motion?</button>
-      <button class="help-tab" onclick="showHelpSection('tipps',this)">💡 Tipps &amp; Tricks</button>
-      <button class="help-tab" onclick="showHelpSection('glossar',this)">📚 Glossar</button>
+      <button class="help-tab active"  onclick="showHelpSection('stopmotion',this)">🎬 Stop-Motion</button>
+      <button class="help-tab"         onclick="showHelpSection('app',this)">📱 Die App</button>
+      <button class="help-tab"         onclick="showHelpSection('kamera',this)">📷 Kamera</button>
+      <button class="help-tab"         onclick="showHelpSection('editor',this)">✂️ Editor</button>
+      <button class="help-tab"         onclick="showHelpSection('audio',this)">🎵 Audio</button>
+      <button class="help-tab"         onclick="showHelpSection('export',this)">📤 Export</button>
+      <button class="help-tab"         onclick="showHelpSection('tipps',this)">💡 Tipps</button>
+      <button class="help-tab"         onclick="showHelpSection('glossar',this)">📚 Glossar</button>
     </div>
     <div id="help-body"></div>
   </div>
@@ -7882,6 +8689,103 @@ const BADGES = [
       return p.length > 0 && p.every(v => v === 100);
     }
   },
+  // ── Neue Abzeichen ──
+  {
+    id: 'marathon',
+    icon: '🏅',
+    name: 'Marathon',
+    desc: 'Nimm 100 Fotos auf',
+    check: () => S.shots.length >= 100
+  },
+  {
+    id: 'superstar',
+    icon: '🌟',
+    name: 'Superstar',
+    desc: 'Nimm 200 Fotos auf',
+    check: () => S.shots.length >= 200
+  },
+  {
+    id: 'multitrack',
+    icon: '🎚️',
+    name: 'Tontechniker',
+    desc: 'Erstelle 3 Audio-Spuren',
+    check: () => (window.audioTracks || []).length >= 3
+  },
+  {
+    id: 'greenscreen-pro',
+    icon: '🟢',
+    name: 'Greenscreen-Profi',
+    desc: 'Benutze den Greenscreen',
+    check: () => !!S.project.usedGreenscreen
+  },
+  {
+    id: 'figuren-reich',
+    icon: '🎭',
+    name: 'Figuren-Reich',
+    desc: 'Erstelle 6 verschiedene Figuren',
+    check: () => (S.project.figures || []).length >= 6
+  },
+  {
+    id: 'szenen-meister',
+    icon: '🎬',
+    name: 'Szenen-Meister',
+    desc: 'Plane 5 Szenen im Storyboard',
+    check: () => (S.project.scenes || []).length >= 5
+  },
+  {
+    id: 'effekt-zauberer',
+    icon: '✨',
+    name: 'Effekt-Zauberer',
+    desc: 'Benutze den FX-Filter im Editor',
+    check: () => !!S.project.usedFx
+  },
+  {
+    id: 'fruehaufsteher',
+    icon: '🌅',
+    name: 'Frühaufsteher',
+    desc: 'Öffne die App an 3 verschiedenen Tagen',
+    check: () => {
+      try {
+        const days = JSON.parse(localStorage.getItem('tfw-opendays') || '[]');
+        return days.length >= 3;
+      } catch(e) { return false; }
+    }
+  },
+  {
+    id: 'farbenfroh',
+    icon: '🎨',
+    name: 'Farbenfroh',
+    desc: 'Male eine Szene mit 5 verschiedenen Farben',
+    check: () => !!S.project.usedManyColors
+  },
+  {
+    id: 'zeitraffer',
+    icon: '⚡',
+    name: 'Zeitraffer-König',
+    desc: 'Benutze den Zeitraffer-Modus',
+    check: () => !!S.project.usedTimelapse
+  },
+  {
+    id: 'titelmacher',
+    icon: '🖼️',
+    name: 'Titelmacher',
+    desc: 'Füge eine Titelkarte ein',
+    check: () => S.shots.some(s => s.isTitleCard)
+  },
+  {
+    id: 'speed-shooter',
+    icon: '⚡',
+    name: 'Speed-Shooter',
+    desc: 'Mach 10 Fotos in einer Minute',
+    check: () => !!S.project.speedShooter
+  },
+  {
+    id: 'allrounder',
+    icon: '🌈',
+    name: 'Allrounder',
+    desc: 'Verdiene 8 andere Abzeichen',
+    check: () => Object.keys(earnedBadges).filter(k => k !== 'allrounder').length >= 8
+  },
 ];
 
 // ── Badge Funktionen ─────────────────────────────
@@ -7967,70 +8871,218 @@ const HELP = {
   stopmotion: {
     title: '🎬 Was ist Stop-Motion?',
     content: `
-      <p>Stop-Motion ist eine Filmtechnik, bei der du viele einzelne Fotos machst und sie hintereinander abspielst – so entsteht die Illusion von Bewegung!</p>
-      <h4>🎬 So funktioniert's:</h4>
+      <p>Stop-Motion ist eine Filmtechnik, bei der du viele einzelne Fotos machst und sie schnell hintereinander abspielst – so entsteht die Illusion von Bewegung!</p>
+      <h4>🎬 So funktioniert's in 6 Schritten:</h4>
       <ol>
         <li>Stelle deine Figur oder dein Objekt auf</li>
-        <li>Mach ein Foto</li>
+        <li>Mach ein Foto mit dem 📷-Knopf</li>
         <li>Bewege die Figur ein kleines bisschen</li>
         <li>Mach wieder ein Foto</li>
         <li>Wiederhole das viele Male</li>
-        <li>Spiele alle Fotos schnell hintereinander ab</li>
+        <li>Schau dir den Film im Editor an!</li>
       </ol>
       <h4>📐 Wie viele Fotos brauche ich?</h4>
-      <p>Für 1 Sekunde Film brauchst du <strong>8–12 Fotos</strong>. Das heißt: Für einen 10-Sekunden-Film brauchst du etwa 80–120 Fotos!</p>
-      <h4>🌟 Bekannte Beispiele</h4>
-      <p>Wallace & Gromit, Shaun das Schaf und Chicken Run wurden alle mit Stop-Motion gemacht. Auch LEGO-Filme nutzen oft diese Technik!</p>
+      <p>Für <strong>1 Sekunde Film</strong> brauchst du <strong>8–12 Fotos</strong>. Für einen 10-Sekunden-Film also etwa 80–120 Fotos!</p>
+      <h4>🌟 Berühmte Stop-Motion-Filme</h4>
+      <p>Wallace &amp; Gromit, Shaun das Schaf, Chicken Run und Coraline wurden alle mit Stop-Motion gemacht. Auch viele LEGO-Videos nutzen diese Technik!</p>
+      <h4>🛠️ Womit kann ich Stop-Motion machen?</h4>
+      <p>Knete, LEGO, Papierfiguren, Stofftiere, Ausschnitte – alles geht! Am besten nimmst du etwas, das du leicht bewegen und positionieren kannst.</p>
+    `
+  },
+  app: {
+    title: '📱 Die App – Überblick',
+    content: `
+      <h4>🗂️ Die drei Haupt-Tabs</h4>
+      <p>Oben in der Mitte findest du die drei großen Tabs:</p>
+      <ul>
+        <li><strong>📷 Kamera</strong> – Hier machst du deine Fotos</li>
+        <li><strong>✂️ Editor</strong> – Hier ordnest du die Fotos und schaust sie an</li>
+        <li><strong>🎵 Audio</strong> – Hier fügst du Musik und Voiceover hinzu</li>
+      </ul>
+      <h4>📋 Linkes Seitenpanel – Planen</h4>
+      <p>Klicke auf den linken Pfeil (☰) um das Planungs-Panel zu öffnen. Dort findest du:</p>
+      <ul>
+        <li>📖 <strong>Story</strong> – Schreibe deine Geschichte</li>
+        <li>🎭 <strong>Figuren</strong> – Erstelle deine Charaktere</li>
+        <li>🎨 <strong>Storyboard</strong> – Plane deine Szenen</li>
+        <li>📅 <strong>Wochenplan</strong> – Organisiere deine Arbeit</li>
+      </ul>
+      <h4>📤 Rechtes Seitenpanel – Export</h4>
+      <p>Klicke auf den rechten Pfeil (▷) um den Export zu öffnen und deinen Film zu speichern.</p>
+      <h4>🏆 Abzeichen</h4>
+      <p>Klicke auf das 🏆-Symbol oben rechts um deine Abzeichen zu sehen. Es gibt über 20 verschiedene zu sammeln!</p>
+    `
+  },
+  kamera: {
+    title: '📷 Kamera – Alle Funktionen',
+    content: `
+      <h4>📷 Der Auslöser</h4>
+      <p>Der große 📷-Knopf in der Mitte macht ein Foto. Links und rechts davon findest du weitere Buttons:</p>
+      <ul>
+        <li>📐 <strong>Format</strong> – Zwischen Quer- und Hochformat wechseln</li>
+        <li>🔄 <strong>Kamera</strong> – Zwischen Vorder- und Rückkamera wechseln</li>
+        <li>🧅 <strong>Zwiebelhaut</strong> – Zeigt das letzte Foto durchsichtig über das Kamerabild</li>
+        <li>⚙️ <strong>Einstellungen</strong> – Öffnet alle weiteren Optionen</li>
+      </ul>
+      <h4>⚙️ Einstellungsmenü</h4>
+      <ul>
+        <li>⊞ <strong>Raster</strong> – Hilfsgitter für gerade Aufnahmen</li>
+        <li>⏱ <strong>Timer</strong> – Selbstauslöser (kein Wackeln!)</li>
+        <li>⚡ <strong>Zeitraffer</strong> – Macht automatisch Fotos in Abständen</li>
+        <li>👁 <strong>Bewegungserkennung</strong> – Warnt wenn sich etwas bewegt</li>
+        <li>🟢 <strong>Greenscreen</strong> – Ersetzt grünen Hintergrund durch ein Bild</li>
+        <li>🔓 <strong>Belichtung fixieren</strong> – Verhindert automatische Helligkeitsanpassung</li>
+      </ul>
+      <h4>🧅 Zwiebelhaut-Panel</h4>
+      <p>Nach dem Öffnen kannst du Transparenz (10–80%) und die Anzahl der eingeblendeten Frames (1–3) einstellen.</p>
+      <h4>🟢 Greenscreen</h4>
+      <p>Aktiviere Greenscreen im Einstellungsmenü. Das Panel erscheint direkt über dem Kamerabild. Wähle Farbe (Grün/Blau/Eigene), stelle die Toleranz ein und wähle einen Hintergrund.</p>
+      <p>💡 Tipp: Nutze den 💉-Pipetten-Button um die Farbe direkt aus dem Kamerabild zu wählen!</p>
+    `
+  },
+  editor: {
+    title: '✂️ Editor – Frames bearbeiten',
+    content: `
+      <h4>▶ Vorschau</h4>
+      <p>Oben siehst du die Vorschau deines Films. Drücke ▶ um ihn abzuspielen. Mit dem FPS-Regler stellst du die Geschwindigkeit ein (8 fps = normal).</p>
+      <h4>📋 Werkzeuge</h4>
+      <ul>
+        <li>☑ <strong>Alle / ☐ Keine</strong> – Alles auswählen oder abwählen</li>
+        <li>🗑 <strong>Löschen</strong> – Markierte Frames löschen</li>
+        <li>📋 <strong>Kopieren</strong> – Markierte Frames duplizieren</li>
+        <li>↩ <strong>Rückgängig</strong> – Letztes Foto rückgängig machen</li>
+      </ul>
+      <h4>📁 Gruppen &amp; Extras (einklappbar)</h4>
+      <ul>
+        <li>↔ <strong>Umkehren</strong> – Reihenfolge der Frames umdrehen</li>
+        <li>🔄 <strong>Drehen</strong> – Frames drehen</li>
+        <li>📁 <strong>Gruppe erstellen</strong> – Markierte Frames zu einer Szene zusammenfassen</li>
+        <li>🎙 <strong>Voiceover</strong> – Gesprochenen Kommentar zu einer Gruppe hinzufügen (auch im Audio-Tab!)</li>
+        <li>🖼 <strong>Titelkarte</strong> – Titelbild oder Abspann einfügen</li>
+        <li>✨ <strong>FX</strong> – Spezialeffekte wie Zoom, Überblendung etc.</li>
+        <li>📤 <strong>Export</strong> – Zum Export-Panel wechseln</li>
+      </ul>
+      <h4>💡 Frame-Menü</h4>
+      <p>Tippe auf einen Frame in der Timeline unten um ein kleines Menü zu öffnen. Damit kannst du einzelne Frames direkt löschen, duplizieren oder drehen.</p>
+    `
+  },
+  audio: {
+    title: '🎵 Audio – Musik & Voiceover',
+    content: `
+      <h4>🎚️ Mehrspurige Timeline</h4>
+      <p>Im Audio-Tab kannst du mehrere Spuren hinzufügen:</p>
+      <ul>
+        <li>🎵 <strong>Musik-Spur</strong> – Hintergrundmusik aus der Bibliothek oder eigene Dateien</li>
+        <li>🎙 <strong>Voiceover-Spur</strong> – Deine eigene Stimme aufnehmen</li>
+      </ul>
+      <h4>Spur-Optionen</h4>
+      <ul>
+        <li><strong>📌 Zuweisen</strong> – Wähle zuerst einen Track in der Bibliothek, dann klicke 📌 um ihn der Spur zuzuweisen</li>
+        <li><strong>🎬 Szene</strong> – Bestimme bei welcher Szene die Spur startet</li>
+        <li><strong>▶ Ab Frame</strong> – Genaue Frame-Nummer für den Start</li>
+        <li><strong>🔊 Lautstärke</strong> – Lautstärke der Spur (0–100%)</li>
+        <li><strong>Effekte</strong> – Fade In, Fade Out, Loop für jede Spur einzeln</li>
+      </ul>
+      <h4>📚 Musikbibliothek</h4>
+      <p>Wähle einen Track und drücke auf „+ Als neue Spur" um ihn direkt zur Timeline hinzuzufügen. Mit ▶ kannst du ihn vorhören.</p>
+      <h4>🎤 Eigene Musik</h4>
+      <p>Lade eigene MP3, WAV oder OGG-Dateien hoch. Danach erscheinen sie in der Bibliothek und können einer Spur zugewiesen werden.</p>
+      <h4>▶ Vorschau mit Audio</h4>
+      <p>Wenn du im Editor auf ▶ drückst, werden alle Spuren automatisch mitgespielt!</p>
+    `
+  },
+  export: {
+    title: '📤 Export – Film speichern',
+    content: `
+      <h4>🎬 Exportieren</h4>
+      <p>Öffne das Export-Panel über den rechten Pfeil (▷) oder den Export-Button im Editor. Dann klicke „▶ Jetzt exportieren".</p>
+      <h4>📁 Formate</h4>
+      <ul>
+        <li>🎬 <strong>MP4</strong> – Standard-Video, funktioniert überall (empfohlen)</li>
+        <li>🎬 <strong>WebM</strong> – Kleineres Dateiformat für Websites</li>
+        <li>🎨 <strong>GIF</strong> – Animiertes Bild, gut für kurze Clips</li>
+        <li>🖼 <strong>ZIP</strong> – Alle Einzelbilder als ZIP-Datei</li>
+      </ul>
+      <h4>📐 Auflösungen</h4>
+      <ul>
+        <li><strong>360p</strong> – Kleine Dateigröße</li>
+        <li><strong>480p</strong> – Standard</li>
+        <li><strong>720p HD</strong> – Gut für Präsentationen</li>
+        <li><strong>1080p Full HD</strong> – Hohe Qualität (Standard)</li>
+        <li><strong>4K</strong> – Maximale Qualität (große Datei!)</li>
+      </ul>
+      <h4>💡 Tipps</h4>
+      <p>Für Schulpräsentationen empfehlen wir <strong>MP4 in 720p</strong> – gute Qualität, nicht zu groß. Füge vorher eine Titelkarte am Anfang und Ende ein!</p>
     `
   },
   tipps: {
-    title: '💡 Tipps & Tricks',
+    title: '💡 Profi-Tipps & Tricks',
     content: `
       <h4>📷 Kamera-Tipps</h4>
       <ul>
-        <li><strong>Stativ nutzen:</strong> Lege das Handy auf ein Buch oder nutze ein Stativ – die Kamera darf sich nicht bewegen!</li>
-        <li><strong>Gute Beleuchtung:</strong> Filme tagsüber am Fenster oder nutze eine Lampe. Keine Schatten auf der Figur!</li>
-        <li><strong>Zwiebelhaut:</strong> Die Zwiebelhaut-Funktion zeigt das letzte Foto durch – so siehst du, wie weit du bewegen sollst.</li>
-        <li><strong>Selbstauslöser:</strong> Nutze den Timer, damit die Kamera beim Auslösen nicht wackelt.</li>
+        <li><strong>Kamera fixieren:</strong> Leg das Handy auf ein Buch oder nutze ein Stativ. Die Kamera darf sich zwischen den Fotos nicht bewegen!</li>
+        <li><strong>Beleuchtung fixieren:</strong> Nutze den „Belichtung fixieren"-Button damit die Helligkeit nicht springt.</li>
+        <li><strong>Timer nutzen:</strong> Der Selbstauslöser verhindert Verwacklungen beim Drücken.</li>
+        <li><strong>Kleine Schritte:</strong> Bewege die Figur nur 2–4mm pro Foto für flüssige Bewegung.</li>
       </ul>
       <h4>🎭 Figuren-Tipps</h4>
       <ul>
-        <li><strong>Knete:</strong> Knete-Figuren lassen sich super bewegen und formen</li>
-        <li><strong>Lego:</strong> Lego-Figuren sind stabil und einfach zu positionieren</li>
-        <li><strong>Papier:</strong> Figuren mit Gelenken aus Musterbeutelklammern</li>
-        <li><strong>Kleine Schritte:</strong> Bewege die Figur nur 2–3mm pro Foto für flüssige Bewegung</li>
+        <li><strong>Knete</strong> lässt sich super formen und bewegen</li>
+        <li><strong>LEGO</strong>-Figuren sind stabil und einfach zu positionieren</li>
+        <li><strong>Papier-Gelenke</strong> mit Musterbeutelklammern für günstige Figuren</li>
+        <li>Klebe Figuren mit Knetmasse auf den Boden – sie rutschen nicht weg!</li>
       </ul>
       <h4>✂️ Schnitt-Tipps</h4>
       <ul>
-        <li><strong>8 fps</strong> = gute, flüssige Bewegung für Anfänger</li>
-        <li>Nutze <strong>Gruppen</strong> für verschiedene Szenen</li>
-        <li>Füge am Anfang und Ende eine schwarze <strong>Titelkarte</strong> ein</li>
-        <li>Musik macht deinen Film viel aufregender!</li>
+        <li>Nutze <strong>Gruppen</strong> für verschiedene Szenen – einfachere Übersicht</li>
+        <li>Füge am Anfang eine <strong>Titelkarte</strong> und am Ende einen <strong>Abspann</strong> ein</li>
+        <li><strong>8–12 fps</strong> ist gut für Anfänger, 24 fps = richtig flüssig</li>
+        <li>Kürze lange Szenen – weniger ist mehr!</li>
+      </ul>
+      <h4>🎵 Audio-Tipps</h4>
+      <ul>
+        <li>Hintergrundmusik macht deinen Film viel aufregender</li>
+        <li>Beim Voiceover: ruhige Umgebung, Mund nah ans Mikro</li>
+        <li>Nutze Fade-In am Anfang und Fade-Out am Ende der Musik</li>
+      </ul>
+      <h4>🏆 Mehr Abzeichen verdienen</h4>
+      <ul>
+        <li>Fülle das komplette Storyboard aus</li>
+        <li>Probiere alle Features aus (Greenscreen, Zeitraffer, FX)</li>
+        <li>Öffne die App an mehreren Tagen</li>
       </ul>
     `
   },
   glossar: {
-    title: '📚 Glossar',
+    title: '📚 Glossar – Filmfachbegriffe',
     content: `
       <dl>
         <dt>🎬 Stop-Motion</dt>
-        <dd>Filmtechnik mit vielen Einzelfotos, die schnell hintereinander abgespielt werden</dd>
-        <dt>🧅 Zwiebelhaut</dt>
+        <dd>Filmtechnik mit vielen Einzelfotos die schnell hintereinander abgespielt werden</dd>
+        <dt>🧅 Zwiebelhaut (Onion Skin)</dt>
         <dd>Das letzte Foto wird durchsichtig über das Kamerabild gelegt – hilft beim präzisen Bewegen der Figur</dd>
         <dt>🎞️ FPS (Frames per Second)</dt>
-        <dd>Bilder pro Sekunde. 8 fps = 8 Fotos ergeben 1 Sekunde Film</dd>
-        <dt>📁 Gruppe</dt>
-        <dd>Mehrere Frames die zusammengehören, z.B. eine Szene. Kann ein Voiceover bekommen</dd>
+        <dd>Bilder pro Sekunde. 8 fps = 8 Fotos ergeben 1 Sekunde Film. Mehr FPS = flüssiger</dd>
+        <dt>📁 Gruppe / Szene</dt>
+        <dd>Mehrere Frames die zusammengehören, z.B. eine Szene. Kann Voiceover und Effekte bekommen</dd>
         <dt>🎙 Voiceover</dt>
-        <dd>Gesprochener Kommentar, der synchron zu einer Gruppe von Frames abgespielt wird</dd>
-        <dt>🟢 Grünscreen</dt>
-        <dd>Grüner Hintergrund der durch ein anderes Bild ersetzt wird – wie im echten Kino!</dd>
+        <dd>Gesprochener Kommentar der über den Film gelegt wird</dd>
+        <dt>🟢 Greenscreen / Chroma-Key</dt>
+        <dd>Grüner Hintergrund der durch ein anderes Bild ersetzt wird – wie im echten Kino und TV!</dd>
         <dt>🎨 Titelkarte</dt>
-        <dd>Ein selbst erstelltes Bild mit Text, z.B. für Anfangs- oder Abspann-Titel</dd>
-        <dt>📤 WebM / MP4</dt>
-        <dd>Videoformate zum Speichern und Teilen deines fertigen Films</dd>
+        <dd>Ein Bild mit Text für Filmtitel, Kapitelüberschriften oder Abspann</dd>
+        <dt>✨ FX (Effekte)</dt>
+        <dd>Spezialeffekte die auf eine Szene angewendet werden: Zoom, Weichzeichner, Farbfilter etc.</dd>
+        <dt>📤 MP4 / WebM / GIF</dt>
+        <dd>Videoformate. MP4 funktioniert überall, WebM ist kleiner, GIF ist für kurze Schleifen</dd>
+        <dt>⚡ Zeitraffer (Timelapse)</dt>
+        <dd>Kamera macht automatisch Fotos in bestimmten Abständen</dd>
+        <dt>🎚️ Mehrspurige Timeline</dt>
+        <dd>Mehrere Audio-Quellen (Musik, Voiceover) können gleichzeitig und zu verschiedenen Zeiten abgespielt werden</dd>
+        <dt>📐 Auflösung</dt>
+        <dd>Größe des Videos in Pixeln. 1080p = 1920×1080 Pixel = Full HD</dd>
         <dt>🏆 Abzeichen</dt>
-        <dd>Belohnungen die du für Fortschritte in der App verdienst – sammel alle 12!</dd>
+        <dd>Belohnungen die du für Fortschritte verdienst – über 20 verschiedene sind in der App versteckt!</dd>
       </dl>
     `
   }
@@ -8089,6 +9141,14 @@ if (typeof addShot !== 'undefined') {
 // We patch via post-init hook in initBadgeHooks()
 
 function initBadgeHooks() {
+  // Track daily app opens
+  try {
+    const today = new Date().toDateString();
+    let days = JSON.parse(localStorage.getItem('tfw-opendays') || '[]');
+    if (!days.includes(today)) { days.push(today); localStorage.setItem('tfw-opendays', JSON.stringify(days)); }
+    checkBadge('fruehaufsteher');
+  } catch(e) {}
+
   // ── Story fields ──
   ['story-title','story-beg','story-ten','story-end','story-about'].forEach(id => {
     const el = document.getElementById(id);
@@ -8569,7 +9629,7 @@ let fxShotRange  = [];  // indices of shots in current scene
 function openFxModal() {
   const modal = document.getElementById('fx-modal');
   fxSelectedId = null;
-
+  S.project.usedFx = true; try { persist(); checkBadge('effekt-zauberer'); } catch(e){}
   // Need at least one group
   if (S.groups.length === 0) {
     showToast('📁 Erstelle zuerst eine Gruppe im Editor!');
@@ -8890,6 +9950,333 @@ if (_closeOb) {
     _closeOb.apply(this, arguments);
     setTimeout(() => { try { syncBadges(); checkAllBadges(); } catch(e) {} }, 300);
   };
+}
+</script>
+
+<!-- ══════════════════════════════════════
+     FREISTELLEN MODAL
+══════════════════════════════════════ -->
+<div id="freistellen-modal" class="ed-modal hidden">
+  <div class="ed-card" style="max-width:420px">
+    <div class="ed-card-title">
+      ✂️ Automatisch Freistellen
+      <button onclick="closeFreistellenModal()" style="margin-left:auto;font-size:18px;color:var(--muted)">✕</button>
+    </div>
+
+    <div id="frei-no-sel" style="display:none;color:var(--muted);font-size:13px;text-align:center;padding:16px 0">
+      ⚠️ Bitte wähle zuerst einen oder mehrere Frames im Editor aus.
+    </div>
+
+    <div id="frei-main">
+      <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.5">
+        🤖 <strong style="color:var(--green)">KI-Freistellen:</strong> Der Hintergrund wird automatisch entfernt und durch transparentes oder farbiges Bild ersetzt. Funktioniert am besten bei Figuren vor einheitlichem Hintergrund.
+      </div>
+
+      <div style="margin-bottom:14px">
+        <label class="field-label">HINTERGRUND NACH DEM FREISTELLEN</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="frei-bg-opt active" data-bg="transparent" onclick="setFreiBg('transparent',this)" style="flex:1;padding:10px 8px;border-radius:10px;border:1px solid rgba(34,197,94,.5);background:rgba(34,197,94,.12);color:var(--green);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">
+            ◻️ Transparent
+          </button>
+          <button class="frei-bg-opt" data-bg="white" onclick="setFreiBg('white',this)" style="flex:1;padding:10px 8px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">
+            ⬜ Weiß
+          </button>
+          <button class="frei-bg-opt" data-bg="black" onclick="setFreiBg('black',this)" style="flex:1;padding:10px 8px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">
+            ⬛ Schwarz
+          </button>
+          <button class="frei-bg-opt" data-bg="custom" onclick="setFreiBg('custom',this)" style="flex:1;padding:10px 8px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">
+            🎨 Farbe
+          </button>
+        </div>
+        <div id="frei-color-pick" style="display:none;margin-top:8px;display:none">
+          <input type="color" id="frei-custom-color" value="#00aaff" style="width:100%;height:36px;border:1px solid var(--border);border-radius:8px;cursor:pointer"/>
+        </div>
+      </div>
+
+      <div id="frei-progress" style="display:none;margin-bottom:12px">
+        <div style="font-family:'Fredoka One',cursive;font-size:13px;color:var(--teal);margin-bottom:6px" id="frei-progress-text">Verarbeite Frame 1/1…</div>
+        <div style="background:var(--s2);border-radius:99px;height:8px;overflow:hidden">
+          <div id="frei-progress-bar" style="height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:99px;width:0%;transition:width .3s"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px">
+        <button class="btn-primary sm" id="frei-apply-btn" onclick="applyFreistellen()" style="flex:1;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 4px 16px rgba(34,197,94,.35)">
+          ✂️ Jetzt freistellen
+        </button>
+        <button class="btn-outline" onclick="closeFreistellenModal()" style="font-size:13px;padding:8px 14px">Abbrechen</button>
+      </div>
+
+      <div id="frei-preview-row" style="display:none;margin-top:14px">
+        <div style="font-family:'Fredoka One',cursive;font-size:13px;color:var(--yellow);margin-bottom:8px">👁 Vorschau (erster Frame):</div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <div style="flex:1;text-align:center">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-family:'Fredoka One',cursive">VORHER</div>
+            <img id="frei-before-img" style="width:100%;border-radius:8px;border:1px solid var(--border)" />
+          </div>
+          <div style="flex:1;text-align:center">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-family:'Fredoka One',cursive">NACHHER</div>
+            <img id="frei-after-img" style="width:100%;border-radius:8px;border:1px solid var(--border);background:repeating-conic-gradient(#888 0% 25%, #555 0% 50%) 0 0 / 10px 10px" />
+          </div>
+        </div>
+        <button class="btn-primary sm" onclick="confirmFreistellen()" style="width:100%;margin-top:10px">✅ Auf alle ausgewählten Frames anwenden</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   FREISTELLEN (KI-Hintergrundentfernung)
+   ═══════════════════════════════════════════════ */
+
+let freiBackground = 'transparent';
+let freiResultCache = []; // {shotId, resultData}
+
+function openFreistellenModal() {
+  const modal = document.getElementById('freistellen-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+
+  // Check selection
+  const noSel = document.getElementById('frei-no-sel');
+  const main  = document.getElementById('frei-main');
+
+  if (typeof selFrames !== 'undefined' && selFrames.size > 0) {
+    noSel.style.display = 'none';
+    main.style.display  = '';
+  } else {
+    noSel.style.display = '';
+    main.style.display  = 'none';
+  }
+
+  // Reset
+  document.getElementById('frei-progress').style.display = 'none';
+  document.getElementById('frei-preview-row').style.display = 'none';
+  document.getElementById('frei-apply-btn').disabled = false;
+  document.getElementById('frei-apply-btn').textContent = '✂️ Jetzt freistellen';
+  freiResultCache = [];
+}
+
+function closeFreistellenModal() {
+  document.getElementById('freistellen-modal').classList.add('hidden');
+}
+
+function setFreiBg(bg, btn) {
+  freiBackground = bg;
+  document.querySelectorAll('.frei-bg-opt').forEach(b => {
+    b.style.borderColor = 'var(--border)';
+    b.style.background  = 'rgba(255,255,255,.04)';
+    b.style.color       = 'var(--text)';
+  });
+  btn.style.borderColor = 'rgba(34,197,94,.5)';
+  btn.style.background  = 'rgba(34,197,94,.12)';
+  btn.style.color       = 'var(--green)';
+  const picker = document.getElementById('frei-color-pick');
+  picker.style.display = (bg === 'custom') ? '' : 'none';
+}
+
+async function applyFreistellen() {
+  const btn = document.getElementById('frei-apply-btn');
+  if (!btn || btn.disabled) return;
+
+  // Get selected shots
+  const selected = (typeof S !== 'undefined' && typeof selFrames !== 'undefined')
+    ? S.shots.filter(s => selFrames.has(s.id))
+    : [];
+
+  if (selected.length === 0) {
+    showToast('⚠️ Keine Frames ausgewählt!');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Lädt…';
+
+  const progressEl  = document.getElementById('frei-progress');
+  const progressTxt = document.getElementById('frei-progress-text');
+  const progressBar = document.getElementById('frei-progress-bar');
+  progressEl.style.display = '';
+  freiResultCache = [];
+
+  // Process only first frame for preview, then ask user to confirm all
+  const previewShot = selected[0];
+  progressTxt.textContent = `Verarbeite Frame 1 von ${selected.length}…`;
+  progressBar.style.width = '10%';
+
+  try {
+    const result = await freistellenSingleFrame(previewShot.data);
+    freiResultCache.push({ shotId: previewShot.id, resultData: result });
+    progressBar.style.width = '100%';
+
+    // Show preview
+    document.getElementById('frei-before-img').src = previewShot.data;
+    document.getElementById('frei-after-img').src  = result;
+    document.getElementById('frei-preview-row').style.display = '';
+
+    if (selected.length === 1) {
+      // Only 1 frame – auto-confirm
+      confirmFreistellen();
+    } else {
+      btn.textContent = '✂️ Erneut versuchen';
+      btn.disabled = false;
+    }
+
+  } catch(err) {
+    progressEl.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = '✂️ Jetzt freistellen';
+    showToast('❌ Fehler beim Freistellen: ' + (err.message || err));
+    console.error('Freistellen error:', err);
+  }
+}
+
+async function confirmFreistellen() {
+  const selected = (typeof S !== 'undefined' && typeof selFrames !== 'undefined')
+    ? S.shots.filter(s => selFrames.has(s.id))
+    : [];
+
+  if (selected.length === 0) return;
+
+  const progressEl  = document.getElementById('frei-progress');
+  const progressTxt = document.getElementById('frei-progress-text');
+  const progressBar = document.getElementById('frei-progress-bar');
+  progressEl.style.display = '';
+  document.getElementById('frei-preview-row').style.display = 'none';
+
+  const applyBtn = document.getElementById('frei-apply-btn');
+  if (applyBtn) { applyBtn.disabled = true; }
+
+  let done = 0;
+  for (const shot of selected) {
+    progressTxt.textContent = `Verarbeite Frame ${done+1} von ${selected.length}…`;
+    progressBar.style.width = Math.round((done / selected.length) * 100) + '%';
+
+    // Check if already in cache
+    const cached = freiResultCache.find(r => r.shotId === shot.id);
+    let resultData;
+    if (cached) {
+      resultData = cached.resultData;
+    } else {
+      resultData = await freistellenSingleFrame(shot.data);
+    }
+
+    // Apply to shot
+    const idx = S.shots.findIndex(s => s.id === shot.id);
+    if (idx !== -1) {
+      S.shots[idx].data = resultData;
+    }
+    done++;
+  }
+
+  progressBar.style.width = '100%';
+  progressTxt.textContent = '✅ Fertig!';
+
+  idbSaveShots(S.shots);
+  renderFrames();
+  renderStrip();
+
+  setTimeout(() => {
+    closeFreistellenModal();
+    showToast(`✂️ ${done} Frame${done !== 1 ? 's' : ''} freigestellt!`);
+  }, 600);
+}
+
+// 100% lokal, kostenlos – kein API-Aufruf
+async function freistellenSingleFrame(imageDataUrl) {
+  return freistellenLokal(imageDataUrl);
+}
+
+async function freistellenLokal(imageDataUrl) {
+  // Extract base64 from data URL (unused, kept for structure)
+  const base64 = imageDataUrl.split(',')[1];
+  // (local processing only)
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width  = img.width;
+      cv.height = img.height;
+      const ctx = cv.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, cv.width, cv.height);
+      const data = imageData.data;
+      const W = cv.width, H = cv.height;
+
+      // Sample background color from corners (most common approach)
+      function getPixel(x, y) {
+        const i = (y * W + x) * 4;
+        return [data[i], data[i+1], data[i+2], data[i+3]];
+      }
+      function colorDist(a, b) {
+        return Math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2);
+      }
+
+      // Average corner colors as background reference
+      const corners = [
+        getPixel(0,0), getPixel(W-1,0),
+        getPixel(0,H-1), getPixel(W-1,H-1),
+        getPixel(Math.floor(W/2),0), getPixel(0,Math.floor(H/2)),
+        getPixel(W-1,Math.floor(H/2)), getPixel(Math.floor(W/2),H-1)
+      ];
+      const bgColor = [
+        corners.reduce((s,c)=>s+c[0],0)/corners.length,
+        corners.reduce((s,c)=>s+c[1],0)/corners.length,
+        corners.reduce((s,c)=>s+c[2],0)/corners.length
+      ];
+
+      const threshold = 60;
+
+      // Flood fill from edges to mark background
+      const visited = new Uint8Array(W * H);
+      const queue = [];
+
+      // Seed from all edges
+      for (let x = 0; x < W; x++) { queue.push([x,0]); queue.push([x,H-1]); }
+      for (let y = 0; y < H; y++) { queue.push([0,y]); queue.push([W-1,y]); }
+
+      while (queue.length > 0) {
+        const [x,y] = queue.pop();
+        if (x < 0 || x >= W || y < 0 || y >= H) continue;
+        const idx = y * W + x;
+        if (visited[idx]) continue;
+        const px = getPixel(x,y);
+        if (colorDist(px, bgColor) > threshold) continue;
+        visited[idx] = 1;
+        queue.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+      }
+
+      // Apply result
+      const bgRgb = freiBackground === 'white' ? [255,255,255] :
+                    freiBackground === 'black' ? [0,0,0]       :
+                    freiBackground === 'custom' ? hexToRgb(document.getElementById('frei-custom-color')?.value||'#0055ff') : null;
+
+      for (let i = 0; i < W * H; i++) {
+        if (visited[i]) {
+          if (bgRgb) {
+            data[i*4]   = bgRgb[0];
+            data[i*4+1] = bgRgb[1];
+            data[i*4+2] = bgRgb[2];
+            data[i*4+3] = 255;
+          } else {
+            data[i*4+3] = 0; // transparent
+          }
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      resolve(cv.toDataURL('image/png'));
+    };
+    img.src = imageDataUrl;
+  });
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return [r,g,b];
 }
 </script>
 
