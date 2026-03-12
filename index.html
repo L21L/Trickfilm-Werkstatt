@@ -400,30 +400,21 @@ textarea{resize:vertical}
 textarea.field-input{min-height:80px;line-height:1.5}
 
 /* ═══════════════════════════
-   PLAN PAGE — ACCORDION
+   PLAN PAGE — SUB TABS
    ═══════════════════════════ */
-.plan-subtabs{display:none!important}
-.plan-section{display:block!important;padding:0}
-#plan-accordion{display:flex;flex-direction:column;padding:10px 10px 80px}
-.acc-item{border-radius:12px;overflow:hidden;margin-bottom:8px;
-  border:1px solid var(--glass-border);background:rgba(13,17,23,.6)}
-.acc-header{width:100%;display:flex;align-items:center;gap:10px;
-  padding:13px 14px;background:none;border:none;cursor:pointer;
-  text-align:left;transition:background .2s}
-.acc-header:hover{background:rgba(255,255,255,.05)}
-.acc-item.open .acc-header{border-bottom:1px solid var(--glass-border)}
-.acc-icon{font-size:20px;flex-shrink:0;line-height:1}
-.acc-label{font-family:'Fredoka One',cursive;font-size:15px;color:var(--muted);flex:1;transition:color .2s}
-.acc-item.open .acc-label{color:var(--yellow)}
-.acc-item[data-acc="figures"].open .acc-label{color:#a855f7}
-.acc-item[data-acc="storyboard"].open .acc-label{color:var(--teal)}
-.acc-item[data-acc="week"].open .acc-label{color:#a855f7}
-.acc-item[data-acc="progress"].open .acc-label{color:var(--teal)}
-.acc-arrow{font-size:11px;color:var(--muted);transition:transform .25s,color .2s;flex-shrink:0}
-.acc-item.open .acc-arrow{transform:rotate(180deg);color:var(--yellow)}
-.acc-body{display:none;padding:14px}
-.acc-item.open .acc-body{display:block;animation:accExpand .22s ease}
-@keyframes accExpand{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.plan-subtabs{display:flex;overflow-x:auto;gap:3px;padding:8px 10px;
+  background:rgba(0,0,0,.2);position:sticky;top:0;z-index:10;
+  border-bottom:1px solid var(--glass-border);scrollbar-width:none}
+.plan-subtabs::-webkit-scrollbar{display:none}
+.plan-subtab{flex-shrink:0;font-family:'Fredoka One',cursive;font-size:11px;
+  padding:6px 11px;border-radius:8px;color:var(--muted);
+  transition:all .2s;white-space:nowrap;border:1px solid transparent}
+.plan-subtab.active{color:var(--yellow);background:rgba(251,191,36,.1);
+  border-color:rgba(251,191,36,.25)}
+.plan-subtab:hover:not(.active){color:var(--text)}
+
+.plan-section{display:none;padding:16px}
+.plan-section.active{display:block}
 
 /* ── Section headers ── */
 .sec-title{font-family:'Fredoka One',cursive;font-size:20px;color:var(--yellow);
@@ -627,98 +618,80 @@ textarea.field-input{min-height:80px;line-height:1.5}
    INTRO & ONBOARDING
    ═══════════════════════════ */
 .intro{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;
-  justify-content:center;background:var(--bg);overflow:hidden}
+  justify-content:center;background:#0a0005;overflow:hidden}
 .intro.hidden{display:none}
 
-/* ── Filmstreifen-Vorhänge (links + rechts) ── */
+/* ── Kinovorhang ── */
 .curtain-side{
   position:absolute;top:0;bottom:0;width:52%;z-index:2;
   display:flex;will-change:transform;overflow:hidden}
 .curtain-left{left:-2%;transform-origin:left center}
 .curtain-right{right:-2%;transform-origin:right center;flex-direction:row-reverse}
 
-/* Filmstreifen-Falten im App-Stil */
+/* Einzelne Vorhang-Falte */
 .curtain-fold{
   flex:1;height:100%;position:relative;
-  background:linear-gradient(180deg,#0d1117 0%,#0f1620 30%,#0a1018 60%,#060914 100%);
-  box-shadow:inset -6px 0 14px rgba(0,0,0,.7),inset 6px 0 8px rgba(45,212,191,.06)}
+  background:linear-gradient(180deg,#6b0f1a 0%,#8b1a2a 15%,#7a1520 50%,#6b1018 80%,#550d16 100%);
+  box-shadow:inset -8px 0 16px rgba(0,0,0,.45),inset 8px 0 10px rgba(180,30,50,.15)}
+/* Alternierende Hell-/Dunkelfalten für 3D-Stoff-Effekt */
 .curtain-fold:nth-child(odd){
-  background:linear-gradient(180deg,#111827 0%,#0d1117 40%,#060914 100%);
-  box-shadow:inset -8px 0 18px rgba(0,0,0,.6),inset 4px 0 10px rgba(251,191,36,.05)}
+  background:linear-gradient(180deg,#8b1a2a 0%,#a82035 15%,#961b2f 50%,#8b1825 80%,#701420 100%);
+  box-shadow:inset -6px 0 18px rgba(0,0,0,.35),inset 6px 0 12px rgba(220,60,80,.12)}
 .curtain-fold:nth-child(3n){
-  background:linear-gradient(180deg,#060914 0%,#0a0f1a 50%,#040810 100%);
-  box-shadow:inset -10px 0 22px rgba(0,0,0,.8)}
-
-/* Glanzlichter auf den Falten */
+  background:linear-gradient(180deg,#550d16 0%,#6b0f1a 15%,#601018 50%,#550d16 80%,#440b13 100%);
+  box-shadow:inset -10px 0 20px rgba(0,0,0,.55),inset 4px 0 8px rgba(140,20,35,.1)}
+/* Glanzlicht auf Stoff */
 .curtain-fold::before{
-  content:'';position:absolute;top:0;bottom:0;left:15%;width:30%;
-  background:linear-gradient(90deg,transparent,rgba(45,212,191,.04),transparent);
+  content:'';position:absolute;top:0;bottom:0;left:20%;width:25%;
+  background:linear-gradient(90deg,transparent,rgba(255,220,200,.06),transparent);
   pointer-events:none}
-/* Perforations — Filmstreifen-Löcher an der Außenkante */
+/* Vertikale Faltenlinien */
 .curtain-fold::after{
-  content:'';position:absolute;top:0;bottom:0;right:0;width:2px;
-  background:linear-gradient(180deg,
-    rgba(251,191,36,.15) 0%,rgba(251,191,36,.05) 10%,
-    rgba(251,191,36,.15) 20%,rgba(251,191,36,.05) 30%,
-    rgba(251,191,36,.15) 40%,rgba(251,191,36,.05) 50%,
-    rgba(251,191,36,.15) 60%,rgba(251,191,36,.05) 70%,
-    rgba(251,191,36,.15) 80%,rgba(251,191,36,.05) 90%,
-    rgba(251,191,36,.15) 100%);
+  content:'';position:absolute;top:0;bottom:0;right:0;width:3px;
+  background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.3),rgba(0,0,0,.6));
   pointer-events:none}
 
-/* Goldene Borte oben — App-Stil */
+/* Goldene Borte oben */
 .curtain-valance{
-  position:absolute;top:0;left:0;right:0;height:48px;z-index:4;
-  background:linear-gradient(180deg,
-    rgba(251,191,36,.9) 0%,
-    rgba(251,191,36,1)  40%,
-    rgba(245,158,11,.95) 70%,
-    rgba(180,110,0,.8)  100%);
-  box-shadow:0 3px 24px rgba(251,191,36,.35),0 1px 0 rgba(255,255,255,.1);
+  position:absolute;top:0;left:0;right:0;height:52px;z-index:4;
+  background:linear-gradient(180deg,#7a5a00,#c9920a 30%,#f0b429 50%,#c9920a 70%,#7a5a00);
+  box-shadow:0 4px 18px rgba(0,0,0,.7),inset 0 2px 4px rgba(255,240,150,.4);
   display:flex;align-items:center;overflow:hidden}
 .curtain-valance::before{
   content:'';position:absolute;inset:0;
   background:repeating-linear-gradient(90deg,
-    transparent 0,transparent 20px,
-    rgba(0,0,0,.18) 20px,rgba(0,0,0,.18) 22px);opacity:.7}
+    transparent 0,transparent 18px,
+    rgba(0,0,0,.25) 18px,rgba(0,0,0,.25) 22px);
+  opacity:.6}
 .curtain-valance::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:10px;
-  background:linear-gradient(180deg,transparent,rgba(0,0,0,.4));
-  border-bottom:2px solid rgba(251,191,36,.4)}
-
-/* Wellen-Unterkante */
+  content:'';position:absolute;bottom:0;left:0;right:0;height:12px;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.5));
+  border-bottom:2px solid rgba(80,40,0,.8)}
+/* Wellen-Unterkante der Borte */
 .valance-scallop{
   position:absolute;bottom:-10px;left:0;right:0;height:20px;z-index:5;
   background:
-    radial-gradient(ellipse 28px 14px at 14px 0,rgba(245,158,11,1) 99%,transparent 100%) left/28px 14px repeat-x,
-    radial-gradient(ellipse 28px 14px at 14px 0,rgba(180,110,0,.9) 99%,transparent 100%) 14px 4px/28px 14px repeat-x}
+    radial-gradient(ellipse 28px 14px at 14px 0,#c9920a 99%,transparent 100%) left/28px 14px repeat-x,
+    radial-gradient(ellipse 28px 14px at 14px 0,#7a5a00 99%,transparent 100%) 14px 4px/28px 14px repeat-x}
 
-/* Tasseln — Teal-Akzent */
+/* Tasseln */
 .curtain-tassel{
-  position:absolute;z-index:6;top:38px;width:14px;display:flex;flex-direction:column;align-items:center}
-.curtain-tassel-head{width:12px;height:12px;border-radius:50% 50% 0 0;
-  background:linear-gradient(180deg,#2dd4bf,#0d9488);
-  box-shadow:0 2px 6px rgba(45,212,191,.5)}
-.curtain-tassel-body{width:2px;height:20px;
-  background:linear-gradient(180deg,#2dd4bf,#0a6b62);
-  box-shadow:2px 0 0 1px rgba(45,212,191,.2)}
+  position:absolute;z-index:6;top:42px;width:14px;display:flex;flex-direction:column;align-items:center}
+.curtain-tassel-head{width:12px;height:14px;border-radius:50% 50% 0 0;
+  background:linear-gradient(180deg,#f0b429,#8b6200);
+  box-shadow:0 2px 4px rgba(0,0,0,.5)}
+.curtain-tassel-body{width:2px;height:22px;
+  background:linear-gradient(180deg,#c9920a,#6b4800);
+  box-shadow:2px 0 0 1px #f0b42955}
 .curtain-tassel-end{width:8px;height:8px;border-radius:50%;
-  background:radial-gradient(circle at 40% 35%,#5eead4,#0d9488);
-  box-shadow:0 2px 6px rgba(45,212,191,.5)}
+  background:radial-gradient(circle at 40% 35%,#ffe066,#8b6200);
+  box-shadow:0 2px 4px rgba(0,0,0,.6)}
 
-/* Hintergrund-Sternefunken */
-.intro::before{
-  content:'';position:absolute;inset:0;z-index:0;
-  background:
-    radial-gradient(ellipse 60% 40% at 50% 50%, rgba(251,191,36,.07) 0%, transparent 70%),
-    radial-gradient(ellipse 30% 60% at 20% 80%, rgba(45,212,191,.05) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 30% at 80% 20%, rgba(168,85,247,.05) 0%, transparent 60%);
-  pointer-events:none}
-
-/* Animations */
+/* Animations-Klassen */
 .intro.play .curtain-left{animation:curtainOpenLeft 1.8s .1s cubic-bezier(.77,0,.18,1) forwards}
 .intro.play .curtain-right{animation:curtainOpenRight 1.8s .1s cubic-bezier(.77,0,.18,1) forwards}
-.intro.play .curtain-fold{animation:foldGlow 1.8s .1s ease-in-out forwards}
+/* Falten bauchen sich beim Öffnen leicht aus */
+.intro.play .curtain-fold{animation:foldBulge 1.8s .1s ease-in-out forwards}
 
 @keyframes curtainOpenLeft{
   0%{transform:translateX(0) scaleX(1)}
@@ -728,109 +701,53 @@ textarea.field-input{min-height:80px;line-height:1.5}
   0%{transform:translateX(0) scaleX(1)}
   15%{transform:translateX(4%) scaleX(1.03)}
   100%{transform:translateX(100%) scaleX(1)}}
-@keyframes foldGlow{
+@keyframes foldBulge{
   0%{filter:brightness(1)}
-  40%{filter:brightness(1.25)}
+  30%{filter:brightness(1.12)}
   100%{filter:brightness(1)}}
-
-/* Hintergrund-Partikel Animation */
-.intro-particle{
-  position:absolute;border-radius:50%;pointer-events:none;z-index:0;
-  animation:particleDrift linear infinite}
-@keyframes particleDrift{
-  0%{transform:translateY(100vh) scale(0);opacity:0}
-  10%{opacity:1}
-  90%{opacity:.6}
-  100%{transform:translateY(-20vh) scale(1);opacity:0}}
-
 .intro-content{display:flex;flex-direction:column;align-items:center;gap:20px;
   z-index:1;text-align:center;pointer-events:none}
 .intro-logo{display:flex;flex-direction:column;align-items:center;gap:8px;
   opacity:0;transform:scale(.3);will-change:transform,opacity}
 .intro.play .intro-logo{animation:springIn .9s 1.5s cubic-bezier(.34,1.56,.64,1) forwards}
 @keyframes springIn{to{opacity:1;transform:scale(1)}}
-
-/* Kamera-Icon mit Glow-Ring */
-.intro-logo-icon{font-size:80px;
-  filter:drop-shadow(0 0 30px rgba(251,191,36,.7)) drop-shadow(0 0 60px rgba(251,191,36,.3));
-  animation:iconPulse 2.5s 2.4s ease-in-out infinite}
-@keyframes iconPulse{0%,100%{filter:drop-shadow(0 0 30px rgba(251,191,36,.7)) drop-shadow(0 0 60px rgba(251,191,36,.3))}
-  50%{filter:drop-shadow(0 0 40px rgba(251,191,36,.9)) drop-shadow(0 0 80px rgba(251,191,36,.5))}}
-
+.intro-logo-icon{font-size:80px;filter:drop-shadow(0 0 40px rgba(251,191,36,.6))}
 .intro-logo-text{display:flex;flex-direction:column;align-items:center;
   font-family:'Fredoka One',cursive;line-height:1.1}
-.intro-logo-meine{font-size:12px;letter-spacing:6px;color:rgba(255,209,102,.6)}
+.intro-logo-meine{font-size:12px;letter-spacing:6px;color:rgba(255,209,102,.5)}
 .intro-logo-trickfilm{font-size:48px;background:linear-gradient(135deg,#ffe566,#ff9f1c);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .intro-logo-werkstatt{font-size:12px;letter-spacing:6px;
-  background:linear-gradient(90deg,#2dd4bf,#4cc9f0);
+  background:linear-gradient(90deg,#06d6a0,#4cc9f0);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .intro-tagline{font-family:'Fredoka One',cursive;font-size:20px;
-  color:rgba(255,255,255,.75);opacity:0;transform:translateY(14px);letter-spacing:1px;
+  color:rgba(255,255,255,.7);opacity:0;transform:translateY(14px);letter-spacing:1px;
   will-change:transform,opacity}
 .intro.play .intro-tagline{animation:fadeUp .7s 2.4s ease forwards}
 @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
-
-/* Kleine Sterne die beim Öffnen aufblitzen */
-.intro-star{position:absolute;z-index:3;font-size:20px;opacity:0;pointer-events:none}
-.intro.play .intro-star{animation:starPop .5s ease forwards}
-.intro-star:nth-child(1){top:30%;left:20%;animation-delay:1.6s}
-.intro-star:nth-child(2){top:60%;left:15%;animation-delay:1.75s}
-.intro-star:nth-child(3){top:25%;right:22%;animation-delay:1.7s}
-.intro-star:nth-child(4){top:55%;right:18%;animation-delay:1.85s}
-.intro-star:nth-child(5){top:45%;left:8%;animation-delay:1.9s}
-.intro-star:nth-child(6){top:70%;right:10%;animation-delay:1.65s}
-@keyframes starPop{
-  0%{opacity:0;transform:scale(0) rotate(0deg)}
-  60%{opacity:1;transform:scale(1.4) rotate(20deg)}
-  100%{opacity:0;transform:scale(0.8) rotate(-10deg) translateY(-30px)}}
-
 .intro-skip{position:absolute;top:20px;right:20px;z-index:3;
   color:rgba(255,255,255,.4);font-size:13px;font-family:'Fredoka One',cursive;
   padding:8px 14px;border-radius:99px;border:1px solid rgba(255,255,255,.1);
-  transition:color .2s,border-color .2s,background .2s;opacity:0;animation:fadeIn .5s 0.8s ease forwards}
-.intro-skip:hover{color:rgba(255,255,255,.85);border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.08)}
+  transition:color .2s,border-color .2s;opacity:0;animation:fadeIn .5s 0.8s ease forwards}
+.intro-skip:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.3)}
 @keyframes fadeIn{to{opacity:1}}
 .onboarding{position:fixed;inset:0;z-index:8000;display:flex;align-items:center;
-  justify-content:center;
-  background:rgba(6,9,20,.88);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:20px}
+  justify-content:center;background:rgba(6,9,20,.92);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:24px}
 .onboarding.hidden{display:none}
-.ob-card{background:var(--surface);border-radius:24px;
-  padding:32px 26px 24px;max-width:400px;width:100%;text-align:center;
-  box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 0 1px rgba(251,191,36,.15);
-  animation:cardIn .4s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden}
-.ob-card::before{content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 80% 50% at 50% 0%, rgba(251,191,36,.06) 0%, transparent 70%);
-  pointer-events:none}
-@keyframes cardIn{from{opacity:0;transform:scale(.85) translateY(24px)}
+.ob-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:36px 28px 28px;max-width:380px;width:100%;text-align:center;
+  box-shadow:0 24px 64px rgba(0,0,0,.6);animation:cardIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes cardIn{from{opacity:0;transform:scale(.88) translateY(20px)}
   to{opacity:1;transform:scale(1) translateY(0)}}
-.ob-icon{font-size:72px;margin-bottom:12px;
-  animation:iconBounce 2s ease-in-out infinite;display:block;line-height:1;
-  filter:drop-shadow(0 4px 16px rgba(251,191,36,.35))}
-@keyframes iconBounce{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}}
-.ob-step-badge{display:inline-flex;align-items:center;gap:5px;
-  background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);
-  color:var(--yellow);font-family:'Fredoka One',cursive;font-size:12px;
-  padding:4px 12px;border-radius:99px;margin-bottom:10px}
-.ob-title{font-family:'Fredoka One',cursive;font-size:22px;color:var(--text);
-  margin-bottom:10px;line-height:1.2}
-.ob-text{font-size:15px;color:var(--muted);line-height:1.65;margin-bottom:20px}
-.ob-text strong{font-style:normal}
-.ob-dots{display:flex;justify-content:center;gap:8px;margin-bottom:20px}
-.ob-dot{width:10px;height:10px;border-radius:50%;background:var(--border);
-  transition:all .3s;cursor:pointer}
-.ob-dot:hover{background:var(--muted)}
-.ob-dot.active{background:var(--yellow);transform:scale(1.35);
-  box-shadow:0 0 8px rgba(251,191,36,.5)}
+.ob-icon{font-size:64px;margin-bottom:16px;animation:phFloat 3s ease-in-out infinite}
+.ob-title{font-family:'Fredoka One',cursive;font-size:26px;color:var(--yellow);margin-bottom:12px}
+.ob-text{font-size:15px;color:var(--muted);line-height:1.6;margin-bottom:24px}
+.ob-dots{display:flex;justify-content:center;gap:8px;margin-bottom:24px}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--border);
+  transition:background .3s,transform .3s}
+.ob-dot.active{background:var(--yellow);transform:scale(1.3)}
 .ob-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.ob-next-big{flex:1;background:linear-gradient(135deg,#fbbf24,#f59e0b);
-  color:#060914;font-family:'Fredoka One',cursive;font-size:16px;
-  padding:12px 20px;border-radius:14px;border:none;cursor:pointer;
-  transition:transform .15s,box-shadow .15s;
-  box-shadow:0 4px 16px rgba(251,191,36,.35)}
-.ob-next-big:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(251,191,36,.5)}
-.ob-next-big:active{transform:scale(.95)}
 
 /* ── Tab-Intro Tooltip ── */
 #tab-intro-overlay{position:fixed;inset:0;z-index:7500;
@@ -2012,12 +1929,6 @@ textarea.field-input{min-height:80px;line-height:1.5}
   </div>
 
   <!-- Inhalt (Logo erscheint nach Öffnung) -->
-  <span class="intro-star">✨</span>
-  <span class="intro-star">⭐</span>
-  <span class="intro-star">✨</span>
-  <span class="intro-star">⭐</span>
-  <span class="intro-star">✨</span>
-  <span class="intro-star">🌟</span>
   <div class="intro-content">
     <div class="intro-logo">
       <span class="intro-logo-icon">🎬</span>
@@ -2046,8 +1957,8 @@ textarea.field-input{min-height:80px;line-height:1.5}
     <p class="ob-text" id="ob-text"></p>
     <div class="ob-dots" id="ob-dots"></div>
     <div class="ob-actions">
-      <button class="btn-ghost" id="ob-skip" style="font-size:13px;color:var(--muted)">Überspringen</button>
-      <button class="ob-next-big" id="ob-next">Weiter →</button>
+      <button class="btn-ghost" id="ob-skip">Überspringen</button>
+      <button class="btn-primary" id="ob-next">Weiter →</button>
     </div>
   </div>
 </div>
@@ -2213,10 +2124,17 @@ textarea.field-input{min-height:80px;line-height:1.5}
           <span class="panel-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Planen</span>
           <button class="panel-close-btn" onclick="ckTogglePanel('left')">✕</button>
         </div>
-        <!-- Accordion (content injected by initCockpit) -->
-        <div class="panel-body" id="plan-panel-body" style="overflow-x:hidden">
-          <div id="plan-accordion"></div>
+        <!-- Plan sub-tabs -->
+        <div class="plan-subtabs" id="plan-subtabs">
+          <button class="plan-subtab active" data-sub="sub-story"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Geschichte</button>
+          <button class="plan-subtab" data-sub="sub-figures"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Figuren</button>
+          <button class="plan-subtab" data-sub="sub-storyboard"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><polygon points="10 9 15 12 10 15 10 9"/></svg>Storyboard</button>
+          <button class="plan-subtab" data-sub="sub-bg"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Hintergrund</button>
+          <button class="plan-subtab" data-sub="sub-week"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Plan</button>
+          <button class="plan-subtab" data-sub="sub-progress"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Fortschritt</button>
         </div>
+        <!-- Plan content injected from existing sections -->
+        <div class="panel-body" id="plan-panel-body"></div>
       </div>
     </div>
 
@@ -3232,12 +3150,12 @@ const PROGRESS_LABELS = [
    ONBOARDING
    ═══════════════════════════════════════════════ */
 const OB_STEPS = [
-  {icon:'🎬',title:'Hallo! Ich bin deine Filmwerkstatt!', text:'Hier machst du deinen eigenen <strong style="color:var(--yellow)">Stop-Motion-Film</strong> – wie bei echten Zeichentrick-Studios! 🍿'},
-  {icon:'🤔',title:'Was ist Stop-Motion?',                text:'Du stellst Figuren hin, machst ein Foto 📷, bewegst sie ein kleeeines bisschen, machst wieder ein Foto… und zack – <strong style="color:var(--teal)">sie bewegen sich!</strong> 🪄'},
-  {icon:'📖',title:'Schritt 1: Deine Geschichte',        text:'Zuerst überlegst du dir <strong style="color:var(--yellow)">WER in deinem Film vorkommt</strong> und WAS passiert. Wie in einem Buch, nur du erfindest es! ✍️'},
-  {icon:'📷',title:'Schritt 2: Fotos machen',            text:'Dann gehst du zum 📷 <strong style="color:var(--yellow)">Kamera-Tab</strong> und fotografierst viele kleine Bilder. Je mehr Bilder, desto flüssiger bewegt sich dein Film! 🎞️'},
-  {icon:'✂️',title:'Schritt 3: Alles zusammenbauen',    text:'Im <strong style="color:var(--teal)">Editor-Tab</strong> kannst du Tempo einstellen, Musik dazumachen und deinen Film vorschauen. '},
-  {icon:'🚀',title:"Los geht's – du schaffst das!",      text:'Tippe auf <strong style="color:var(--yellow)">📷 Kamera</strong> und mach dein erstes Foto! Dein Film wartet auf dich! 🌟'},
+  {icon:'🎬',title:'Willkommen!',         text:'Hier lernst du Schritt für Schritt deinen eigenen Stop-Motion-Film zu machen!'},
+  {icon:'🤔',title:'Was ist Stop-Motion?',text:'Du fotografierst Figuren und bewegst sie dabei ganz langsam. Abgespielt sieht es aus wie ein Film!'},
+  {icon:'📋',title:'Schritt 1: Planen',   text:'Zuerst planst du deine Geschichte und Figuren im Storyboard.'},
+  {icon:'📷',title:'Schritt 2: Filmen',   text:'Dann fotografierst du viele kleine Bilder mit der Kamera.'},
+  {icon:'🎞️',title:'Schritt 3: Schneiden',text:'Im Editor stellst du Tempo ein und fügst Musik hinzu.'},
+  {icon:'🚀',title:"Los geht's!",          text:'Du bist bereit! Viel Spaß beim Filmen!'},
 ];
 let obStep = 0;
 
@@ -3475,37 +3393,14 @@ function hideFrameCtx() {
 }
 
 function initCockpit() {
-  // Build accordion in left panel
-  const accordion = $('plan-accordion');
+  // Move plan content into left panel body
+  const planBody = $('plan-panel-body');
   const pgPlan = $('pg-plan');
-  const ACC_DEFS = [
-    {key:'story',      icon:'📖', label:'Meine Geschichte',  sub:'sub-story',      open:true},
-    {key:'figures',    icon:'🎭', label:'Figuren',            sub:'sub-figures',    open:false},
-    {key:'storyboard', icon:'🎬', label:'Storyboard',         sub:'sub-storyboard', open:false},
-    {key:'bg',         icon:'🌄', label:'Hintergrund',        sub:'sub-bg',         open:false},
-    {key:'week',       icon:'📅', label:'Produktionsplan',    sub:'sub-week',       open:false},
-    {key:'progress',   icon:'📊', label:'Fortschritt',        sub:'sub-progress',   open:false},
-  ];
-  if (accordion && pgPlan) {
-    ACC_DEFS.forEach(def => {
-      const section = pgPlan.querySelector('#' + def.sub);
-      if (!section) return;
-      const item = document.createElement('div');
-      item.className = 'acc-item' + (def.open ? ' open' : '');
-      item.dataset.acc = def.key;
-      const header = document.createElement('button');
-      header.className = 'acc-header';
-      header.innerHTML = `<span class="acc-icon">${def.icon}</span><span class="acc-label">${def.label}</span><span class="acc-arrow">▼</span>`;
-      header.addEventListener('click', () => {
-        item.classList.toggle('open');
-        try { playSwoosh(); } catch(e){}
-      });
-      const body = document.createElement('div');
-      body.className = 'acc-body';
-      body.appendChild(section);
-      item.appendChild(header);
-      item.appendChild(body);
-      accordion.appendChild(item);
+  if (planBody && pgPlan) {
+    Array.from(pgPlan.children).forEach(child => {
+      if (!child.classList.contains('plan-subtabs')) {
+        planBody.appendChild(child);
+      }
     });
   }
 
@@ -4690,38 +4585,17 @@ function initIntro() {
    ═══════════════════════════════════════════════ */
 function renderObStep() {
   const s = OB_STEPS[obStep];
-  const isLast = obStep === OB_STEPS.length - 1;
-  const stepLabels = ['','Schritt 1','Schritt 2','Schritt 3','Schritt 4',''];
-  $('ob-icon').textContent = s.icon;
+  $('ob-icon').textContent  = s.icon;
   $('ob-title').textContent = s.title;
-  $('ob-text').innerHTML = s.text; // allow HTML in text for highlights
-  // Step badge
-  let badge = $('ob-step-badge');
-  if (!badge) {
-    badge = document.createElement('div');
-    badge.id = 'ob-step-badge';
-    badge.className = 'ob-step-badge';
-    $('ob-title').before(badge);
-  }
-  if (obStep > 0 && obStep < OB_STEPS.length-1) {
-    badge.style.display = 'inline-flex';
-    badge.textContent = stepLabels[obStep] || ('Schritt ' + obStep);
-  } else {
-    badge.style.display = 'none';
-  }
-  // Dots
+  $('ob-text').textContent  = s.text;
   const dotsEl = $('ob-dots');
   dotsEl.innerHTML = '';
   OB_STEPS.forEach((_,i) => {
     const d = document.createElement('div');
     d.className = 'ob-dot' + (i===obStep?' active':'');
-    d.addEventListener('click', () => { obStep = i; renderObStep(); });
     dotsEl.appendChild(d);
   });
-  // Button
-  const btn = $('ob-next');
-  btn.className = isLast ? 'ob-next-big' : 'ob-next-big';
-  btn.textContent = isLast ? "Los geht's! 🚀" : 'Weiter →';
+  $('ob-next').textContent = obStep===OB_STEPS.length-1 ? "Los geht's! 🚀" : 'Weiter →';
 }
 function closeOnboarding() {
   $('onboarding').classList.add('hidden');
@@ -8737,7 +8611,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadState();
   try { syncBadges(); } catch(e) {}
   initNav();
-  // initPlanSubTabs(); // replaced by accordion
+  initPlanSubTabs();
   initStory();
   initFigures();
   initStoryboard();
@@ -10233,9 +10107,9 @@ if (_closeOb) {
      FREISTELLEN MODAL
 ══════════════════════════════════════ -->
 <div id="freistellen-modal" class="ed-modal hidden">
-  <div class="ed-card" style="max-width:420px">
+  <div class="ed-card" style="max-width:520px;width:100%">
     <div class="ed-card-title">
-      ✂️ Automatisch Freistellen
+      ✂️ Freistellen
       <button onclick="closeFreistellenModal()" style="margin-left:auto;font-size:18px;color:var(--muted)">✕</button>
     </div>
 
@@ -10244,98 +10118,284 @@ if (_closeOb) {
     </div>
 
     <div id="frei-main">
-      <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.5">
-        🤖 <strong style="color:var(--green)">KI-Freistellen:</strong> Der Hintergrund wird automatisch entfernt und durch transparentes oder farbiges Bild ersetzt. Funktioniert am besten bei Figuren vor einheitlichem Hintergrund.
-      </div>
 
-      <div style="margin-bottom:14px">
-        <label class="field-label">HINTERGRUND NACH DEM FREISTELLEN</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="frei-bg-opt active" data-bg="transparent" onclick="setFreiBg('transparent',this)" style="flex:1;padding:10px 8px;border-radius:10px;border:1px solid rgba(34,197,94,.5);background:rgba(34,197,94,.12);color:var(--green);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">
-            ◻️ Transparent
+      <!-- Step 1: Auswahl-Modus -->
+      <div id="frei-step1">
+        <div style="font-family:'Fredoka One',cursive;font-size:14px;color:var(--yellow);margin-bottom:10px">
+          🖊️ Schritt 1: Markiere die Figur
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.55;background:rgba(255,255,255,.04);border-radius:8px;padding:10px">
+          Zeichne mit dem Pinsel <strong style="color:var(--green)">grün</strong> über die Figur die du behalten willst, und <strong style="color:var(--red)">rot</strong> auf den Hintergrund der weg soll. Dann auf „Freistellen" drücken.
+        </div>
+
+        <!-- Tool selector -->
+        <div style="display:flex;gap:6px;margin-bottom:10px;align-items:center">
+          <button id="frei-tool-fg" onclick="setFreiTool('fg')"
+            style="flex:1;padding:9px 6px;border-radius:10px;border:2px solid rgba(34,197,94,.7);background:rgba(34,197,94,.18);color:#4ade80;font-family:'Fredoka One',cursive;font-size:13px;cursor:pointer;transition:all .2s">
+            🟢 Figur behalten
           </button>
-          <button class="frei-bg-opt" data-bg="white" onclick="setFreiBg('white',this)" style="flex:1;padding:10px 8px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">
-            ⬜ Weiß
+          <button id="frei-tool-bg" onclick="setFreiTool('bg')"
+            style="flex:1;padding:9px 6px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);font-family:'Fredoka One',cursive;font-size:13px;cursor:pointer;transition:all .2s">
+            🔴 Hintergrund löschen
           </button>
-          <button class="frei-bg-opt" data-bg="black" onclick="setFreiBg('black',this)" style="flex:1;padding:10px 8px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">
-            ⬛ Schwarz
-          </button>
-          <button class="frei-bg-opt" data-bg="custom" onclick="setFreiBg('custom',this)" style="flex:1;padding:10px 8px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">
-            🎨 Farbe
+          <button onclick="freiClearStrokes()"
+            title="Alle Markierungen löschen"
+            style="padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">
+            🗑 Reset
           </button>
         </div>
-        <div id="frei-color-pick" style="display:none;margin-top:8px;display:none">
-          <input type="color" id="frei-custom-color" value="#00aaff" style="width:100%;height:36px;border:1px solid var(--border);border-radius:8px;cursor:pointer"/>
+
+        <!-- Brush size -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:11px;color:var(--muted);font-family:'Fredoka One',cursive;white-space:nowrap">Pinselgröße</span>
+          <input type="range" id="frei-brush-size" min="4" max="40" value="14"
+            style="flex:1;accent-color:var(--green)"
+            oninput="freiUpdateBrushCursor()"/>
+          <span id="frei-brush-val" style="font-size:11px;color:var(--muted);font-family:'Fredoka One',cursive;width:24px">14</span>
+        </div>
+
+        <!-- Canvas container -->
+        <div id="frei-canvas-wrap" style="position:relative;border-radius:10px;overflow:hidden;border:2px solid var(--border);background:#111;margin-bottom:12px;cursor:crosshair;touch-action:none">
+          <canvas id="frei-img-canvas"></canvas>
+          <canvas id="frei-draw-canvas" style="position:absolute;top:0;left:0;opacity:0.7"></canvas>
+        </div>
+
+        <!-- Mode: smart vs simple -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--glass-border)">
+          <span style="font-size:12px;color:var(--muted);font-family:'Fredoka One',cursive;flex:1">Freistell-Qualität</span>
+          <button id="frei-mode-smart" onclick="setFreiMode('smart')"
+            style="padding:5px 12px;border-radius:8px;border:2px solid rgba(45,212,191,.6);background:rgba(45,212,191,.15);color:var(--teal);font-family:'Fredoka One',cursive;font-size:11px;cursor:pointer">
+            ✨ Präzise
+          </button>
+          <button id="frei-mode-simple" onclick="setFreiMode('simple')"
+            style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);font-family:'Fredoka One',cursive;font-size:11px;cursor:pointer">
+            ⚡ Schnell
+          </button>
+        </div>
+
+        <!-- Background result -->
+        <div style="margin-bottom:12px">
+          <label class="field-label">HINTERGRUND NACH DEM FREISTELLEN</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="frei-bg-opt active" data-bg="transparent" onclick="setFreiBg('transparent',this)" style="flex:1;padding:9px 6px;border-radius:10px;border:1px solid rgba(34,197,94,.5);background:rgba(34,197,94,.12);color:var(--green);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">◻️ Transparent</button>
+            <button class="frei-bg-opt" data-bg="white" onclick="setFreiBg('white',this)" style="flex:1;padding:9px 6px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">⬜ Weiß</button>
+            <button class="frei-bg-opt" data-bg="black" onclick="setFreiBg('black',this)" style="flex:1;padding:9px 6px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">⬛ Schwarz</button>
+            <button class="frei-bg-opt" data-bg="custom" onclick="setFreiBg('custom',this)" style="flex:1;padding:9px 6px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-family:'Fredoka One',cursive;font-size:12px;cursor:pointer">🎨 Farbe</button>
+          </div>
+          <div id="frei-color-pick" style="display:none;margin-top:8px">
+            <input type="color" id="frei-custom-color" value="#00aaff" style="width:100%;height:36px;border:1px solid var(--border);border-radius:8px;cursor:pointer"/>
+          </div>
+        </div>
+
+        <div id="frei-progress" style="display:none;margin-bottom:12px">
+          <div style="font-family:'Fredoka One',cursive;font-size:13px;color:var(--teal);margin-bottom:6px" id="frei-progress-text">Verarbeite…</div>
+          <div style="background:var(--s2);border-radius:99px;height:8px;overflow:hidden">
+            <div id="frei-progress-bar" style="height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:99px;width:0%;transition:width .3s"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <button class="btn-primary sm" id="frei-apply-btn" onclick="applyFreistellen()"
+            style="flex:1;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 4px 16px rgba(34,197,94,.35)">
+            ✂️ Jetzt freistellen
+          </button>
+          <button class="btn-outline" onclick="closeFreistellenModal()" style="font-size:13px;padding:8px 14px">Abbrechen</button>
         </div>
       </div>
 
-      <div id="frei-progress" style="display:none;margin-bottom:12px">
-        <div style="font-family:'Fredoka One',cursive;font-size:13px;color:var(--teal);margin-bottom:6px" id="frei-progress-text">Verarbeite Frame 1/1…</div>
-        <div style="background:var(--s2);border-radius:99px;height:8px;overflow:hidden">
-          <div id="frei-progress-bar" style="height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:99px;width:0%;transition:width .3s"></div>
+      <!-- Step 2: Preview + bestätigen -->
+      <div id="frei-step2" style="display:none">
+        <div style="font-family:'Fredoka One',cursive;font-size:14px;color:var(--yellow);margin-bottom:10px">
+          👁 Schritt 2: Vorschau prüfen
         </div>
-      </div>
-
-      <div style="display:flex;gap:8px">
-        <button class="btn-primary sm" id="frei-apply-btn" onclick="applyFreistellen()" style="flex:1;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 4px 16px rgba(34,197,94,.35)">
-          ✂️ Jetzt freistellen
-        </button>
-        <button class="btn-outline" onclick="closeFreistellenModal()" style="font-size:13px;padding:8px 14px">Abbrechen</button>
-      </div>
-
-      <div id="frei-preview-row" style="display:none;margin-top:14px">
-        <div style="font-family:'Fredoka One',cursive;font-size:13px;color:var(--yellow);margin-bottom:8px">👁 Vorschau (erster Frame):</div>
-        <div style="display:flex;gap:8px;align-items:flex-start">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
           <div style="flex:1;text-align:center">
             <div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-family:'Fredoka One',cursive">VORHER</div>
-            <img id="frei-before-img" style="width:100%;border-radius:8px;border:1px solid var(--border)" />
+            <img id="frei-before-img" style="width:100%;border-radius:8px;border:1px solid var(--border)"/>
           </div>
           <div style="flex:1;text-align:center">
             <div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-family:'Fredoka One',cursive">NACHHER</div>
-            <img id="frei-after-img" style="width:100%;border-radius:8px;border:1px solid var(--border);background:repeating-conic-gradient(#888 0% 25%, #555 0% 50%) 0 0 / 10px 10px" />
+            <img id="frei-after-img" style="width:100%;border-radius:8px;border:1px solid var(--border);background:repeating-conic-gradient(#888 0% 25%,#555 0% 50%) 0 0/10px 10px"/>
           </div>
         </div>
-        <button class="btn-primary sm" onclick="confirmFreistellen()" style="width:100%;margin-top:10px">✅ Auf alle ausgewählten Frames anwenden</button>
+        <div id="frei-multi-hint" style="display:none;font-size:12px;color:var(--muted);margin-bottom:10px;text-align:center;font-family:'Fredoka One',cursive"></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-outline" onclick="freiBackToEdit()" style="font-size:13px;padding:8px 14px">← Nochmal markieren</button>
+          <button class="btn-primary sm" onclick="confirmFreistellen()"
+            style="flex:1;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 4px 16px rgba(34,197,94,.35)">
+            ✅ Auf alle Frames anwenden
+          </button>
+        </div>
       </div>
+
     </div>
   </div>
 </div>
 
 <script>
 /* ═══════════════════════════════════════════════
-   FREISTELLEN (KI-Hintergrundentfernung)
+   FREISTELLEN — Pinsel-geführtes Freistellen
    ═══════════════════════════════════════════════ */
 
-let freiBackground = 'transparent';
-let freiResultCache = []; // {shotId, resultData}
+let freiBackground  = 'transparent';
+let freiResultCache = [];
+let freiTool        = 'fg';   // 'fg' = Figur (grün), 'bg' = Hintergrund (rot)
+let freiMode        = 'smart'; // 'smart' | 'simple'
+let freiDrawing     = false;
+let freiStrokes     = { fg: [], bg: [] }; // pixel strokes on the ORIGINAL image coords
+let freiImgNatW     = 1, freiImgNatH = 1;
+let freiScale       = 1;
+let freiCurrentImageUrl = null;
 
+/* ── Open/Close ─────────────────────────────── */
 function openFreistellenModal() {
   const modal = document.getElementById('freistellen-modal');
   if (!modal) return;
   modal.classList.remove('hidden');
 
-  // Check selection
   const noSel = document.getElementById('frei-no-sel');
   const main  = document.getElementById('frei-main');
+  const hasSel = typeof selFrames !== 'undefined' && selFrames.size > 0;
 
-  if (typeof selFrames !== 'undefined' && selFrames.size > 0) {
-    noSel.style.display = 'none';
-    main.style.display  = '';
-  } else {
-    noSel.style.display = '';
-    main.style.display  = 'none';
-  }
+  noSel.style.display = hasSel ? 'none' : '';
+  main.style.display  = hasSel ? ''     : 'none';
+  if (!hasSel) return;
 
-  // Reset
+  // Reset UI
+  document.getElementById('frei-step1').style.display = '';
+  document.getElementById('frei-step2').style.display = 'none';
   document.getElementById('frei-progress').style.display = 'none';
-  document.getElementById('frei-preview-row').style.display = 'none';
-  document.getElementById('frei-apply-btn').disabled = false;
-  document.getElementById('frei-apply-btn').textContent = '✂️ Jetzt freistellen';
+  const btn = document.getElementById('frei-apply-btn');
+  btn.disabled = false;
+  btn.textContent = '✂️ Jetzt freistellen';
   freiResultCache = [];
+  freiStrokes = { fg: [], bg: [] };
+
+  // Load first selected frame into canvas
+  const firstShot = S.shots.find(s => selFrames.has(s.id));
+  if (firstShot) freiLoadImageToCanvas(firstShot.data);
 }
 
 function closeFreistellenModal() {
   document.getElementById('freistellen-modal').classList.add('hidden');
+}
+
+function freiBackToEdit() {
+  document.getElementById('frei-step2').style.display = 'none';
+  document.getElementById('frei-step1').style.display = '';
+  freiResultCache = [];
+  const btn = document.getElementById('frei-apply-btn');
+  btn.disabled = false;
+  btn.textContent = '✂️ Jetzt freistellen';
+}
+
+/* ── Canvas setup ────────────────────────────── */
+function freiLoadImageToCanvas(dataUrl) {
+  freiCurrentImageUrl = dataUrl;
+  freiStrokes = { fg: [], bg: [] };
+  const img = new Image();
+  img.onload = () => {
+    freiImgNatW = img.width;
+    freiImgNatH = img.height;
+    const wrap = document.getElementById('frei-canvas-wrap');
+    const maxW = wrap.clientWidth || 460;
+    freiScale = Math.min(1, maxW / img.width);
+    const dw = Math.round(img.width * freiScale);
+    const dh = Math.round(img.height * freiScale);
+
+    const imgCv  = document.getElementById('frei-img-canvas');
+    const drawCv = document.getElementById('frei-draw-canvas');
+    imgCv.width  = drawCv.width  = dw;
+    imgCv.height = drawCv.height = dh;
+    imgCv.style.width = drawCv.style.width = dw + 'px';
+    imgCv.style.height = drawCv.style.height = dh + 'px';
+
+    imgCv.getContext('2d').drawImage(img, 0, 0, dw, dh);
+    freiClearDrawLayer();
+    freiSetupCanvasEvents();
+  };
+  img.src = dataUrl;
+}
+
+function freiClearDrawLayer() {
+  const cv  = document.getElementById('frei-draw-canvas');
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, cv.width, cv.height);
+}
+
+/* ── Canvas drawing events ───────────────────── */
+function freiSetupCanvasEvents() {
+  const cv = document.getElementById('frei-draw-canvas');
+  cv.onpointerdown = e => { freiDrawing = true; cv.setPointerCapture(e.pointerId); freiPaintAt(e); };
+  cv.onpointermove = e => { if (freiDrawing) freiPaintAt(e); };
+  cv.onpointerup   = e => { freiDrawing = false; };
+  cv.onpointercancel = () => { freiDrawing = false; };
+}
+
+function freiGetPos(e) {
+  const cv   = document.getElementById('frei-draw-canvas');
+  const rect = cv.getBoundingClientRect();
+  return {
+    x: (e.clientX - rect.left),
+    y: (e.clientY - rect.top)
+  };
+}
+
+function freiPaintAt(e) {
+  const cv   = document.getElementById('frei-draw-canvas');
+  const ctx  = cv.getContext('2d');
+  const { x, y } = freiGetPos(e);
+  const brushPx = parseInt(document.getElementById('frei-brush-size').value);
+  const isFg = freiTool === 'fg';
+  const color = isFg ? 'rgba(34,197,94,0.85)' : 'rgba(239,68,68,0.85)';
+
+  ctx.beginPath();
+  ctx.arc(x, y, brushPx / 2, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+
+  // Store in natural image coords
+  const nx = Math.round(x / freiScale);
+  const ny = Math.round(y / freiScale);
+  const nr = Math.round((brushPx / 2) / freiScale);
+  freiStrokes[isFg ? 'fg' : 'bg'].push({ x: nx, y: ny, r: nr });
+}
+
+function freiUpdateBrushCursor() {
+  const v = document.getElementById('frei-brush-size').value;
+  document.getElementById('frei-brush-val').textContent = v;
+}
+
+function freiClearStrokes() {
+  freiStrokes = { fg: [], bg: [] };
+  freiClearDrawLayer();
+}
+
+/* ── Tool / mode / bg setters ────────────────── */
+function setFreiTool(tool) {
+  freiTool = tool;
+  const fg = document.getElementById('frei-tool-fg');
+  const bg = document.getElementById('frei-tool-bg');
+  if (tool === 'fg') {
+    fg.style.borderColor = 'rgba(34,197,94,.7)'; fg.style.background = 'rgba(34,197,94,.18)'; fg.style.color = '#4ade80';
+    bg.style.borderColor = 'var(--border)'; bg.style.background = 'rgba(255,255,255,.04)'; bg.style.color = 'var(--muted)';
+  } else {
+    bg.style.borderColor = 'rgba(239,68,68,.7)'; bg.style.background = 'rgba(239,68,68,.18)'; bg.style.color = '#f87171';
+    fg.style.borderColor = 'var(--border)'; fg.style.background = 'rgba(255,255,255,.04)'; fg.style.color = 'var(--muted)';
+  }
+}
+
+function setFreiMode(mode) {
+  freiMode = mode;
+  const s = document.getElementById('frei-mode-smart');
+  const f = document.getElementById('frei-mode-simple');
+  if (mode === 'smart') {
+    s.style.borderColor = 'rgba(45,212,191,.6)'; s.style.background = 'rgba(45,212,191,.15)'; s.style.color = 'var(--teal)'; s.style.borderWidth='2px';
+    f.style.borderColor = 'var(--border)'; f.style.background = 'none'; f.style.color = 'var(--muted)'; f.style.borderWidth='1px';
+  } else {
+    f.style.borderColor = 'rgba(251,191,36,.6)'; f.style.background = 'rgba(251,191,36,.1)'; f.style.color = 'var(--yellow)'; f.style.borderWidth='2px';
+    s.style.borderColor = 'var(--border)'; s.style.background = 'none'; s.style.color = 'var(--muted)'; s.style.borderWidth='1px';
+  }
 }
 
 function setFreiBg(bg, btn) {
@@ -10348,105 +10408,86 @@ function setFreiBg(bg, btn) {
   btn.style.borderColor = 'rgba(34,197,94,.5)';
   btn.style.background  = 'rgba(34,197,94,.12)';
   btn.style.color       = 'var(--green)';
-  const picker = document.getElementById('frei-color-pick');
-  picker.style.display = (bg === 'custom') ? '' : 'none';
+  document.getElementById('frei-color-pick').style.display = (bg === 'custom') ? '' : 'none';
 }
 
+/* ── Apply (preview first frame) ─────────────── */
 async function applyFreistellen() {
   const btn = document.getElementById('frei-apply-btn');
   if (!btn || btn.disabled) return;
 
-  // Get selected shots
   const selected = (typeof S !== 'undefined' && typeof selFrames !== 'undefined')
-    ? S.shots.filter(s => selFrames.has(s.id))
-    : [];
-
-  if (selected.length === 0) {
-    showToast('⚠️ Keine Frames ausgewählt!');
-    return;
-  }
+    ? S.shots.filter(s => selFrames.has(s.id)) : [];
+  if (selected.length === 0) { showToast('⚠️ Keine Frames ausgewählt!'); return; }
 
   btn.disabled = true;
-  btn.textContent = '⏳ Lädt…';
-
-  const progressEl  = document.getElementById('frei-progress');
-  const progressTxt = document.getElementById('frei-progress-text');
-  const progressBar = document.getElementById('frei-progress-bar');
-  progressEl.style.display = '';
+  btn.textContent = '⏳ Verarbeite…';
+  document.getElementById('frei-progress').style.display = '';
+  document.getElementById('frei-progress-bar').style.width = '10%';
+  document.getElementById('frei-progress-text').textContent = 'Berechne Maske…';
   freiResultCache = [];
 
-  // Process only first frame for preview, then ask user to confirm all
-  const previewShot = selected[0];
-  progressTxt.textContent = `Verarbeite Frame 1 von ${selected.length}…`;
-  progressBar.style.width = '10%';
-
   try {
-    const result = await freistellenSingleFrame(previewShot.data);
+    const previewShot = selected[0];
+    const result = await freistellenMitStrokes(previewShot.data, freiStrokes, freiMode);
     freiResultCache.push({ shotId: previewShot.id, resultData: result });
-    progressBar.style.width = '100%';
+    document.getElementById('frei-progress-bar').style.width = '100%';
 
-    // Show preview
     document.getElementById('frei-before-img').src = previewShot.data;
     document.getElementById('frei-after-img').src  = result;
-    document.getElementById('frei-preview-row').style.display = '';
 
-    if (selected.length === 1) {
-      // Only 1 frame – auto-confirm
-      confirmFreistellen();
+    const multiHint = document.getElementById('frei-multi-hint');
+    if (selected.length > 1) {
+      multiHint.style.display = '';
+      multiHint.textContent = `Markierung wird auf alle ${selected.length} ausgewählten Frames angewendet`;
     } else {
-      btn.textContent = '✂️ Erneut versuchen';
-      btn.disabled = false;
+      multiHint.style.display = 'none';
     }
 
+    document.getElementById('frei-step1').style.display = 'none';
+    document.getElementById('frei-step2').style.display = '';
+
   } catch(err) {
-    progressEl.style.display = 'none';
+    document.getElementById('frei-progress').style.display = 'none';
     btn.disabled = false;
     btn.textContent = '✂️ Jetzt freistellen';
-    showToast('❌ Fehler beim Freistellen: ' + (err.message || err));
+    showToast('❌ Fehler: ' + (err.message || err));
     console.error('Freistellen error:', err);
   }
 }
 
+/* ── Confirm (apply to all selected frames) ─── */
 async function confirmFreistellen() {
   const selected = (typeof S !== 'undefined' && typeof selFrames !== 'undefined')
-    ? S.shots.filter(s => selFrames.has(s.id))
-    : [];
-
+    ? S.shots.filter(s => selFrames.has(s.id)) : [];
   if (selected.length === 0) return;
 
-  const progressEl  = document.getElementById('frei-progress');
+  document.getElementById('frei-step2').style.display = 'none';
+  document.getElementById('frei-step1').style.display = '';
+  document.getElementById('frei-progress').style.display = '';
+  const btn = document.getElementById('frei-apply-btn');
+  if (btn) btn.disabled = true;
+
   const progressTxt = document.getElementById('frei-progress-text');
   const progressBar = document.getElementById('frei-progress-bar');
-  progressEl.style.display = '';
-  document.getElementById('frei-preview-row').style.display = 'none';
-
-  const applyBtn = document.getElementById('frei-apply-btn');
-  if (applyBtn) { applyBtn.disabled = true; }
 
   let done = 0;
   for (const shot of selected) {
     progressTxt.textContent = `Verarbeite Frame ${done+1} von ${selected.length}…`;
-    progressBar.style.width = Math.round((done / selected.length) * 100) + '%';
+    progressBar.style.width  = Math.round((done / selected.length) * 100) + '%';
 
-    // Check if already in cache
     const cached = freiResultCache.find(r => r.shotId === shot.id);
-    let resultData;
-    if (cached) {
-      resultData = cached.resultData;
-    } else {
-      resultData = await freistellenSingleFrame(shot.data);
-    }
+    const resultData = cached
+      ? cached.resultData
+      : await freistellenMitStrokes(shot.data, freiStrokes, freiMode);
 
-    // Apply to shot
     const idx = S.shots.findIndex(s => s.id === shot.id);
-    if (idx !== -1) {
-      S.shots[idx].data = resultData;
-    }
+    if (idx !== -1) S.shots[idx].data = resultData;
     done++;
   }
 
-  progressBar.style.width = '100%';
-  progressTxt.textContent = '✅ Fertig!';
+  progressBar.style.width  = '100%';
+  progressTxt.textContent  = '✅ Fertig!';
 
   idbSaveShots(S.shots);
   renderFrames();
@@ -10455,94 +10496,187 @@ async function confirmFreistellen() {
   setTimeout(() => {
     closeFreistellenModal();
     showToast(`✂️ ${done} Frame${done !== 1 ? 's' : ''} freigestellt!`);
-  }, 600);
+  }, 500);
 }
 
-// 100% lokal, kostenlos – kein API-Aufruf
-async function freistellenSingleFrame(imageDataUrl) {
-  return freistellenLokal(imageDataUrl);
-}
-
-async function freistellenLokal(imageDataUrl) {
-  // Extract base64 from data URL (unused, kept for structure)
-  const base64 = imageDataUrl.split(',')[1];
-  // (local processing only)
-  return new Promise((resolve) => {
+/* ══════════════════════════════════════════════
+   KERN-ALGORITHMUS: Stroke-geführtes Freistellen
+   ══════════════════════════════════════════════ */
+async function freistellenMitStrokes(imageDataUrl, strokes, mode) {
+  return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => {
-      const cv = document.createElement('canvas');
-      cv.width  = img.width;
-      cv.height = img.height;
-      const ctx = cv.getContext('2d');
-      ctx.drawImage(img, 0, 0);
+    img.onerror = reject;
+    img.onload  = () => {
+      try {
+        const W = img.width, H = img.height;
+        const cv  = document.createElement('canvas');
+        cv.width  = W; cv.height = H;
+        const ctx = cv.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const imgData = ctx.getImageData(0, 0, W, H);
+        const px      = imgData.data;
 
-      const imageData = ctx.getImageData(0, 0, cv.width, cv.height);
-      const data = imageData.data;
-      const W = cv.width, H = cv.height;
+        /* ── 1. Erstelle Vordergrund/Hintergrund-Seed-Pixel ── */
+        const fgSeeds = new Uint8Array(W * H); // 1 = definitiv Vordergrund
+        const bgSeeds = new Uint8Array(W * H); // 1 = definitiv Hintergrund
 
-      // Sample background color from corners (most common approach)
-      function getPixel(x, y) {
-        const i = (y * W + x) * 4;
-        return [data[i], data[i+1], data[i+2], data[i+3]];
-      }
-      function colorDist(a, b) {
-        return Math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2);
-      }
-
-      // Average corner colors as background reference
-      const corners = [
-        getPixel(0,0), getPixel(W-1,0),
-        getPixel(0,H-1), getPixel(W-1,H-1),
-        getPixel(Math.floor(W/2),0), getPixel(0,Math.floor(H/2)),
-        getPixel(W-1,Math.floor(H/2)), getPixel(Math.floor(W/2),H-1)
-      ];
-      const bgColor = [
-        corners.reduce((s,c)=>s+c[0],0)/corners.length,
-        corners.reduce((s,c)=>s+c[1],0)/corners.length,
-        corners.reduce((s,c)=>s+c[2],0)/corners.length
-      ];
-
-      const threshold = 60;
-
-      // Flood fill from edges to mark background
-      const visited = new Uint8Array(W * H);
-      const queue = [];
-
-      // Seed from all edges
-      for (let x = 0; x < W; x++) { queue.push([x,0]); queue.push([x,H-1]); }
-      for (let y = 0; y < H; y++) { queue.push([0,y]); queue.push([W-1,y]); }
-
-      while (queue.length > 0) {
-        const [x,y] = queue.pop();
-        if (x < 0 || x >= W || y < 0 || y >= H) continue;
-        const idx = y * W + x;
-        if (visited[idx]) continue;
-        const px = getPixel(x,y);
-        if (colorDist(px, bgColor) > threshold) continue;
-        visited[idx] = 1;
-        queue.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
-      }
-
-      // Apply result
-      const bgRgb = freiBackground === 'white' ? [255,255,255] :
-                    freiBackground === 'black' ? [0,0,0]       :
-                    freiBackground === 'custom' ? hexToRgb(document.getElementById('frei-custom-color')?.value||'#0055ff') : null;
-
-      for (let i = 0; i < W * H; i++) {
-        if (visited[i]) {
-          if (bgRgb) {
-            data[i*4]   = bgRgb[0];
-            data[i*4+1] = bgRgb[1];
-            data[i*4+2] = bgRgb[2];
-            data[i*4+3] = 255;
-          } else {
-            data[i*4+3] = 0; // transparent
+        function paintSeedCircle(arr, cx, cy, r) {
+          for (let dy = -r; dy <= r; dy++) {
+            for (let dx = -r; dx <= r; dx++) {
+              if (dx*dx + dy*dy > r*r) continue;
+              const nx = cx + dx, ny = cy + dy;
+              if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
+              arr[ny * W + nx] = 1;
+            }
           }
         }
-      }
 
-      ctx.putImageData(imageData, 0, 0);
-      resolve(cv.toDataURL('image/png'));
+        // Hat der User Strokes gemalt?
+        const hasFgStrokes = strokes.fg && strokes.fg.length > 0;
+        const hasBgStrokes = strokes.bg && strokes.bg.length > 0;
+
+        if (hasFgStrokes) {
+          strokes.fg.forEach(s => paintSeedCircle(fgSeeds, s.x, s.y, s.r));
+        }
+        if (hasBgStrokes) {
+          strokes.bg.forEach(s => paintSeedCircle(bgSeeds, s.x, s.y, s.r));
+        }
+
+        /* ── 2. Wenn keine Strokes: Fallback zu Ecken-BG ── */
+        if (!hasFgStrokes && !hasBgStrokes) {
+          // Legacy: seed BG von allen Kanten
+          for (let x = 0; x < W; x++) { bgSeeds[x] = 1; bgSeeds[(H-1)*W+x] = 1; }
+          for (let y = 0; y < H; y++) { bgSeeds[y*W] = 1; bgSeeds[y*W+W-1] = 1; }
+        }
+
+        /* ── 3. Farb-Sampling der Seeds ── */
+        function sampleColor(seeds) {
+          const samples = [];
+          for (let i = 0; i < W*H && samples.length < 500; i++) {
+            if (!seeds[i]) continue;
+            samples.push([px[i*4], px[i*4+1], px[i*4+2]]);
+          }
+          if (samples.length === 0) return null;
+          return samples;
+        }
+
+        const fgSamples = hasFgStrokes ? sampleColor(fgSeeds) : null;
+        const bgSamples = sampleColor(bgSeeds);
+
+        /* ── 4. Pixel-Klassifikation ── */
+        function colorDist(r1,g1,b1, r2,g2,b2) {
+          return Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2);
+        }
+        function minDistToSamples(r,g,b, samples) {
+          let min = Infinity;
+          for (let s of samples) {
+            const d = colorDist(r,g,b, s[0],s[1],s[2]);
+            if (d < min) min = d;
+          }
+          return min;
+        }
+        function avgDistToSamples(r,g,b, samples) {
+          // Use nearest 5 average for robustness
+          let dists = samples.map(s => colorDist(r,g,b,s[0],s[1],s[2]));
+          dists.sort((a,b) => a-b);
+          const k = Math.min(5, dists.length);
+          return dists.slice(0,k).reduce((a,v)=>a+v,0)/k;
+        }
+
+        // Build mask: 0 = BG (remove), 1 = FG (keep), 2 = uncertain
+        const mask = new Uint8Array(W * H);
+
+        // First pass: set definite seeds
+        for (let i = 0; i < W*H; i++) {
+          if (fgSeeds[i])      mask[i] = 1;
+          else if (bgSeeds[i]) mask[i] = 0;
+          else                 mask[i] = 2;
+        }
+
+        // Color-based classification of uncertain pixels
+        if (bgSamples && bgSamples.length > 0) {
+          const threshold = mode === 'smart' ? 55 : 70;
+          for (let i = 0; i < W*H; i++) {
+            if (mask[i] !== 2) continue;
+            const r = px[i*4], g = px[i*4+1], b = px[i*4+2];
+            if (fgSamples && fgSamples.length > 0) {
+              const dBg = avgDistToSamples(r,g,b, bgSamples);
+              const dFg = avgDistToSamples(r,g,b, fgSamples);
+              mask[i] = dFg <= dBg ? 1 : 0;
+            } else {
+              // No FG samples: keep pixels far from BG
+              const dBg = avgDistToSamples(r,g,b, bgSamples);
+              mask[i] = dBg > threshold ? 1 : 0;
+            }
+          }
+        } else {
+          // No BG samples at all: keep everything with FG seeds as guide
+          for (let i = 0; i < W*H; i++) {
+            if (mask[i] === 2) mask[i] = 1;
+          }
+        }
+
+        /* ── 5. Smart-Modus: Flood-Fill-Verfeinerung ── */
+        if (mode === 'smart') {
+          // Remove isolated BG islands (morphological closing approximation)
+          // Pass: for each BG pixel, check if 4-neighbors are mostly FG → flip to FG
+          const maskCopy = new Uint8Array(mask);
+          for (let y = 1; y < H-1; y++) {
+            for (let x = 1; x < W-1; x++) {
+              const i = y*W+x;
+              if (maskCopy[i] !== 0) continue;
+              const neighbors = [maskCopy[(y-1)*W+x], maskCopy[(y+1)*W+x],
+                                 maskCopy[y*W+x-1],   maskCopy[y*W+x+1]];
+              const fgCount = neighbors.filter(v=>v===1).length;
+              if (fgCount >= 3) mask[i] = 1; // surrounded by FG → flip
+            }
+          }
+
+          // Edge softening: pixels at FG/BG boundary get semi-transparency
+          for (let y = 1; y < H-1; y++) {
+            for (let x = 1; x < W-1; x++) {
+              const i = y*W+x;
+              if (mask[i] !== 1) continue;
+              const hasNeighborBg = [mask[(y-1)*W+x], mask[(y+1)*W+x],
+                                     mask[y*W+x-1],   mask[y*W+x+1]].some(v=>v===0);
+              if (hasNeighborBg) mask[i] = 3; // edge pixel → semi-transparent
+            }
+          }
+        }
+
+        /* ── 6. Ergebnis-Pixel schreiben ── */
+        const bgRgb = freiBackground === 'white'  ? [255,255,255] :
+                      freiBackground === 'black'  ? [0,0,0]       :
+                      freiBackground === 'custom' ? hexToRgb(document.getElementById('frei-custom-color')?.value||'#0055ff') : null;
+
+        const outData = ctx.createImageData(W, H);
+        const out = outData.data;
+
+        for (let i = 0; i < W*H; i++) {
+          const sr = px[i*4], sg = px[i*4+1], sb = px[i*4+2];
+          let alpha;
+          if      (mask[i] === 1) alpha = 255;
+          else if (mask[i] === 3) alpha = 180; // soft edge
+          else                    alpha = 0;   // removed
+
+          if (alpha === 0 && bgRgb) {
+            out[i*4]=bgRgb[0]; out[i*4+1]=bgRgb[1]; out[i*4+2]=bgRgb[2]; out[i*4+3]=255;
+          } else if (alpha > 0 && alpha < 255 && bgRgb) {
+            // Blend edge with bg
+            const t = alpha / 255;
+            out[i*4]   = Math.round(sr*t + bgRgb[0]*(1-t));
+            out[i*4+1] = Math.round(sg*t + bgRgb[1]*(1-t));
+            out[i*4+2] = Math.round(sb*t + bgRgb[2]*(1-t));
+            out[i*4+3] = 255;
+          } else {
+            out[i*4]=sr; out[i*4+1]=sg; out[i*4+2]=sb; out[i*4+3]=alpha;
+          }
+        }
+
+        ctx.putImageData(outData, 0, 0);
+        resolve(cv.toDataURL('image/png'));
+
+      } catch(e) { reject(e); }
     };
     img.src = imageDataUrl;
   });
