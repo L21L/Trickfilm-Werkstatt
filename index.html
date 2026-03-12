@@ -1577,100 +1577,311 @@ textarea.field-input{min-height:80px;line-height:1.5}
 #help-body p{margin-bottom:8px}
 
 /* ═══════════════════════════════════════════════
-   SMARTPHONE OPTIMIERUNGEN (max-width: 480px)
+   SMARTPHONE OPTIMIERUNGEN
    ═══════════════════════════════════════════════ */
+
+/* ── Touch-Geräte allgemein ── */
+@media (hover:none) and (pointer:coarse){
+  .nav-tab{min-height:48px}
+  .btn-primary{min-height:48px}
+  .etb{min-height:40px}
+  .cch{min-height:38px}
+  .strip-del,.strip-retouch{opacity:1;width:22px;height:22px;font-size:12px}
+  .frm-mv-l,.frm-mv-r{width:36px;height:36px}
+  /* Größere Tap-Targets für kleine Buttons */
+  .panel-close-btn{width:38px;height:38px}
+  .timeline-minimize-btn{width:36px;height:36px}
+  .ctx-btn{padding:10px 12px;min-width:56px}
+  .tl-thumb{height:56px;width:76px}
+}
+
+/* ── Tablets / kleine Bildschirme ── */
+@media (max-width:768px){
+  :root{
+    --panel-w: min(85vw, 320px);
+    --timeline-h: 88px;
+  }
+  /* Side Panels als Overlay auf Mobile */
+  .side-panel{
+    position: fixed;
+    top: var(--topbar-h);
+    bottom: 0;
+    width: 0 !important;
+    z-index: 200;
+    transition: width .3s cubic-bezier(.4,0,.2,1);
+  }
+  #left-panel{ left: 0; }
+  #right-panel{ right: 0; }
+  .side-panel.open{ width: var(--panel-w) !important; }
+  .side-panel-inner{
+    height: 100%;
+    border-radius: 0 var(--r) var(--r) 0;
+  }
+  #right-panel .side-panel-inner{
+    border-radius: var(--r) 0 0 var(--r);
+  }
+  /* Dimm-Overlay hinter Panel */
+  .side-panel.open::after{
+    content: '';
+    position: fixed;
+    inset: 0;
+    left: var(--panel-w);
+    background: rgba(0,0,0,.45);
+    z-index: -1;
+  }
+  #right-panel.open::after{
+    left: 0;
+    right: var(--panel-w);
+  }
+  /* Mode-Bar kompakter */
+  #mode-bar{ padding: 0 6px; gap: 2px; height: 44px; }
+  .mode-btn{ padding: 6px 10px; font-size: 12px; gap: 5px; }
+  .mode-btn .mode-icon{ font-size: 16px; }
+  .panel-toggle-btn{ padding: 6px 10px; font-size: 11px; gap: 4px; }
+}
+
+/* ── Smartphones (max 480px) ── */
 @media (max-width:480px){
   :root{
-    --topbar-h:48px;
-    --nav-h:60px;
-    --r:10px;
-    --r-sm:6px;
+    --topbar-h: 48px;
+    --nav-h: 60px;
+    --timeline-h: 80px;
+    --r: 10px;
+    --r-sm: 6px;
+    --panel-w: 88vw;
   }
-  .topbar{padding:0 8px;gap:6px}
-  .logo-inline{padding:4px 8px;gap:7px}
-  .inline-icon{font-size:18px}
-  .inline-trickfilm{font-size:14px}
-  .inline-meine,.inline-werkstatt{font-size:7px;letter-spacing:2px}
-  .topbar-title{font-size:13px}
-  .bottom-nav{height:var(--nav-h)}
-  .nav-icon{font-size:20px}
-  .nav-label{font-size:9px}
-  .nav-tab{gap:2px;padding:4px 2px}
-  #cam-box{max-height:52vw}
-  .cam-controls{padding:6px 8px;gap:6px}
-  .cam-row1{gap:4px}
-  .cch{font-size:11px;padding:5px 9px}
-  .cam-shoot-row{gap:10px;padding:2px 8px}
-  #shoot-btn{width:62px;height:62px;font-size:24px}
-  .cam-action-btn{font-size:11px;padding:6px 10px}
-  #filmstrip-wrap{min-height:70px;max-height:110px}
-  #shot-cnt{font-size:10px;padding:3px 8px}
-  #scene-progress-bar{font-size:10px}
-  .spb-track{width:60px}
-  .plan-subtabs{padding:8px 8px 0}
-  .plan-subtab{font-size:11px;padding:6px 10px}
-  .plan-section{padding:12px}
-  .sec-title{font-size:17px;margin-bottom:12px}
-  .story-grid{gap:10px}
-  .story-field{padding:10px}
-  .field-input.lg{font-size:18px;padding:10px 12px}
-  .fig-grid{grid-template-columns:1fr 1fr}
-  .fig-emoji{font-size:32px}
-  .fig-name{font-size:13px}
-  .scene-grid{grid-template-columns:1fr 1fr;gap:8px}
-  .scene-card{padding:8px}
-  .bg-grid{grid-template-columns:repeat(2,1fr)}
-  #prev-cv{max-height:45vw}
-  .prev-controls{padding:5px 8px}
-  .prev-row{gap:5px}
-  .prev-label{font-size:10px;width:50px}
-  .prev-val{font-size:11px;min-width:28px}
-  .edit-toolbar{padding:4px 6px;gap:4px}
-  .etb{font-size:10px;padding:5px 8px}
-  #frm-grid{grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:4px}
-  .frm-num{font-size:8px}
-  .intro-logo-icon{font-size:60px}
-  .intro-logo-trickfilm{font-size:36px}
-  .intro-logo-meine{font-size:10px;letter-spacing:4px}
-  .intro-logo-werkstatt{font-size:10px;letter-spacing:4px}
-  .intro-tagline{font-size:16px}
-  .ki-btn{font-size:13px;padding:10px 12px}
-  .ki-btn-icon{font-size:18px}
-  .draw-tools-row{gap:4px}
-  .draw-tool-btn{width:34px;height:34px;font-size:16px}
-  .draw-colors{gap:4px}
-  .draw-color{width:22px;height:22px}
-  .fx-grid{grid-template-columns:1fr 1fr;gap:8px}
-  .fx-card{padding:10px}
-  .fx-card-icon{font-size:20px}
-  .fx-card-name{font-size:12px}
-  .fx-sheet{padding:12px}
-  .ed-card{padding:14px;border-radius:12px}
-  .ed-card-title{font-size:16px}
-  .toast{font-size:12px;padding:7px 14px;bottom:76px}
-  .ob-card{padding:24px 18px 20px}
-  .ob-title{font-size:22px}
-  .ob-icon{font-size:52px}
-  #ai-bubble{width:46px;height:46px;font-size:20px;bottom:70px}
-  #ai-panel{right:8px;bottom:120px;width:calc(100vw - 16px);height:min(460px,calc(100vh - 160px))}
+
+  /* ── Topbar ── */
+  .topbar{ padding: 0 8px; gap: 6px; }
+  .logo-inline{ padding: 4px 8px; gap: 6px; }
+  .inline-icon{ font-size: 17px; }
+  .inline-trickfilm{ font-size: 13px; }
+  .inline-meine,.inline-werkstatt{ font-size: 7px; letter-spacing: 2px; }
+  .topbar-title{ font-size: 13px; }
+
+  /* ── Mode-Bar ── */
+  #mode-bar{ padding: 0 4px; gap: 1px; height: 42px; overflow-x: auto; scrollbar-width: none; }
+  #mode-bar::-webkit-scrollbar{ display: none; }
+  .mode-btn{ padding: 5px 9px; font-size: 11px; gap: 4px; border-radius: 8px; }
+  .mode-btn .mode-icon{ font-size: 15px; }
+  /* "Planen" und "Export" Text bei kleinem Screen verstecken, nur Icon */
+  .panel-toggle-btn{ padding: 5px 8px; font-size: 11px; gap: 4px; border-radius: 8px; }
+  #mode-bar-panel-btns{ gap: 4px; }
+
+  /* ── Cockpit / Center Stage ── */
+  #cockpit{ padding-top: var(--topbar-h); }
+
+  /* ── Side Panels als Vollbild-Overlay ── */
+  .side-panel{
+    position: fixed;
+    top: 0; bottom: 0; left: 0; right: 0;
+    width: 0 !important;
+    z-index: 300;
+  }
+  .side-panel.open{ width: 100% !important; }
+  .side-panel-inner{
+    width: min(88vw, 360px);
+    height: 100%;
+    border-radius: 0 var(--r) var(--r) 0;
+  }
+  #right-panel .side-panel-inner{
+    margin-left: auto;
+    border-radius: var(--r) 0 0 var(--r);
+  }
+  .side-panel.open::after{
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: -1;
+  }
+  .panel-header{ padding: 10px 12px; }
+  .panel-title{ font-size: 15px; }
+  .panel-subtab{ font-size: 10px; padding: 5px 9px; }
+
+  /* ── Timeline ── */
+  #bottom-timeline{ height: var(--timeline-h); }
+  .timeline-header{ height: 32px; padding: 0 8px; gap: 6px; }
+  .timeline-title{ font-size: 11px; }
+  .timeline-count{ font-size: 10px; padding: 1px 6px; }
+  .timeline-strip-wrap{ padding: 0 4px; }
+  .tl-thumb{ height: 46px; width: 62px; }
+  .tl-num{ font-size: 8px; }
+  .tl-empty{ font-size: 11px; }
+  .timeline-minimize-btn{ width: 30px; height: 30px; font-size: 12px; }
+
+  /* ── Frame-Kontext-Overlay ── */
+  #frame-ctx{
+    left: 50% !important;
+    transform: translateX(-50%) translateY(4px) !important;
+    bottom: calc(var(--timeline-h) + 8px);
+    top: auto !important;
+    flex-wrap: wrap;
+    max-width: calc(100vw - 16px);
+    justify-content: center;
+  }
+  #frame-ctx.show{ transform: translateX(-50%) translateY(0) !important; }
+  .ctx-btn{ padding: 8px 10px; min-width: 50px; font-size: 9px; }
+  .ctx-btn .ctx-icon{ font-size: 18px; }
+
+  /* ── Kamera ── */
+  #cam-overlay-bottom{ padding: 6px 8px 10px; gap: 5px; }
+  #cam-shoot-row-main{ padding: 4px 8px; }
+  .cam-shoot-left{ margin-right: 10px; gap: 5px; }
+  .cam-shoot-right{ margin-left: 10px; gap: 5px; }
+  .cam-side-btn{ padding: 6px 8px; min-width: 48px; font-size: 11px; }
+  #shoot-btn{ width: 64px; height: 64px; font-size: 26px; }
+  .cam-row1{ gap: 4px; }
+  .cch{ font-size: 11px; padding: 5px 9px; }
+  .cam-action-btn{ font-size: 11px; padding: 6px 10px; }
+  #shot-cnt{ font-size: 10px; padding: 3px 8px; top: 8px; left: 8px; }
+  #scene-progress-bar{ font-size: 10px; top: 8px; right: 8px; }
+  .spb-track{ width: 60px; }
+  #cam-mini-strip{ padding: 4px 8px 3px; }
+  .cam-mini-thumb{ width: 38px; height: 29px; }
+
+  /* ── Adjustment Panel ── */
+  #cam-adj-inner{ padding: 6px 10px 8px; gap: 4px; }
+  .adj-row{ gap: 6px; }
+  .adj-label{ font-size: 10px; width: 28px; }
+  .adj-val{ font-size: 10px; min-width: 26px; }
+  .adj-grid{ gap: 2px 10px; }
+
+  /* ── Editor ── */
+  #prev-cv{ max-height: 42vw; }
+  .prev-controls{ padding: 5px 8px; }
+  .prev-row{ gap: 5px; }
+  .prev-label{ font-size: 10px; width: 50px; }
+  .prev-val{ font-size: 11px; min-width: 28px; }
+  .edit-toolbar{ padding: 4px 6px; gap: 4px; }
+  .etb{ font-size: 10px; padding: 5px 8px; }
+  #frm-grid{ grid-template-columns: repeat(auto-fill,minmax(72px,1fr)); gap: 4px; }
+  .frm-num{ font-size: 8px; }
+  #group-bar{ padding: 4px 6px; min-height: 36px; }
+  .grp-pill{ font-size: 11px; padding: 4px 8px; }
+
+  /* ── Plan-Seiten ── */
+  .plan-subtabs{ padding: 6px 8px 0; }
+  .plan-subtab{ font-size: 10px; padding: 5px 9px; }
+  .plan-section{ padding: 12px; }
+  .sec-title{ font-size: 16px; margin-bottom: 10px; }
+  .story-grid{ gap: 10px; }
+  .story-field{ padding: 10px; }
+  .field-input.lg{ font-size: 18px; padding: 10px 12px; }
+  .fig-grid{ grid-template-columns: 1fr 1fr; gap: 8px; }
+  .fig-emoji{ font-size: 32px; }
+  .fig-name{ font-size: 13px; }
+  .fig-card{ padding: 10px; gap: 6px; }
+  .scene-grid{ grid-template-columns: 1fr 1fr; gap: 8px; }
+  .scene-card{ padding: 8px; }
+  .bg-grid{ grid-template-columns: repeat(2,1fr); gap: 8px; }
+  .ki-btn{ font-size: 13px; padding: 10px 12px; }
+  .ki-btn-icon{ font-size: 18px; }
+  .week-table th,.week-table td{ padding: 5px 6px; font-size: 12px; }
+  .week-task-input{ font-size: 13px; }
+
+  /* ── Draw Modal ── */
+  .draw-header{ height: 46px; padding: 0 10px; gap: 6px; }
+  .draw-toolbar{ padding: 8px 10px; }
+  .draw-tools-row{ gap: 4px; margin-bottom: 6px; }
+  .draw-tool-btn{ width: 36px; height: 36px; font-size: 17px; }
+  .draw-colors{ gap: 4px; margin-bottom: 6px; }
+  .draw-color{ width: 24px; height: 24px; }
+  .draw-size-row{ margin-bottom: 6px; }
+  .draw-bg-row{ margin-bottom: 6px; }
+
+  /* ── FX Modal ── */
+  .fx-sheet{ padding: 12px; max-height: 75vh; }
+  .fx-grid{ grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .fx-card{ padding: 10px; }
+  .fx-card-icon{ font-size: 20px; }
+  .fx-card-name{ font-size: 12px; }
+  .fx-header{ font-size: 16px; }
+
+  /* ── Modals (ed-card) ── */
+  .ed-modal{ padding: 8px; align-items: flex-end; }
+  .ed-card{
+    padding: 14px;
+    border-radius: 16px 16px 12px 12px;
+    max-width: 100%;
+    max-height: 88vh;
+  }
+  .ed-card-title{ font-size: 16px; margin-bottom: 10px; }
+
+  /* ── Retusche Modal ── */
+  .retouch-header{ height: 46px; padding: 0 10px; }
+  .retouch-toolbar{ padding: 8px 10px; }
+  .retouch-tools-row{ gap: 4px; margin-bottom: 6px; }
+  .retouch-tool-btn{ height: 34px; font-size: 12px; padding: 0 10px; }
+  .retouch-size-row{ margin-bottom: 6px; }
+
+  /* ── Toast ── */
+  .toast{ font-size: 12px; padding: 7px 14px; bottom: calc(var(--timeline-h) + 12px); }
+
+  /* ── Onboarding ── */
+  .ob-card{ padding: 24px 18px 20px; }
+  .ob-title{ font-size: 22px; }
+  .ob-icon{ font-size: 52px; }
+
+  /* ── Intro ── */
+  .intro-logo-icon{ font-size: 60px; }
+  .intro-logo-trickfilm{ font-size: 36px; }
+  .intro-logo-meine{ font-size: 10px; letter-spacing: 4px; }
+  .intro-logo-werkstatt{ font-size: 10px; letter-spacing: 4px; }
+  .intro-tagline{ font-size: 16px; }
+  .intro-skip{ font-size: 12px; padding: 6px 12px; }
+
+  /* ── AI Assistent ── */
+  #ai-bubble{ width: 46px; height: 46px; font-size: 20px; bottom: calc(var(--timeline-h) + 12px); }
+  #help-float-btn{ width: 46px; height: 46px; font-size: 20px; bottom: calc(var(--timeline-h) + 12px); }
+  #ai-panel{
+    right: 8px;
+    bottom: calc(var(--timeline-h) + 64px);
+    width: calc(100vw - 16px);
+    height: min(460px, calc(100vh - 160px));
+  }
+
+  /* ── Badge & Help ── */
+  #badge-grid{ grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .badge-item{ padding: 10px 6px; }
+  .badge-icon{ font-size: 1.7rem; }
+  .badge-name{ font-size: 0.6rem; }
+  .badge-desc{ font-size: 0.5rem; }
+  .help-box{ width: min(calc(100vw - 16px), 420px); }
+  #help-body{ padding: 12px 16px; font-size: 0.82rem; }
+
+  /* ── Legal ── */
+  .legal-link{ bottom: calc(var(--timeline-h) + 2px); font-size: 9px; }
+  .legal-sheet{ padding: 16px 16px 28px; }
+
+  /* ── Placeholder ── */
+  .ph-title{ font-size: 28px; }
+  .ph-sub{ font-size: 14px; }
+  .ph-icon{ font-size: 56px; }
 }
+
+/* ── Sehr kleine Geräte (max 360px) ── */
 @media (max-width:360px){
-  .inline-trickfilm{font-size:12px}
-  .topbar-title{display:none}
-  .nav-label{display:none}
-  .nav-icon{font-size:22px}
-  .bottom-nav{height:52px}
-  :root{--nav-h:52px}
-  #shoot-btn{width:56px;height:56px;font-size:22px}
-  .cch{font-size:10px;padding:4px 7px}
-}
-@media (hover:none) and (pointer:coarse){
-  .nav-tab{min-height:44px}
-  .btn-primary{min-height:44px}
-  .etb{min-height:36px}
-  .cch{min-height:34px}
-  .strip-del,.strip-retouch{opacity:1;width:20px;height:20px;font-size:11px}
-  .frm-mv-l,.frm-mv-r{width:34px;height:34px}
+  :root{
+    --nav-h: 52px;
+    --timeline-h: 72px;
+    --topbar-h: 46px;
+  }
+  .inline-trickfilm{ font-size: 12px; }
+  .topbar-title{ display: none; }
+  .nav-label{ display: none; }
+  .nav-icon{ font-size: 22px; }
+  .bottom-nav{ height: 52px; }
+  #shoot-btn{ width: 58px; height: 58px; font-size: 24px; }
+  .cch{ font-size: 10px; padding: 4px 7px; }
+  .mode-btn span:last-child{ display: none; } /* nur Icons in Mode-Bar */
+  .mode-btn{ padding: 5px 7px; }
+  .panel-toggle-btn span:last-child{ display: none; }
+  .tl-thumb{ height: 40px; width: 54px; }
+  #frm-grid{ grid-template-columns: repeat(auto-fill,minmax(64px,1fr)); }
+  .ed-card{ padding: 12px; }
+  .fx-card{ padding: 8px; }
+  .ctx-btn{ min-width: 44px; padding: 7px 7px; font-size: 8px; }
 }
 </style>
 </head>
