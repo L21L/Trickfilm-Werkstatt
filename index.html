@@ -536,10 +536,11 @@ textarea.field-input{min-height:80px;line-height:1.5}
 /* ── Backgrounds ── */
 .bg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .bg-card{cursor:pointer;border-radius:var(--r-sm);overflow:hidden;
-  border:2px solid transparent;transition:all .2s;position:relative}
+  border:2px solid transparent;transition:all .2s;position:relative;
+  aspect-ratio:4/3}
 .bg-card.selected{border-color:var(--yellow);box-shadow:0 0 0 2px rgba(251,191,36,.3)}
 .bg-card:hover{border-color:rgba(251,191,36,.5)}
-.bg-card svg{width:100%;display:block}
+.bg-card svg{width:100%;height:100%;display:block;position:absolute;inset:0}
 .bg-card-name{font-family:'Fredoka One',cursive;font-size:10px;color:var(--muted);
   text-align:center;padding:4px 2px}
 .bg-upload-area{display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -970,7 +971,9 @@ textarea.field-input{min-height:80px;line-height:1.5}
 .retouch-actions{display:flex;gap:8px}
 .retouch-bg-section{margin-bottom:8px}
 .retouch-bg-label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block}
-.retouch-bg-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.retouch-bg-row{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;
+  overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.retouch-bg-row::-webkit-scrollbar{display:none}
 .retouch-bg-option{width:36px;height:36px;border-radius:6px;border:2px solid transparent;cursor:pointer;overflow:hidden;flex-shrink:0;background:#222;transition:border-color .15s}
 .retouch-bg-option:hover{border-color:rgba(255,255,255,.4)}
 .retouch-bg-option.active{border-color:var(--red)}
@@ -1674,11 +1677,13 @@ textarea.field-input{min-height:80px;line-height:1.5}
   /* ── Side Panels als Vollbild-Overlay ── */
   .side-panel{
     position: fixed;
-    top: 0; bottom: 0; left: 0; right: 0;
+    top: calc(var(--topbar-h) + 42px); bottom: 0; left: 0; right: 0;
     width: 0 !important;
-    z-index: 300;
+    z-index: 250;
   }
   .side-panel.open{ width: 100% !important; }
+  /* Mode-bar muss über den Panels liegen damit Planen/Export klickbar bleiben */
+  #mode-bar{ z-index: 300; position: relative; }
   .side-panel-inner{
     width: min(88vw, 360px);
     height: 100%;
@@ -3874,7 +3879,9 @@ function initBackgrounds() {
   BG_LIB.forEach((bg, i) => {
     const card = document.createElement('div');
     card.className = 'bg-card' + (S.project.background === i ? ' selected' : '');
-    card.innerHTML = bg.svg + `<div class="bg-card-name">${bg.name}</div>`;
+    // Inject svg with preserveAspectRatio=slice so it fills portrait cards too
+    const svgWithSlice = bg.svg.replace('<svg ', '<svg preserveAspectRatio="xMidYMid slice" ');
+    card.innerHTML = svgWithSlice + `<div class="bg-card-name">${bg.name}</div>`;
     card.addEventListener('click', () => {
       S.project.background = i;
       scheduleSave();
@@ -5731,7 +5738,7 @@ function initGsBgLib() {
     wrap.style.cssText = 'flex-shrink:0;cursor:pointer;border-radius:4px;overflow:hidden;' +
       'border:2px solid transparent;transition:border-color .15s;width:52px;';
     wrap.title = bg.name;
-    wrap.innerHTML = bg.svg;
+    wrap.innerHTML = bg.svg.replace('<svg ', '<svg preserveAspectRatio="xMidYMid slice" ');
     wrap.querySelector('svg').style.cssText = 'width:52px;height:39px;display:block;pointer-events:none';
     wrap.addEventListener('click', () => {
       setGsBgFromLib(i);
@@ -9537,7 +9544,8 @@ function initRetouchModal() {
     div.className = 'retouch-bg-option';
     div.dataset.rbg = String(i);
     div.title = bg.name;
-    div.innerHTML = bg.svg;
+    const svgWithSlice = bg.svg.replace('<svg ', '<svg preserveAspectRatio="xMidYMid slice" ');
+    div.innerHTML = svgWithSlice;
     bgRow.insertBefore(div, document.getElementById('retouch-bg-upload-btn'));
   });
   // Insert custom backgrounds
