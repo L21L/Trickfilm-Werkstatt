@@ -400,21 +400,30 @@ textarea{resize:vertical}
 textarea.field-input{min-height:80px;line-height:1.5}
 
 /* ═══════════════════════════
-   PLAN PAGE — SUB TABS
+   PLAN PAGE — ACCORDION
    ═══════════════════════════ */
-.plan-subtabs{display:flex;overflow-x:auto;gap:3px;padding:8px 10px;
-  background:rgba(0,0,0,.2);position:sticky;top:0;z-index:10;
-  border-bottom:1px solid var(--glass-border);scrollbar-width:none}
-.plan-subtabs::-webkit-scrollbar{display:none}
-.plan-subtab{flex-shrink:0;font-family:'Fredoka One',cursive;font-size:11px;
-  padding:6px 11px;border-radius:8px;color:var(--muted);
-  transition:all .2s;white-space:nowrap;border:1px solid transparent}
-.plan-subtab.active{color:var(--yellow);background:rgba(251,191,36,.1);
-  border-color:rgba(251,191,36,.25)}
-.plan-subtab:hover:not(.active){color:var(--text)}
-
-.plan-section{display:none;padding:16px}
-.plan-section.active{display:block}
+.plan-subtabs{display:none!important}
+.plan-section{display:block!important;padding:0}
+#plan-accordion{display:flex;flex-direction:column;padding:10px 10px 80px}
+.acc-item{border-radius:12px;overflow:hidden;margin-bottom:8px;
+  border:1px solid var(--glass-border);background:rgba(13,17,23,.6)}
+.acc-header{width:100%;display:flex;align-items:center;gap:10px;
+  padding:13px 14px;background:none;border:none;cursor:pointer;
+  text-align:left;transition:background .2s}
+.acc-header:hover{background:rgba(255,255,255,.05)}
+.acc-item.open .acc-header{border-bottom:1px solid var(--glass-border)}
+.acc-icon{font-size:20px;flex-shrink:0;line-height:1}
+.acc-label{font-family:'Fredoka One',cursive;font-size:15px;color:var(--muted);flex:1;transition:color .2s}
+.acc-item.open .acc-label{color:var(--yellow)}
+.acc-item[data-acc="figures"].open .acc-label{color:#a855f7}
+.acc-item[data-acc="storyboard"].open .acc-label{color:var(--teal)}
+.acc-item[data-acc="week"].open .acc-label{color:#a855f7}
+.acc-item[data-acc="progress"].open .acc-label{color:var(--teal)}
+.acc-arrow{font-size:11px;color:var(--muted);transition:transform .25s,color .2s;flex-shrink:0}
+.acc-item.open .acc-arrow{transform:rotate(180deg);color:var(--yellow)}
+.acc-body{display:none;padding:14px}
+.acc-item.open .acc-body{display:block;animation:accExpand .22s ease}
+@keyframes accExpand{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── Section headers ── */
 .sec-title{font-family:'Fredoka One',cursive;font-size:20px;color:var(--yellow);
@@ -618,80 +627,98 @@ textarea.field-input{min-height:80px;line-height:1.5}
    INTRO & ONBOARDING
    ═══════════════════════════ */
 .intro{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;
-  justify-content:center;background:#0a0005;overflow:hidden}
+  justify-content:center;background:var(--bg);overflow:hidden}
 .intro.hidden{display:none}
 
-/* ── Kinovorhang ── */
+/* ── Filmstreifen-Vorhänge (links + rechts) ── */
 .curtain-side{
   position:absolute;top:0;bottom:0;width:52%;z-index:2;
   display:flex;will-change:transform;overflow:hidden}
 .curtain-left{left:-2%;transform-origin:left center}
 .curtain-right{right:-2%;transform-origin:right center;flex-direction:row-reverse}
 
-/* Einzelne Vorhang-Falte */
+/* Filmstreifen-Falten im App-Stil */
 .curtain-fold{
   flex:1;height:100%;position:relative;
-  background:linear-gradient(180deg,#6b0f1a 0%,#8b1a2a 15%,#7a1520 50%,#6b1018 80%,#550d16 100%);
-  box-shadow:inset -8px 0 16px rgba(0,0,0,.45),inset 8px 0 10px rgba(180,30,50,.15)}
-/* Alternierende Hell-/Dunkelfalten für 3D-Stoff-Effekt */
+  background:linear-gradient(180deg,#0d1117 0%,#0f1620 30%,#0a1018 60%,#060914 100%);
+  box-shadow:inset -6px 0 14px rgba(0,0,0,.7),inset 6px 0 8px rgba(45,212,191,.06)}
 .curtain-fold:nth-child(odd){
-  background:linear-gradient(180deg,#8b1a2a 0%,#a82035 15%,#961b2f 50%,#8b1825 80%,#701420 100%);
-  box-shadow:inset -6px 0 18px rgba(0,0,0,.35),inset 6px 0 12px rgba(220,60,80,.12)}
+  background:linear-gradient(180deg,#111827 0%,#0d1117 40%,#060914 100%);
+  box-shadow:inset -8px 0 18px rgba(0,0,0,.6),inset 4px 0 10px rgba(251,191,36,.05)}
 .curtain-fold:nth-child(3n){
-  background:linear-gradient(180deg,#550d16 0%,#6b0f1a 15%,#601018 50%,#550d16 80%,#440b13 100%);
-  box-shadow:inset -10px 0 20px rgba(0,0,0,.55),inset 4px 0 8px rgba(140,20,35,.1)}
-/* Glanzlicht auf Stoff */
+  background:linear-gradient(180deg,#060914 0%,#0a0f1a 50%,#040810 100%);
+  box-shadow:inset -10px 0 22px rgba(0,0,0,.8)}
+
+/* Glanzlichter auf den Falten */
 .curtain-fold::before{
-  content:'';position:absolute;top:0;bottom:0;left:20%;width:25%;
-  background:linear-gradient(90deg,transparent,rgba(255,220,200,.06),transparent);
+  content:'';position:absolute;top:0;bottom:0;left:15%;width:30%;
+  background:linear-gradient(90deg,transparent,rgba(45,212,191,.04),transparent);
   pointer-events:none}
-/* Vertikale Faltenlinien */
+/* Perforations — Filmstreifen-Löcher an der Außenkante */
 .curtain-fold::after{
-  content:'';position:absolute;top:0;bottom:0;right:0;width:3px;
-  background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.3),rgba(0,0,0,.6));
+  content:'';position:absolute;top:0;bottom:0;right:0;width:2px;
+  background:linear-gradient(180deg,
+    rgba(251,191,36,.15) 0%,rgba(251,191,36,.05) 10%,
+    rgba(251,191,36,.15) 20%,rgba(251,191,36,.05) 30%,
+    rgba(251,191,36,.15) 40%,rgba(251,191,36,.05) 50%,
+    rgba(251,191,36,.15) 60%,rgba(251,191,36,.05) 70%,
+    rgba(251,191,36,.15) 80%,rgba(251,191,36,.05) 90%,
+    rgba(251,191,36,.15) 100%);
   pointer-events:none}
 
-/* Goldene Borte oben */
+/* Goldene Borte oben — App-Stil */
 .curtain-valance{
-  position:absolute;top:0;left:0;right:0;height:52px;z-index:4;
-  background:linear-gradient(180deg,#7a5a00,#c9920a 30%,#f0b429 50%,#c9920a 70%,#7a5a00);
-  box-shadow:0 4px 18px rgba(0,0,0,.7),inset 0 2px 4px rgba(255,240,150,.4);
+  position:absolute;top:0;left:0;right:0;height:48px;z-index:4;
+  background:linear-gradient(180deg,
+    rgba(251,191,36,.9) 0%,
+    rgba(251,191,36,1)  40%,
+    rgba(245,158,11,.95) 70%,
+    rgba(180,110,0,.8)  100%);
+  box-shadow:0 3px 24px rgba(251,191,36,.35),0 1px 0 rgba(255,255,255,.1);
   display:flex;align-items:center;overflow:hidden}
 .curtain-valance::before{
   content:'';position:absolute;inset:0;
   background:repeating-linear-gradient(90deg,
-    transparent 0,transparent 18px,
-    rgba(0,0,0,.25) 18px,rgba(0,0,0,.25) 22px);
-  opacity:.6}
+    transparent 0,transparent 20px,
+    rgba(0,0,0,.18) 20px,rgba(0,0,0,.18) 22px);opacity:.7}
 .curtain-valance::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:12px;
-  background:linear-gradient(180deg,transparent,rgba(0,0,0,.5));
-  border-bottom:2px solid rgba(80,40,0,.8)}
-/* Wellen-Unterkante der Borte */
+  content:'';position:absolute;bottom:0;left:0;right:0;height:10px;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.4));
+  border-bottom:2px solid rgba(251,191,36,.4)}
+
+/* Wellen-Unterkante */
 .valance-scallop{
   position:absolute;bottom:-10px;left:0;right:0;height:20px;z-index:5;
   background:
-    radial-gradient(ellipse 28px 14px at 14px 0,#c9920a 99%,transparent 100%) left/28px 14px repeat-x,
-    radial-gradient(ellipse 28px 14px at 14px 0,#7a5a00 99%,transparent 100%) 14px 4px/28px 14px repeat-x}
+    radial-gradient(ellipse 28px 14px at 14px 0,rgba(245,158,11,1) 99%,transparent 100%) left/28px 14px repeat-x,
+    radial-gradient(ellipse 28px 14px at 14px 0,rgba(180,110,0,.9) 99%,transparent 100%) 14px 4px/28px 14px repeat-x}
 
-/* Tasseln */
+/* Tasseln — Teal-Akzent */
 .curtain-tassel{
-  position:absolute;z-index:6;top:42px;width:14px;display:flex;flex-direction:column;align-items:center}
-.curtain-tassel-head{width:12px;height:14px;border-radius:50% 50% 0 0;
-  background:linear-gradient(180deg,#f0b429,#8b6200);
-  box-shadow:0 2px 4px rgba(0,0,0,.5)}
-.curtain-tassel-body{width:2px;height:22px;
-  background:linear-gradient(180deg,#c9920a,#6b4800);
-  box-shadow:2px 0 0 1px #f0b42955}
+  position:absolute;z-index:6;top:38px;width:14px;display:flex;flex-direction:column;align-items:center}
+.curtain-tassel-head{width:12px;height:12px;border-radius:50% 50% 0 0;
+  background:linear-gradient(180deg,#2dd4bf,#0d9488);
+  box-shadow:0 2px 6px rgba(45,212,191,.5)}
+.curtain-tassel-body{width:2px;height:20px;
+  background:linear-gradient(180deg,#2dd4bf,#0a6b62);
+  box-shadow:2px 0 0 1px rgba(45,212,191,.2)}
 .curtain-tassel-end{width:8px;height:8px;border-radius:50%;
-  background:radial-gradient(circle at 40% 35%,#ffe066,#8b6200);
-  box-shadow:0 2px 4px rgba(0,0,0,.6)}
+  background:radial-gradient(circle at 40% 35%,#5eead4,#0d9488);
+  box-shadow:0 2px 6px rgba(45,212,191,.5)}
 
-/* Animations-Klassen */
+/* Hintergrund-Sternefunken */
+.intro::before{
+  content:'';position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 50%, rgba(251,191,36,.07) 0%, transparent 70%),
+    radial-gradient(ellipse 30% 60% at 20% 80%, rgba(45,212,191,.05) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 80% 20%, rgba(168,85,247,.05) 0%, transparent 60%);
+  pointer-events:none}
+
+/* Animations */
 .intro.play .curtain-left{animation:curtainOpenLeft 1.8s .1s cubic-bezier(.77,0,.18,1) forwards}
 .intro.play .curtain-right{animation:curtainOpenRight 1.8s .1s cubic-bezier(.77,0,.18,1) forwards}
-/* Falten bauchen sich beim Öffnen leicht aus */
-.intro.play .curtain-fold{animation:foldBulge 1.8s .1s ease-in-out forwards}
+.intro.play .curtain-fold{animation:foldGlow 1.8s .1s ease-in-out forwards}
 
 @keyframes curtainOpenLeft{
   0%{transform:translateX(0) scaleX(1)}
@@ -701,53 +728,109 @@ textarea.field-input{min-height:80px;line-height:1.5}
   0%{transform:translateX(0) scaleX(1)}
   15%{transform:translateX(4%) scaleX(1.03)}
   100%{transform:translateX(100%) scaleX(1)}}
-@keyframes foldBulge{
+@keyframes foldGlow{
   0%{filter:brightness(1)}
-  30%{filter:brightness(1.12)}
+  40%{filter:brightness(1.25)}
   100%{filter:brightness(1)}}
+
+/* Hintergrund-Partikel Animation */
+.intro-particle{
+  position:absolute;border-radius:50%;pointer-events:none;z-index:0;
+  animation:particleDrift linear infinite}
+@keyframes particleDrift{
+  0%{transform:translateY(100vh) scale(0);opacity:0}
+  10%{opacity:1}
+  90%{opacity:.6}
+  100%{transform:translateY(-20vh) scale(1);opacity:0}}
+
 .intro-content{display:flex;flex-direction:column;align-items:center;gap:20px;
   z-index:1;text-align:center;pointer-events:none}
 .intro-logo{display:flex;flex-direction:column;align-items:center;gap:8px;
   opacity:0;transform:scale(.3);will-change:transform,opacity}
 .intro.play .intro-logo{animation:springIn .9s 1.5s cubic-bezier(.34,1.56,.64,1) forwards}
 @keyframes springIn{to{opacity:1;transform:scale(1)}}
-.intro-logo-icon{font-size:80px;filter:drop-shadow(0 0 40px rgba(251,191,36,.6))}
+
+/* Kamera-Icon mit Glow-Ring */
+.intro-logo-icon{font-size:80px;
+  filter:drop-shadow(0 0 30px rgba(251,191,36,.7)) drop-shadow(0 0 60px rgba(251,191,36,.3));
+  animation:iconPulse 2.5s 2.4s ease-in-out infinite}
+@keyframes iconPulse{0%,100%{filter:drop-shadow(0 0 30px rgba(251,191,36,.7)) drop-shadow(0 0 60px rgba(251,191,36,.3))}
+  50%{filter:drop-shadow(0 0 40px rgba(251,191,36,.9)) drop-shadow(0 0 80px rgba(251,191,36,.5))}}
+
 .intro-logo-text{display:flex;flex-direction:column;align-items:center;
   font-family:'Fredoka One',cursive;line-height:1.1}
-.intro-logo-meine{font-size:12px;letter-spacing:6px;color:rgba(255,209,102,.5)}
+.intro-logo-meine{font-size:12px;letter-spacing:6px;color:rgba(255,209,102,.6)}
 .intro-logo-trickfilm{font-size:48px;background:linear-gradient(135deg,#ffe566,#ff9f1c);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .intro-logo-werkstatt{font-size:12px;letter-spacing:6px;
-  background:linear-gradient(90deg,#06d6a0,#4cc9f0);
+  background:linear-gradient(90deg,#2dd4bf,#4cc9f0);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .intro-tagline{font-family:'Fredoka One',cursive;font-size:20px;
-  color:rgba(255,255,255,.7);opacity:0;transform:translateY(14px);letter-spacing:1px;
+  color:rgba(255,255,255,.75);opacity:0;transform:translateY(14px);letter-spacing:1px;
   will-change:transform,opacity}
 .intro.play .intro-tagline{animation:fadeUp .7s 2.4s ease forwards}
 @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+
+/* Kleine Sterne die beim Öffnen aufblitzen */
+.intro-star{position:absolute;z-index:3;font-size:20px;opacity:0;pointer-events:none}
+.intro.play .intro-star{animation:starPop .5s ease forwards}
+.intro-star:nth-child(1){top:30%;left:20%;animation-delay:1.6s}
+.intro-star:nth-child(2){top:60%;left:15%;animation-delay:1.75s}
+.intro-star:nth-child(3){top:25%;right:22%;animation-delay:1.7s}
+.intro-star:nth-child(4){top:55%;right:18%;animation-delay:1.85s}
+.intro-star:nth-child(5){top:45%;left:8%;animation-delay:1.9s}
+.intro-star:nth-child(6){top:70%;right:10%;animation-delay:1.65s}
+@keyframes starPop{
+  0%{opacity:0;transform:scale(0) rotate(0deg)}
+  60%{opacity:1;transform:scale(1.4) rotate(20deg)}
+  100%{opacity:0;transform:scale(0.8) rotate(-10deg) translateY(-30px)}}
+
 .intro-skip{position:absolute;top:20px;right:20px;z-index:3;
   color:rgba(255,255,255,.4);font-size:13px;font-family:'Fredoka One',cursive;
   padding:8px 14px;border-radius:99px;border:1px solid rgba(255,255,255,.1);
-  transition:color .2s,border-color .2s;opacity:0;animation:fadeIn .5s 0.8s ease forwards}
-.intro-skip:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.3)}
+  transition:color .2s,border-color .2s,background .2s;opacity:0;animation:fadeIn .5s 0.8s ease forwards}
+.intro-skip:hover{color:rgba(255,255,255,.85);border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.08)}
 @keyframes fadeIn{to{opacity:1}}
 .onboarding{position:fixed;inset:0;z-index:8000;display:flex;align-items:center;
-  justify-content:center;background:rgba(6,9,20,.92);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:24px}
+  justify-content:center;
+  background:rgba(6,9,20,.88);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:20px}
 .onboarding.hidden{display:none}
-.ob-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;
-  padding:36px 28px 28px;max-width:380px;width:100%;text-align:center;
-  box-shadow:0 24px 64px rgba(0,0,0,.6);animation:cardIn .4s cubic-bezier(.34,1.56,.64,1)}
-@keyframes cardIn{from{opacity:0;transform:scale(.88) translateY(20px)}
+.ob-card{background:var(--surface);border-radius:24px;
+  padding:32px 26px 24px;max-width:400px;width:100%;text-align:center;
+  box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 0 1px rgba(251,191,36,.15);
+  animation:cardIn .4s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden}
+.ob-card::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%, rgba(251,191,36,.06) 0%, transparent 70%);
+  pointer-events:none}
+@keyframes cardIn{from{opacity:0;transform:scale(.85) translateY(24px)}
   to{opacity:1;transform:scale(1) translateY(0)}}
-.ob-icon{font-size:64px;margin-bottom:16px;animation:phFloat 3s ease-in-out infinite}
-.ob-title{font-family:'Fredoka One',cursive;font-size:26px;color:var(--yellow);margin-bottom:12px}
-.ob-text{font-size:15px;color:var(--muted);line-height:1.6;margin-bottom:24px}
-.ob-dots{display:flex;justify-content:center;gap:8px;margin-bottom:24px}
-.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--border);
-  transition:background .3s,transform .3s}
-.ob-dot.active{background:var(--yellow);transform:scale(1.3)}
+.ob-icon{font-size:72px;margin-bottom:12px;
+  animation:iconBounce 2s ease-in-out infinite;display:block;line-height:1;
+  filter:drop-shadow(0 4px 16px rgba(251,191,36,.35))}
+@keyframes iconBounce{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}}
+.ob-step-badge{display:inline-flex;align-items:center;gap:5px;
+  background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);
+  color:var(--yellow);font-family:'Fredoka One',cursive;font-size:12px;
+  padding:4px 12px;border-radius:99px;margin-bottom:10px}
+.ob-title{font-family:'Fredoka One',cursive;font-size:22px;color:var(--text);
+  margin-bottom:10px;line-height:1.2}
+.ob-text{font-size:15px;color:var(--muted);line-height:1.65;margin-bottom:20px}
+.ob-text strong{font-style:normal}
+.ob-dots{display:flex;justify-content:center;gap:8px;margin-bottom:20px}
+.ob-dot{width:10px;height:10px;border-radius:50%;background:var(--border);
+  transition:all .3s;cursor:pointer}
+.ob-dot:hover{background:var(--muted)}
+.ob-dot.active{background:var(--yellow);transform:scale(1.35);
+  box-shadow:0 0 8px rgba(251,191,36,.5)}
 .ob-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ob-next-big{flex:1;background:linear-gradient(135deg,#fbbf24,#f59e0b);
+  color:#060914;font-family:'Fredoka One',cursive;font-size:16px;
+  padding:12px 20px;border-radius:14px;border:none;cursor:pointer;
+  transition:transform .15s,box-shadow .15s;
+  box-shadow:0 4px 16px rgba(251,191,36,.35)}
+.ob-next-big:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(251,191,36,.5)}
+.ob-next-big:active{transform:scale(.95)}
 
 /* ── Tab-Intro Tooltip ── */
 #tab-intro-overlay{position:fixed;inset:0;z-index:7500;
@@ -1929,6 +2012,12 @@ textarea.field-input{min-height:80px;line-height:1.5}
   </div>
 
   <!-- Inhalt (Logo erscheint nach Öffnung) -->
+  <span class="intro-star">✨</span>
+  <span class="intro-star">⭐</span>
+  <span class="intro-star">✨</span>
+  <span class="intro-star">⭐</span>
+  <span class="intro-star">✨</span>
+  <span class="intro-star">🌟</span>
   <div class="intro-content">
     <div class="intro-logo">
       <span class="intro-logo-icon">🎬</span>
@@ -1957,8 +2046,8 @@ textarea.field-input{min-height:80px;line-height:1.5}
     <p class="ob-text" id="ob-text"></p>
     <div class="ob-dots" id="ob-dots"></div>
     <div class="ob-actions">
-      <button class="btn-ghost" id="ob-skip">Überspringen</button>
-      <button class="btn-primary" id="ob-next">Weiter →</button>
+      <button class="btn-ghost" id="ob-skip" style="font-size:13px;color:var(--muted)">Überspringen</button>
+      <button class="ob-next-big" id="ob-next">Weiter →</button>
     </div>
   </div>
 </div>
@@ -2124,17 +2213,10 @@ textarea.field-input{min-height:80px;line-height:1.5}
           <span class="panel-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Planen</span>
           <button class="panel-close-btn" onclick="ckTogglePanel('left')">✕</button>
         </div>
-        <!-- Plan sub-tabs -->
-        <div class="plan-subtabs" id="plan-subtabs">
-          <button class="plan-subtab active" data-sub="sub-story"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Geschichte</button>
-          <button class="plan-subtab" data-sub="sub-figures"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Figuren</button>
-          <button class="plan-subtab" data-sub="sub-storyboard"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><polygon points="10 9 15 12 10 15 10 9"/></svg>Storyboard</button>
-          <button class="plan-subtab" data-sub="sub-bg"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Hintergrund</button>
-          <button class="plan-subtab" data-sub="sub-week"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Plan</button>
-          <button class="plan-subtab" data-sub="sub-progress"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Fortschritt</button>
+        <!-- Accordion (content injected by initCockpit) -->
+        <div class="panel-body" id="plan-panel-body" style="overflow-x:hidden">
+          <div id="plan-accordion"></div>
         </div>
-        <!-- Plan content injected from existing sections -->
-        <div class="panel-body" id="plan-panel-body"></div>
       </div>
     </div>
 
@@ -3150,12 +3232,12 @@ const PROGRESS_LABELS = [
    ONBOARDING
    ═══════════════════════════════════════════════ */
 const OB_STEPS = [
-  {icon:'🎬',title:'Willkommen!',         text:'Hier lernst du Schritt für Schritt deinen eigenen Stop-Motion-Film zu machen!'},
-  {icon:'🤔',title:'Was ist Stop-Motion?',text:'Du fotografierst Figuren und bewegst sie dabei ganz langsam. Abgespielt sieht es aus wie ein Film!'},
-  {icon:'📋',title:'Schritt 1: Planen',   text:'Zuerst planst du deine Geschichte und Figuren im Storyboard.'},
-  {icon:'📷',title:'Schritt 2: Filmen',   text:'Dann fotografierst du viele kleine Bilder mit der Kamera.'},
-  {icon:'🎞️',title:'Schritt 3: Schneiden',text:'Im Editor stellst du Tempo ein und fügst Musik hinzu.'},
-  {icon:'🚀',title:"Los geht's!",          text:'Du bist bereit! Viel Spaß beim Filmen!'},
+  {icon:'🎬',title:'Hallo! Ich bin deine Filmwerkstatt!', text:'Hier machst du deinen eigenen <strong style="color:var(--yellow)">Stop-Motion-Film</strong> – wie bei echten Zeichentrick-Studios! 🍿'},
+  {icon:'🤔',title:'Was ist Stop-Motion?',                text:'Du stellst Figuren hin, machst ein Foto 📷, bewegst sie ein kleeeines bisschen, machst wieder ein Foto… und zack – <strong style="color:var(--teal)">sie bewegen sich!</strong> 🪄'},
+  {icon:'📖',title:'Schritt 1: Deine Geschichte',        text:'Zuerst überlegst du dir <strong style="color:var(--yellow)">WER in deinem Film vorkommt</strong> und WAS passiert. Wie in einem Buch, nur du erfindest es! ✍️'},
+  {icon:'📷',title:'Schritt 2: Fotos machen',            text:'Dann gehst du zum 📷 <strong style="color:var(--yellow)">Kamera-Tab</strong> und fotografierst viele kleine Bilder. Je mehr Bilder, desto flüssiger bewegt sich dein Film! 🎞️'},
+  {icon:'✂️',title:'Schritt 3: Alles zusammenbauen',    text:'Im <strong style="color:var(--teal)">Editor-Tab</strong> kannst du Tempo einstellen, Musik dazumachen und deinen Film vorschauen. '},
+  {icon:'🚀',title:"Los geht's – du schaffst das!",      text:'Tippe auf <strong style="color:var(--yellow)">📷 Kamera</strong> und mach dein erstes Foto! Dein Film wartet auf dich! 🌟'},
 ];
 let obStep = 0;
 
@@ -3393,14 +3475,37 @@ function hideFrameCtx() {
 }
 
 function initCockpit() {
-  // Move plan content into left panel body
-  const planBody = $('plan-panel-body');
+  // Build accordion in left panel
+  const accordion = $('plan-accordion');
   const pgPlan = $('pg-plan');
-  if (planBody && pgPlan) {
-    Array.from(pgPlan.children).forEach(child => {
-      if (!child.classList.contains('plan-subtabs')) {
-        planBody.appendChild(child);
-      }
+  const ACC_DEFS = [
+    {key:'story',      icon:'📖', label:'Meine Geschichte',  sub:'sub-story',      open:true},
+    {key:'figures',    icon:'🎭', label:'Figuren',            sub:'sub-figures',    open:false},
+    {key:'storyboard', icon:'🎬', label:'Storyboard',         sub:'sub-storyboard', open:false},
+    {key:'bg',         icon:'🌄', label:'Hintergrund',        sub:'sub-bg',         open:false},
+    {key:'week',       icon:'📅', label:'Produktionsplan',    sub:'sub-week',       open:false},
+    {key:'progress',   icon:'📊', label:'Fortschritt',        sub:'sub-progress',   open:false},
+  ];
+  if (accordion && pgPlan) {
+    ACC_DEFS.forEach(def => {
+      const section = pgPlan.querySelector('#' + def.sub);
+      if (!section) return;
+      const item = document.createElement('div');
+      item.className = 'acc-item' + (def.open ? ' open' : '');
+      item.dataset.acc = def.key;
+      const header = document.createElement('button');
+      header.className = 'acc-header';
+      header.innerHTML = `<span class="acc-icon">${def.icon}</span><span class="acc-label">${def.label}</span><span class="acc-arrow">▼</span>`;
+      header.addEventListener('click', () => {
+        item.classList.toggle('open');
+        try { playSwoosh(); } catch(e){}
+      });
+      const body = document.createElement('div');
+      body.className = 'acc-body';
+      body.appendChild(section);
+      item.appendChild(header);
+      item.appendChild(body);
+      accordion.appendChild(item);
     });
   }
 
@@ -4585,17 +4690,38 @@ function initIntro() {
    ═══════════════════════════════════════════════ */
 function renderObStep() {
   const s = OB_STEPS[obStep];
-  $('ob-icon').textContent  = s.icon;
+  const isLast = obStep === OB_STEPS.length - 1;
+  const stepLabels = ['','Schritt 1','Schritt 2','Schritt 3','Schritt 4',''];
+  $('ob-icon').textContent = s.icon;
   $('ob-title').textContent = s.title;
-  $('ob-text').textContent  = s.text;
+  $('ob-text').innerHTML = s.text; // allow HTML in text for highlights
+  // Step badge
+  let badge = $('ob-step-badge');
+  if (!badge) {
+    badge = document.createElement('div');
+    badge.id = 'ob-step-badge';
+    badge.className = 'ob-step-badge';
+    $('ob-title').before(badge);
+  }
+  if (obStep > 0 && obStep < OB_STEPS.length-1) {
+    badge.style.display = 'inline-flex';
+    badge.textContent = stepLabels[obStep] || ('Schritt ' + obStep);
+  } else {
+    badge.style.display = 'none';
+  }
+  // Dots
   const dotsEl = $('ob-dots');
   dotsEl.innerHTML = '';
   OB_STEPS.forEach((_,i) => {
     const d = document.createElement('div');
     d.className = 'ob-dot' + (i===obStep?' active':'');
+    d.addEventListener('click', () => { obStep = i; renderObStep(); });
     dotsEl.appendChild(d);
   });
-  $('ob-next').textContent = obStep===OB_STEPS.length-1 ? "Los geht's! 🚀" : 'Weiter →';
+  // Button
+  const btn = $('ob-next');
+  btn.className = isLast ? 'ob-next-big' : 'ob-next-big';
+  btn.textContent = isLast ? "Los geht's! 🚀" : 'Weiter →';
 }
 function closeOnboarding() {
   $('onboarding').classList.add('hidden');
@@ -8611,7 +8737,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadState();
   try { syncBadges(); } catch(e) {}
   initNav();
-  initPlanSubTabs();
+  // initPlanSubTabs(); // replaced by accordion
   initStory();
   initFigures();
   initStoryboard();
