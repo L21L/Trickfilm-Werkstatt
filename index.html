@@ -262,20 +262,22 @@ textarea{resize:vertical}
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.1);
-  color: var(--text);
+  gap: 4px;
+  padding: 9px 12px;
+  border-radius: 14px;
+  background: rgba(13,17,28,.7);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(200,220,240,0.75);
   cursor: pointer;
-  transition: all .2s;
+  transition: all .2s cubic-bezier(.4,0,.2,1);
   min-width: 58px;
   font-family: 'Fredoka One', cursive;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
-.cam-side-btn:hover { background: rgba(255,255,255,.13); border-color: rgba(255,255,255,.2); }
-.cam-side-btn.active { background: rgba(251,191,36,.18); border-color: rgba(251,191,36,.45); color: var(--yellow); }
-.cam-side-label { font-size: 10px; line-height: 1; color: var(--muted); }
+.cam-side-btn:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.22); color: var(--text); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.4); }
+.cam-side-btn.active { background: rgba(251,191,36,.16); border-color: rgba(251,191,36,.5); color: var(--yellow); box-shadow: 0 0 14px rgba(251,191,36,.18); }
+.cam-side-label { font-size: 9.5px; line-height: 1; color: currentColor; opacity: 0.7; letter-spacing: .2px; }
 
 /* Onion skin toggle switch */
 .onion-toggle-switch { position:relative; display:inline-block; width:44px; height:24px; }
@@ -1183,11 +1185,13 @@ textarea.field-input{min-height:80px;line-height:1.5}
 .cam-controls{padding:0;display:flex;flex-direction:column;gap:6px;flex-shrink:0;pointer-events:all}
 .cam-row1{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;flex-wrap:nowrap}
 .cam-row1::-webkit-scrollbar{display:none}
-.cch{flex-shrink:0;background:rgba(6,9,20,.6);border:1px solid rgba(255,255,255,.18);
-  color:rgba(255,255,255,.85);font-family:'Fredoka One',cursive;font-size:12px;
-  padding:7px 12px;border-radius:18px;transition:all .2s;white-space:nowrap;
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);min-height:36px}
-.cch.on{background:rgba(251,191,36,.25);border-color:rgba(251,191,36,.7);color:var(--yellow)}
+.cch{flex-shrink:0;background:rgba(10,15,26,.7);border:1px solid rgba(255,255,255,.14);
+  color:rgba(200,220,240,0.8);font-family:'Fredoka One',cursive;font-size:12px;
+  padding:8px 12px;border-radius:12px;transition:all .2s cubic-bezier(.4,0,.2,1);white-space:nowrap;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);min-height:38px;
+  display:flex;align-items:center;justify-content:center;gap:2px;letter-spacing:.2px}
+.cch:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.24);color:var(--text);transform:translateY(-1px)}
+.cch.on{background:rgba(251,191,36,.2);border-color:rgba(251,191,36,.65);color:var(--yellow);box-shadow:0 0 10px rgba(251,191,36,.18)}
 .cch:active{transform:scale(.94)}
 /* Timelapse / Greenscreen glass panels */
 #tl-panel{background:rgba(6,9,20,.75);border:1px solid rgba(255,255,255,.12);
@@ -1278,11 +1282,12 @@ textarea.field-input{min-height:80px;line-height:1.5}
 .cam-shoot-row{display:flex;align-items:center;justify-content:center;gap:18px}
 #shoot-btn{
   width:80px;height:80px;border-radius:50%;
-  background:linear-gradient(135deg,#fbbf24,#f59e0b);
+  background:radial-gradient(circle at 35% 35%, #fcd34d, #f59e0b 55%, #d97706);
   font-size:34px;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 6px 28px rgba(251,191,36,.55);
+  box-shadow:0 6px 28px rgba(251,191,36,.55), inset 0 1px 0 rgba(255,255,255,.3);
   transition:transform .12s,box-shadow .12s;
-  flex-shrink:0;border:3px solid rgba(255,255,255,.25)}
+  flex-shrink:0;border:3px solid rgba(255,255,255,.3);
+  color:rgba(255,255,255,0.95)}
 #shoot-btn:active{transform:scale(.88);box-shadow:0 2px 10px rgba(251,191,36,.3)}
 .cam-row2{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
 .cam-action-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
@@ -2556,24 +2561,77 @@ textarea.field-input{min-height:80px;line-height:1.5}
         <!-- LEFT: Format + Camera switch -->
         <div class="cam-shoot-left">
           <button class="cam-side-btn" onclick="togFormat()" id="btn-format-side" title="Format wechseln">
-            <span style="font-size:18px">📐</span>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px">
+              <!-- Äußeres Rahmen-Querformat -->
+              <rect x="2" y="5" width="20" height="14" rx="2.5" stroke="currentColor" stroke-width="1.8" fill="none"/>
+              <!-- Inneres Rahmen-Hochformat (gestrichelt) -->
+              <rect x="8" y="2" width="8" height="20" rx="2" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2.5 1.5" fill="none" opacity="0.55"/>
+              <!-- Pfeile in der Mitte -->
+              <path d="M10 12H14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M13 10.5L14.5 12L13 13.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M11 10.5L9.5 12L11 13.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
             <span class="cam-side-label">Format</span>
           </button>
           <button class="cam-side-btn" onclick="swCam()" id="btn-swcam-side" title="Kamera wechseln">
-            <span style="font-size:18px">🔄</span>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px">
+              <!-- Kamera-Body -->
+              <rect x="2" y="7" width="20" height="13" rx="3" stroke="currentColor" stroke-width="1.8" fill="none"/>
+              <!-- Objektiv -->
+              <circle cx="12" cy="13.5" r="3.8" stroke="currentColor" stroke-width="1.6" fill="none"/>
+              <circle cx="12" cy="13.5" r="1.5" fill="currentColor" opacity="0.5"/>
+              <!-- Flip-Pfeil oben -->
+              <path d="M8 4C8 4 10 2.5 12 2.5C14 2.5 16 4 16 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+              <path d="M14.5 2.2L16 4L14.2 5.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
             <span class="cam-side-label">Kamera</span>
           </button>
         </div>
         <!-- CENTER: Shutter -->
-        <button id="shoot-btn" onclick="takeShot()">📷</button>
+        <button id="shoot-btn" onclick="takeShot()" title="Foto aufnehmen">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:38px;height:38px;display:block">
+            <!-- Kameragehäuse -->
+            <rect x="4" y="14" width="40" height="28" rx="6" fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+            <!-- Sucher-Buckel -->
+            <rect x="16" y="9" width="16" height="7" rx="3" fill="rgba(0,0,0,0.5)" stroke="rgba(255,255,255,0.14)" stroke-width="1.2"/>
+            <!-- Objektiv-Außenring -->
+            <circle cx="24" cy="28" r="10" fill="rgba(0,0,0,0.5)" stroke="rgba(255,255,255,0.22)" stroke-width="1.8"/>
+            <!-- Objektiv-Innenring -->
+            <circle cx="24" cy="28" r="6.5" fill="rgba(10,16,30,0.8)" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/>
+            <!-- Linsen-Reflex -->
+            <circle cx="24" cy="28" r="4" fill="rgba(251,191,36,0.15)"/>
+            <circle cx="21.5" cy="25.5" r="1.2" fill="rgba(255,255,255,0.35)"/>
+            <!-- Blitz-Symbol oben links -->
+            <rect x="7" y="17" width="8" height="5" rx="2" fill="rgba(251,191,36,0.18)" stroke="rgba(251,191,36,0.4)" stroke-width="1"/>
+            <!-- Auslöser-Punkt -->
+            <circle cx="37" cy="19" r="2.5" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+          </svg>
+        </button>
         <!-- RIGHT: Onion skin + Settings -->
         <div class="cam-shoot-right">
           <button class="cam-side-btn" onclick="togOnionNew()" id="btn-onion-side" title="Zwiebelhaut">
-            <span style="font-size:18px">🧅</span>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px">
+              <!-- Äußere Schicht -->
+              <ellipse cx="12" cy="13" rx="8" ry="8.5" stroke="currentColor" stroke-width="1.6" fill="none" opacity="0.35"/>
+              <!-- Mittlere Schicht -->
+              <ellipse cx="12" cy="13" rx="5.5" ry="6" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.6"/>
+              <!-- Innere Schicht / Kern -->
+              <ellipse cx="12" cy="13" rx="3" ry="3.2" stroke="currentColor" stroke-width="1.4" fill="currentColor" opacity="0.25"/>
+              <!-- Stiel -->
+              <path d="M12 4.5C12 4.5 11 3 12 2C13 3 12 4.5 12 4.5Z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+              <path d="M12 4.5V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
             <span class="cam-side-label">Zwiebelhaut</span>
           </button>
           <button class="cam-side-btn" onclick="toggleCamSettingsMenu()" id="btn-settings-side" title="Einstellungen">
-            <span style="font-size:18px">⚙️</span>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px">
+              <!-- Zahnrad-Außenring -->
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/>
+              <!-- Zahnrad-Zähne -->
+              <path d="M12 2v2M12 20v2M2 12h2M20 12h2M5.05 5.05l1.41 1.41M17.54 17.54l1.41 1.41M5.05 18.95l1.41-1.41M17.54 6.46l1.41-1.41" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <!-- Zahnrad-Körper (Pfad) -->
+              <path d="M9.5 3.5L10.5 2h3l1 1.5 1.5.6L17.5 3l2.1 2.1-1.1 1.5.6 1.5H21v3l-1.5 1-.6 1.5 1.1 1.5-2.1 2.1-1.5-1.1-1.5.6-1 1.5h-3l-1-1.5-1.5-.6L6.5 21l-2.1-2.1 1.1-1.5L4.9 16H3.5v-3l1.5-1 .6-1.5-1.1-1.5L6.5 6.9l1.5 1.1 1.5-.6z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            </svg>
             <span class="cam-side-label">Einstellungen</span>
           </button>
         </div>
@@ -2582,7 +2640,13 @@ textarea.field-input{min-height:80px;line-height:1.5}
       <!-- Onion Skin Panel (closeable) -->
       <div id="onion-settings-panel" style="display:none;background:rgba(13,17,23,.95);border:1px solid rgba(45,212,191,.3);border-radius:12px;margin:6px 8px;padding:12px;backdrop-filter:blur(20px)">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <span style="font-family:'Fredoka One',cursive;color:var(--teal);font-size:15px">🧅 Zwiebelhaut</span>
+          <span style="font-family:'Fredoka One',cursive;color:var(--teal);font-size:15px;display:flex;align-items:center;gap:6px">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0">
+              <ellipse cx="10" cy="12" rx="7" ry="7.5" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.35"/>
+              <ellipse cx="10" cy="12" rx="4.5" ry="5" stroke="currentColor" stroke-width="1.4" fill="none" opacity="0.65"/>
+              <ellipse cx="10" cy="12" rx="2" ry="2.2" fill="currentColor" opacity="0.5"/>
+              <path d="M10 4.5V6M10 4.5C10 4.5 9.2 3.2 10 2C10.8 3.2 10 4.5 10 4.5Z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+            </svg>Zwiebelhaut</span>
           <button onclick="closeOnionPanel()" style="color:var(--muted);font-size:16px;background:none;border:none;cursor:pointer">✕</button>
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
@@ -2612,16 +2676,53 @@ textarea.field-input{min-height:80px;line-height:1.5}
       <!-- Camera Settings Menu (closeable overlay) -->
       <div id="cam-settings-menu" style="display:none;background:rgba(13,17,23,.95);border:1px solid rgba(251,191,36,.25);border-radius:12px;margin:6px 8px;padding:12px;backdrop-filter:blur(20px)">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <span style="font-family:'Fredoka One',cursive;color:var(--yellow);font-size:15px">⚙️ Einstellungen</span>
+          <span style="font-family:'Fredoka One',cursive;color:var(--yellow);font-size:15px;display:flex;align-items:center;gap:6px">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0">
+              <circle cx="10" cy="10" r="2.8" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <path d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M4.1 4.1l1.4 1.4M14.5 14.5l1.4 1.4M4.1 15.9l1.4-1.4M14.5 5.5l1.4-1.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>Einstellungen</span>
           <button onclick="closeCamSettings()" style="color:var(--muted);font-size:16px;background:none;border:none;cursor:pointer">✕</button>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
-          <button class="cch" id="btn-grid-s"   onclick="togGrid()">⊞ Raster</button>
-          <button class="cch" id="btn-timer-s"  onclick="togTimer()">⏱ Timer</button>
-          <button class="cch" id="btn-tl-s"     onclick="togTimelapse()">⚡ Zeitraffer</button>
-          <button class="cch" id="btn-motion-s" onclick="togMotion()">👁 Bewegung</button>
-          <button class="cch" id="btn-gs-s"     onclick="togGreenScreen()">🟢 Greenscreen</button>
-          <button class="cch" id="btn-exp-s"    onclick="togExposureLock()">🔓 Belichtung</button>
+          <button class="cch" id="btn-grid-s" onclick="togGrid()">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;display:inline-block;vertical-align:-3px;margin-right:5px">
+              <rect x="1" y="1" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <rect x="12" y="1" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <rect x="1" y="12" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <rect x="12" y="12" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            </svg>Raster</button>
+          <button class="cch" id="btn-timer-s" onclick="togTimer()">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;display:inline-block;vertical-align:-3px;margin-right:5px">
+              <circle cx="10" cy="11" r="7.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <path d="M10 7.5V11.5L12.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M7.5 1.5H12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M10 1.5V3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>Timer</button>
+          <button class="cch" id="btn-tl-s" onclick="togTimelapse()">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;display:inline-block;vertical-align:-3px;margin-right:5px">
+              <path d="M10 3L12.5 8H17L13.5 11L15 16L10 13L5 16L6.5 11L3 8H7.5L10 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+            </svg>Zeitraffer</button>
+          <button class="cch" id="btn-motion-s" onclick="togMotion()">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;display:inline-block;vertical-align:-3px;margin-right:5px">
+              <circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <circle cx="10" cy="10" r="1.5" fill="currentColor" opacity="0.7"/>
+              <path d="M2 10h2M16 10h2M10 2v2M10 16v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M4.2 4.2l1.4 1.4M14.4 14.4l1.4 1.4M4.2 15.8l1.4-1.4M14.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity="0.6"/>
+            </svg>Bewegung</button>
+          <button class="cch" id="btn-gs-s" onclick="togGreenScreen()">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;display:inline-block;vertical-align:-3px;margin-right:5px">
+              <rect x="1.5" y="3.5" width="17" height="13" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <circle cx="10" cy="10" r="3.5" stroke="currentColor" stroke-width="1.3" fill="none" opacity="0.6"/>
+              <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+              <path d="M1.5 10h3.5M15 10h3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/>
+            </svg>Greenscreen</button>
+          <button class="cch" id="btn-exp-s" onclick="togExposureLock()">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;display:inline-block;vertical-align:-3px;margin-right:5px">
+              <circle cx="10" cy="9" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <path d="M10 5V3M10 15v-2M5 9H3M17 9h-2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <rect x="7" y="13" width="6" height="5" rx="1.5" stroke="currentColor" stroke-width="1.4" fill="none"/>
+              <path d="M8.5 13V12a1.5 1.5 0 013 0v1" stroke="currentColor" stroke-width="1.3"/>
+            </svg>Belichtung</button>
         </div>
         <!-- Timelapse Panel (shown when Zeitraffer is active) -->
         <div id="tl-panel" style="display:none;margin-bottom:10px">
