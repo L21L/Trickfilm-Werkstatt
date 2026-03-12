@@ -1879,21 +1879,21 @@ textarea.field-input{min-height:80px;line-height:1.5}
   <!-- Mode Bar -->
   <div id="mode-bar" role="navigation" aria-label="Hauptnavigation">
     <button class="mode-btn active" data-mode="cam" onclick="ckGoMode('cam')">
-      <span class="mode-icon">📷</span><span>Kamera</span>
+      <span class="mode-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span><span>Kamera</span>
     </button>
     <button class="mode-btn" data-mode="edit" onclick="ckGoMode('edit')">
-      <span class="mode-icon">✂️</span><span>Editor</span>
+      <span class="mode-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span><span>Editor</span>
     </button>
     <button class="mode-btn" data-mode="mus" onclick="ckGoMode('mus')">
-      <span class="mode-icon">🎵</span><span>Audio</span>
+      <span class="mode-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span>Audio</span>
     </button>
     <div class="mode-bar-spacer"></div>
     <div id="mode-bar-panel-btns">
       <button class="panel-toggle-btn" id="left-panel-btn" onclick="ckTogglePanel('left')">
-        <span>📋</span><span>Planen</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span><span>Planen</span>
       </button>
       <button class="panel-toggle-btn" id="right-panel-btn" onclick="ckTogglePanel('right')">
-        <span>🎬</span><span>Export</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/><path d="M8 10l2 2-2 2"/></svg></span><span>Export</span>
       </button>
     </div>
   </div>
@@ -1905,17 +1905,17 @@ textarea.field-input{min-height:80px;line-height:1.5}
     <div class="side-panel" id="left-panel">
       <div class="side-panel-inner">
         <div class="panel-header">
-          <span class="panel-title">📋 Planen</span>
+          <span class="panel-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Planen</span>
           <button class="panel-close-btn" onclick="ckTogglePanel('left')">✕</button>
         </div>
         <!-- Plan sub-tabs -->
         <div class="plan-subtabs" id="plan-subtabs">
-          <button class="plan-subtab active" data-sub="sub-story">📖 Geschichte</button>
-          <button class="plan-subtab" data-sub="sub-figures">🎭 Figuren</button>
-          <button class="plan-subtab" data-sub="sub-storyboard">🎬 Storyboard</button>
-          <button class="plan-subtab" data-sub="sub-bg">🌄 Hintergrund</button>
-          <button class="plan-subtab" data-sub="sub-week">📅 Plan</button>
-          <button class="plan-subtab" data-sub="sub-progress">📊 Fortschritt</button>
+          <button class="plan-subtab active" data-sub="sub-story"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Geschichte</button>
+          <button class="plan-subtab" data-sub="sub-figures"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Figuren</button>
+          <button class="plan-subtab" data-sub="sub-storyboard"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><polygon points="10 9 15 12 10 15 10 9"/></svg>Storyboard</button>
+          <button class="plan-subtab" data-sub="sub-bg"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Hintergrund</button>
+          <button class="plan-subtab" data-sub="sub-week"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Plan</button>
+          <button class="plan-subtab" data-sub="sub-progress"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Fortschritt</button>
         </div>
         <!-- Plan content injected from existing sections -->
         <div class="panel-body" id="plan-panel-body"></div>
@@ -1951,7 +1951,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
       <!-- PERMANENT BOTTOM TIMELINE -->
       <div id="bottom-timeline">
         <div class="timeline-header">
-          <span class="timeline-title">🎞️ Timeline <span class="timeline-count" id="tl-count-display">0 Frames</span></span>
+          <span class="timeline-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px"><rect x="2" y="7" width="3" height="10"/><rect x="7" y="4" width="3" height="16"/><rect x="12" y="9" width="3" height="8"/><rect x="17" y="2" width="3" height="20"/></svg> Timeline <span class="timeline-count" id="tl-count-display">0 Frames</span></span>
           <div class="timeline-spacer"></div>
           <button class="timeline-minimize-btn" id="tl-minimize-btn" onclick="ckToggleTimeline()" title="Timeline ein-/ausblenden">▼</button>
         </div>
@@ -2449,7 +2449,6 @@ textarea.field-input{min-height:80px;line-height:1.5}
             <button class="etb" onclick="dissolveGroup()">📂 Auflösen</button>
           </div>
           <div class="edit-tool-row">
-            <button class="etb" onclick="openVoiceoverModal()">🎙 Voiceover</button>
             <button class="etb" onclick="insertTitleCard()">🖼 Titelkarte</button>
             <button class="etb" onclick="openFxModal()" style="background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(45,212,191,.15));border-color:rgba(168,85,247,.5);color:#c084fc">✨ FX</button>
             <button class="etb" onclick="openFreistellenModal()" style="background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(45,212,191,.15));border-color:rgba(34,197,94,.5);color:#4ade80">✂️ Freistellen</button>
@@ -2481,110 +2480,6 @@ textarea.field-input{min-height:80px;line-height:1.5}
   </section>
 
   <!-- VOICEOVER MODAL -->
-  <div id="vo-modal" class="ed-modal hidden">
-    <div class="ed-card">
-      <div class="ed-card-title">🎙 Voiceover aufnehmen
-        <button onclick="closeVoModal()">✕</button>
-      </div>
-      <select class="vo-group-select" id="vo-group-sel"></select>
-      <div id="vo-no-groups" style="display:none;color:var(--muted);font-size:13px;margin-bottom:10px">
-        Erstelle zuerst eine Gruppe (Frames markieren → 📁 Gruppe erstellen)
-      </div>
-      <div class="vo-viz" id="vo-viz"></div>
-      <div class="vo-timer" id="vo-timer">0:00</div>
-      <div class="vo-btns">
-        <button class="vo-btn rec" id="vo-rec-btn"  onclick="startVoRec()">⏺ Aufnehmen</button>
-        <button class="vo-btn"     id="vo-stop-btn" onclick="stopVoRec()" style="display:none">⏹ Stopp</button>
-        <button class="vo-btn"     id="vo-play-btn" onclick="playVoRec()" style="display:none">▶ Anhören</button>
-        <button class="vo-btn"     id="vo-del-btn"  onclick="delVoRec()"  style="display:none">🗑 Löschen</button>
-      </div>
-      <div class="vo-sync-info" id="vo-sync-info" style="display:none"></div>
-      <div class="vo-sync-btns" id="vo-sync-btns" style="display:none">
-        <button class="etb" onclick="voAdjustFrames()">⚡ Frames anpassen</button>
-        <button class="etb" onclick="voTrimAudio()">✂️ Voiceover kürzen</button>
-      </div>
-      <button class="btn-primary sm" id="vo-save-btn" onclick="saveVoiceover()" style="display:none;width:100%">✅ Speichern</button>
-    </div>
-  </div>
-
-  <!-- TITLE CARD MODAL -->
-  <div id="tc-modal" class="ed-modal hidden">
-    <div class="ed-card">
-      <div class="ed-card-title">
-        <button class="tc-tab-btn active" id="tc-tab-title" onclick="switchTcTab('title')">🖼 Titelkarte</button>
-        <button class="tc-tab-btn" id="tc-tab-credits" onclick="switchTcTab('credits')">🎬 Abspann</button>
-        <button onclick="closeTcModal()" style="margin-left:auto;font-size:18px;color:var(--muted)">✕</button>
-      </div>
-
-      <!-- TITLE CARD SECTION -->
-      <div id="tc-section-title">
-        <label class="field-label">TEXT</label>
-        <input id="tc-text" class="field-input" type="text" placeholder="Filmtitel…" style="margin-bottom:10px"/>
-        <label class="field-label" style="margin-bottom:6px">UNTERTITEL (optional)</label>
-        <input id="tc-sub" class="field-input" type="text" placeholder="Ein Film von…" style="margin-bottom:10px"/>
-        <div style="display:flex;gap:10px;margin-bottom:12px">
-          <div style="flex:1">
-            <label class="field-label">HINTERGRUND</label>
-            <input type="color" id="tc-bg" value="#000000"
-              style="width:100%;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer"/>
-          </div>
-          <div style="flex:1">
-            <label class="field-label">TEXTFARBE</label>
-            <input type="color" id="tc-fg" value="#ffffff"
-              style="width:100%;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer"/>
-          </div>
-          <div style="flex:1">
-            <label class="field-label">AKZENT</label>
-            <input type="color" id="tc-accent" value="#fbbf24"
-              style="width:100%;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer"/>
-          </div>
-        </div>
-        <label class="field-label" style="margin-bottom:6px">STIL</label>
-        <div class="tc-styles" id="tc-styles"></div>
-        <label class="field-label" style="margin-bottom:6px">ANZAHL FRAMES</label>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-          <input type="range" class="prev-slider" id="tc-frames" min="1" max="48" value="8" style="flex:1"/>
-          <span class="prev-val" id="tc-frames-val">8</span>
-        </div>
-        <button class="btn-primary sm" onclick="doInsertTitleCard()" style="width:100%">🖼 Einfügen</button>
-      </div>
-
-      <!-- CREDITS SECTION -->
-      <div id="tc-section-credits" style="display:none">
-        <label class="field-label">FILMTITEL</label>
-        <input id="cr-title" class="field-input" type="text" placeholder="Mein Film" style="margin-bottom:8px"/>
-        <label class="field-label">CREDITS (eine Zeile pro Eintrag)</label>
-        <textarea id="cr-text" class="field-input" rows="5" style="margin-bottom:10px"
-          placeholder="Regie: Max Mustermann&#10;Kamera: Lena Beispiel&#10;Musik: …"></textarea>
-        <div style="display:flex;gap:10px;margin-bottom:12px">
-          <div style="flex:1">
-            <label class="field-label">HINTERGRUND</label>
-            <input type="color" id="cr-bg" value="#000000"
-              style="width:100%;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer"/>
-          </div>
-          <div style="flex:1">
-            <label class="field-label">TEXTFARBE</label>
-            <input type="color" id="cr-fg" value="#ffffff"
-              style="width:100%;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer"/>
-          </div>
-          <div style="flex:1">
-            <label class="field-label">AKZENT</label>
-            <input type="color" id="cr-accent" value="#fbbf24"
-              style="width:100%;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer"/>
-          </div>
-        </div>
-        <label class="field-label" style="margin-bottom:6px">STIL</label>
-        <div class="tc-styles" id="cr-styles"></div>
-        <label class="field-label" style="margin-bottom:6px">FRAMES (Gesamtlänge)</label>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-          <input type="range" class="prev-slider" id="cr-frames" min="8" max="120" value="32" style="flex:1"/>
-          <span class="prev-val" id="cr-frames-val">32</span>
-        </div>
-        <button class="btn-primary sm" onclick="doInsertCredits()" style="width:100%">🎬 Abspann einfügen</button>
-      </div>
-    </div>
-  </div>
-
   <!-- FRAME FULLSCREEN MODAL -->
   <div id="frm-modal" class="hidden" onclick="closeFrmModal()">
     <button id="frm-modal-close" onclick="closeFrmModal()">✕</button>
@@ -4677,19 +4572,24 @@ function playClick() {
 
 /* ── Kamera Init ────────────────────────────── */
 async function initCam() {
-  // Stop existing stream
   if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
   const vid = $('cam-vid');
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:camFacing, width:{ideal:1280}, height:{ideal:720}},
-      audio:false
-    });
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:{exact:camFacing},width:{ideal:1280},height:{ideal:720}},
+        audio:false
+      });
+    } catch(e) {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:camFacing,width:{ideal:1280},height:{ideal:720}},
+        audio:false
+      });
+    }
     vid.srcObject = stream;
     camStream = stream;
-    // Size viewfinder to exact crop ratio once video metadata is ready
     vid.addEventListener('loadedmetadata', () => { sizeCamViewfinder(); applyCamFilter(); }, {once:true});
-    // Hide fallback if shown
     const fb = $('cam-fallback');
     if (fb) fb.style.display = 'none';
     vid.style.display = 'block';
@@ -6170,15 +6070,22 @@ function startPrevAudio() {
   const fps = S.fps || 8;
   window.audioTracks.forEach(track => {
     try {
+      const fps = S.fps || 8;
       const delayMs = ((track.startFrame || 0) / fps) * 1000;
+      const endFrame = (track.endFrame !== undefined && track.endFrame >= 0) ? track.endFrame : -1;
+      const durationMs = endFrame >= 0 ? Math.max(0, (endFrame - (track.startFrame || 0)) / fps * 1000) : -1;
       if (track.type === 'voiceover' && track.voiceover) {
         // Voiceover track – data URL
         const audio = new Audio(track.voiceover);
         audio.volume = (track.vol || 80) / 100;
         if (track.fx && track.fx.loop) audio.loop = true;
-        const el = { audio, timeout: null };
-        if (delayMs > 0) el.timeout = setTimeout(() => { try { audio.play(); } catch(e){} }, delayMs);
-        else try { audio.play(); } catch(e){}
+        const el = { audio, timeout: null, stopTimeout: null };
+        const playFn = () => {
+          try { audio.play(); } catch(e){}
+          if (durationMs > 0) el.stopTimeout = setTimeout(() => { try { audio.pause(); } catch(e){} }, durationMs);
+        };
+        if (delayMs > 0) el.timeout = setTimeout(playFn, delayMs);
+        else playFn();
         window._prevAudioEls.push(el);
       } else if (track.musicKey) {
         // Music from IDB
@@ -6193,8 +6100,11 @@ function startPrevAudio() {
               src.buffer = decoded;
               src.loop = !!(track.fx && track.fx.loop);
               src.connect(gain); gain.connect(ctx.destination);
-              const el = { audio: null, ctx, src, timeout: null };
-              const startFn = () => { try { src.start(); } catch(e){} };
+              const el = { audio: null, ctx, src, timeout: null, stopTimeout: null };
+              const startFn = () => {
+                try { src.start(); } catch(e){}
+                if (durationMs > 0) el.stopTimeout = setTimeout(() => { try { src.stop(); } catch(e){} }, durationMs);
+              };
               if (delayMs > 0) el.timeout = setTimeout(startFn, delayMs);
               else startFn();
               window._prevAudioEls.push(el);
@@ -6208,6 +6118,7 @@ function startPrevAudio() {
 function stopPrevAudio() {
   (window._prevAudioEls || []).forEach(el => {
     if (el.timeout) clearTimeout(el.timeout);
+    if (el.stopTimeout) clearTimeout(el.stopTimeout);
     try { if (el.audio) { el.audio.pause(); el.audio.currentTime = 0; } } catch(e){}
     try { if (el.src) el.src.stop(); } catch(e){}
     try { if (el.ctx) el.ctx.close(); } catch(e){}
@@ -6303,6 +6214,10 @@ function closeVoModal() {
   $('vo-modal').classList.add('hidden');
   stopVoRec();
   cancelAnimationFrame(voRafId);
+  window._voTrackId = null;
+  // Restore group selector visibility for next normal open
+  const sel = $('vo-group-sel');
+  if (sel) sel.style.display = 'block';
 }
 function initVoViz() {
   const viz = $('vo-viz');
@@ -6315,7 +6230,7 @@ function initVoViz() {
   }
 }
 async function startVoRec() {
-  if (S.groups.length === 0) { showToast('Erstelle zuerst eine Gruppe'); return; }
+  if (!window._voTrackId && S.groups.length === 0) { showToast('Erstelle zuerst eine Gruppe'); return; }
   try {
     voStream = await navigator.mediaDevices.getUserMedia({audio:true});
     const ac = new (window.AudioContext||window.webkitAudioContext)();
@@ -6518,16 +6433,24 @@ function insertTitleCard() {
   $('tc-section-credits').style.display = 'none';
   $('tc-tab-title').classList.add('active');
   $('tc-tab-credits').classList.remove('active');
+  // Re-render style picker
   renderStylePicker('tc-styles', CARD_STYLES, tcStyleIdx, i => { tcStyleIdx=i; renderStylePicker('tc-styles',CARD_STYLES,tcStyleIdx,()=>{}); });
-  // frame count slider
+  // Frame count slider – clone to remove previous listeners
   const sl = $('tc-frames');
-  if (sl) sl.addEventListener('input', () => { $('tc-frames-val').textContent = sl.value; });
-  // color pickers re-render previews
+  if (sl) {
+    const sl2 = sl.cloneNode(true);
+    sl.parentNode.replaceChild(sl2, sl);
+    sl2.addEventListener('input', () => { $('tc-frames-val').textContent = sl2.value; });
+  }
+  // Color pickers – clone to remove previous listeners
   ['tc-bg','tc-fg','tc-accent'].forEach(id => {
-    const el = $(id); if(el) el.addEventListener('input', () => renderStylePicker('tc-styles',CARD_STYLES,tcStyleIdx,i=>{tcStyleIdx=i;renderStylePicker('tc-styles',CARD_STYLES,tcStyleIdx,()=>{});}));
+    const el = $(id);
+    if (!el) return;
+    const el2 = el.cloneNode(true);
+    el.parentNode.replaceChild(el2, el);
+    el2.addEventListener('input', () => renderStylePicker('tc-styles',CARD_STYLES,tcStyleIdx,i=>{tcStyleIdx=i;renderStylePicker('tc-styles',CARD_STYLES,tcStyleIdx,()=>{});}));
   });
 }
-function closeTcModal() { $('tc-modal').classList.add('hidden'); }
 
 function doInsertTitleCard() {
   const text   = ($('tc-text').value   || 'Titel').trim();
@@ -6536,7 +6459,8 @@ function doInsertTitleCard() {
   const fg     = $('tc-fg').value;
   const accent = $('tc-accent').value;
   const frames = +($('tc-frames').value || 8);
-  const st     = CARD_STYLES[tcStyleIdx];
+  const st     = CARD_STYLES[tcStyleIdx] || CARD_STYLES[0];
+  if (!st || !st.draw) { showToast('⚠️ Kein Stil ausgewählt'); return; }
   const w=640, h=480;
   const cv = document.createElement('canvas'); cv.width=w; cv.height=h;
   st.draw(cv.getContext('2d'), w, h, text, sub, fg, bg, accent);
@@ -6544,10 +6468,12 @@ function doInsertTitleCard() {
   const newShots = Array.from({length: frames}, () => ({ id: genShotId(), data: dataUrl, groupId: null }));
   S.shots.unshift(...newShots);
   idbSaveShots(S.shots);
-  renderStrip(); renderFrames(); updateShotCount();
+  renderStrip(); renderFrames(); updateShotCount(); renderBottomTimeline();
   closeTcModal();
   showToast(`🖼 Titelkarte eingefügt (${frames} Frames)`);
+  try { checkBadge('titelkarte'); } catch(e) {}
 }
+function closeTcModal() { $('tc-modal').classList.add('hidden'); }
 
 function doInsertCredits() {
   const titleText = ($('cr-title').value || S.project.title || 'Film').trim();
@@ -6772,12 +6698,27 @@ function openVoiceoverForTrack(trackId) {
   const track = window.audioTracks.find(t => t.id === trackId);
   if (!track) return;
   window._voTrackId = trackId;
-  // Reuse vo-modal but adapted for track recording
   const modal = $('vo-modal');
   if (!modal) return;
   modal.classList.remove('hidden');
   const title = modal.querySelector('.ed-card-title');
   if (title) title.childNodes[0].textContent = '🎙 Voiceover aufnehmen – ' + track.name + ' ';
+  // Reset UI state
+  voBlob = null;
+  $('vo-timer').textContent = '0:00';
+  $('vo-rec-btn').style.display  = 'inline-block';
+  $('vo-stop-btn').style.display = 'none';
+  $('vo-play-btn').style.display = 'none';
+  $('vo-del-btn').style.display  = 'none';
+  $('vo-save-btn').style.display = 'none';
+  $('vo-sync-info').style.display = 'none';
+  $('vo-sync-btns').style.display = 'none';
+  // Hide group selector – not needed for track recording
+  const sel = $('vo-group-sel');
+  if (sel) sel.style.display = 'none';
+  const noGrp = $('vo-no-groups');
+  if (noGrp) noGrp.style.display = 'none';
+  initVoViz();
 }
 
 function renderAudioTracks() {
@@ -6838,6 +6779,11 @@ function renderAudioTracks() {
         <input type="number" value="${track.startFrame || 0}" min="0"
           style="width:64px;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Fredoka One',cursive;font-size:12px"
           onchange="setTrackFrame('${track.id}',+this.value)"/>
+        <span style="font-size:11px;color:var(--muted);flex-shrink:0;white-space:nowrap">⏹ Bis Frame:</span>
+        <input type="number" value="${track.endFrame !== undefined && track.endFrame >= 0 ? track.endFrame : ''}" min="0"
+          placeholder="Ende"
+          style="width:64px;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-family:'Fredoka One',cursive;font-size:12px"
+          onchange="setTrackEndFrame('${track.id}',this.value===''?-1:+this.value)"/>
       </div>
       <div class="audio-track-vol">
         <span>🔊</span>
@@ -6890,6 +6836,11 @@ function removeAudioTrack(id) {
 function setTrackFrame(id, frame) {
   const track = window.audioTracks.find(t => t.id === id);
   if (track) track.startFrame = frame;
+}
+
+function setTrackEndFrame(id, frame) {
+  const track = window.audioTracks.find(t => t.id === id);
+  if (track) track.endFrame = frame; // -1 = kein Ende (spielt bis zum Ende)
 }
 
 function setTrackVol(id, vol) {
@@ -10259,6 +10210,109 @@ function hexToRgb(hex) {
   return [r,g,b];
 }
 </script>
+
+<!-- VOICEOVER MODAL -->
+<div id="vo-modal" class="ed-modal hidden">
+  <div class="ed-card">
+    <div class="ed-card-title">🎙 Voiceover aufnehmen
+      <button onclick="closeVoModal()">✕</button>
+    </div>
+    <select class="vo-group-select" id="vo-group-sel"></select>
+    <div id="vo-no-groups" style="display:none;color:var(--muted);font-size:13px;margin-bottom:10px">
+      Erstelle zuerst eine Gruppe (Frames markieren → 📁 Gruppe erstellen)
+    </div>
+    <div class="vo-viz" id="vo-viz"></div>
+    <div class="vo-timer" id="vo-timer">0:00</div>
+    <div class="vo-btns">
+      <button class="vo-btn rec" id="vo-rec-btn"  onclick="startVoRec()">⏺ Aufnehmen</button>
+      <button class="vo-btn"     id="vo-stop-btn" onclick="stopVoRec()" style="display:none">⏹ Stopp</button>
+      <button class="vo-btn"     id="vo-play-btn" onclick="playVoRec()" style="display:none">▶ Anhören</button>
+      <button class="vo-btn"     id="vo-del-btn"  onclick="delVoRec()"  style="display:none">🗑 Löschen</button>
+    </div>
+    <div class="vo-sync-info" id="vo-sync-info" style="display:none"></div>
+    <div class="vo-sync-btns" id="vo-sync-btns" style="display:none">
+      <button class="etb" onclick="voAdjustFrames()">⚡ Frames anpassen</button>
+      <button class="etb" onclick="voTrimAudio()">✂️ Voiceover kürzen</button>
+    </div>
+    <button class="btn-primary sm" id="vo-save-btn" onclick="saveVoiceover()" style="display:none;width:100%">✅ Speichern</button>
+  </div>
+</div>
+
+<!-- TITLE CARD MODAL -->
+<div id="tc-modal" class="ed-modal hidden">
+  <div class="ed-card">
+    <div class="ed-card-title">
+      <button class="tc-tab-btn active" id="tc-tab-title" onclick="switchTcTab('title')">🖼 Titelkarte</button>
+      <button class="tc-tab-btn" id="tc-tab-credits" onclick="switchTcTab('credits')">🎬 Abspann</button>
+      <button onclick="closeTcModal()" style="margin-left:auto;font-size:18px;color:var(--muted)">✕</button>
+    </div>
+    <!-- TITLE CARD SECTION -->
+    <div id="tc-section-title">
+      <label class="field-label">TEXT</label>
+      <input id="tc-text" class="field-input" type="text" placeholder="Filmtitel…" style="margin-bottom:10px"/>
+      <label class="field-label" style="margin-bottom:6px">UNTERTITEL (optional)</label>
+      <input id="tc-sub" class="field-input" type="text" placeholder="Ein Film von…" style="margin-bottom:10px"/>
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="flex:1">
+          <label class="field-label">HINTERGRUND</label>
+          <input type="color" id="tc-bg" value="#000000"
+            style="width:100%;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer"/>
+        </div>
+        <div style="flex:1">
+          <label class="field-label">TEXTFARBE</label>
+          <input type="color" id="tc-fg" value="#ffffff"
+            style="width:100%;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer"/>
+        </div>
+        <div style="flex:1">
+          <label class="field-label">AKZENT</label>
+          <input type="color" id="tc-accent" value="#fbbf24"
+            style="width:100%;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer"/>
+        </div>
+      </div>
+      <label class="field-label" style="margin-bottom:6px">STIL</label>
+      <div class="tc-styles" id="tc-styles"></div>
+      <label class="field-label" style="margin-bottom:6px">ANZAHL FRAMES</label>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <input type="range" class="prev-slider" id="tc-frames" min="1" max="48" value="8" style="flex:1"/>
+        <span class="prev-val" id="tc-frames-val">8</span>
+      </div>
+      <button class="btn-primary sm" onclick="doInsertTitleCard()" style="width:100%">🖼 Einfügen</button>
+    </div>
+    <!-- CREDITS SECTION -->
+    <div id="tc-section-credits" style="display:none">
+      <label class="field-label">FILMTITEL</label>
+      <input id="cr-title" class="field-input" type="text" placeholder="Mein Film" style="margin-bottom:8px"/>
+      <label class="field-label">CREDITS (eine Zeile pro Eintrag)</label>
+      <textarea id="cr-text" class="field-input" rows="5" style="margin-bottom:10px"
+        placeholder="Regie: Max Mustermann&#10;Kamera: Lena Beispiel&#10;Musik: …"></textarea>
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="flex:1">
+          <label class="field-label">HINTERGRUND</label>
+          <input type="color" id="cr-bg" value="#000000"
+            style="width:100%;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer"/>
+        </div>
+        <div style="flex:1">
+          <label class="field-label">TEXTFARBE</label>
+          <input type="color" id="cr-fg" value="#ffffff"
+            style="width:100%;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer"/>
+        </div>
+        <div style="flex:1">
+          <label class="field-label">AKZENT</label>
+          <input type="color" id="cr-accent" value="#fbbf24"
+            style="width:100%;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer"/>
+        </div>
+      </div>
+      <label class="field-label" style="margin-bottom:6px">STIL</label>
+      <div class="tc-styles" id="cr-styles"></div>
+      <label class="field-label" style="margin-bottom:6px">FRAMES (Gesamtlänge)</label>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <input type="range" class="prev-slider" id="cr-frames" min="8" max="120" value="32" style="flex:1"/>
+        <span class="prev-val" id="cr-frames-val">32</span>
+      </div>
+      <button class="btn-primary sm" onclick="doInsertCredits()" style="width:100%">🎬 Abspann einfügen</button>
+    </div>
+  </div>
+</div>
 
 <!-- ── Impressum / Datenschutz Link ── -->
 <button class="legal-link" onclick="openLegal()">Impressum & Datenschutz</button>
