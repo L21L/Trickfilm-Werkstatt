@@ -3181,14 +3181,28 @@ textarea.field-input{min-height:80px;line-height:1.5}
 
           <!-- Fade -->
           <div style="margin-bottom:14px">
-            <label class="field-label">ÜBERGÄNGE</label>
-            <div style="display:flex;gap:12px">
+            <label class="field-label">ÜBERGÄNGE (BILD)</label>
+            <div style="display:flex;gap:12px;margin-bottom:8px">
               <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);cursor:pointer">
-                <input type="checkbox" id="exp-fadein" onchange="fadeIn=this.checked" style="accent-color:var(--yellow)"/> Einblenden
+                <input type="checkbox" id="exp-fadein" onchange="fadeIn=this.checked;$('exp-fadein-dur-row').style.display=this.checked?'flex':'none'" style="accent-color:var(--yellow)"/> Einblenden
               </label>
               <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);cursor:pointer">
-                <input type="checkbox" id="exp-fadeout" onchange="fadeOut=this.checked" style="accent-color:var(--yellow)"/> Ausblenden
+                <input type="checkbox" id="exp-fadeout" onchange="fadeOut=this.checked;$('exp-fadeout-dur-row').style.display=this.checked?'flex':'none'" style="accent-color:var(--yellow)"/> Ausblenden
               </label>
+            </div>
+            <div id="exp-fadein-dur-row" style="display:none;align-items:center;gap:8px;margin-bottom:6px">
+              <span style="font-size:11px;color:var(--muted);min-width:80px">Einblenden:</span>
+              <input type="range" id="exp-fadein-dur" min="0.3" max="3" step="0.1" value="0.5"
+                oninput="fadeInDuration=+this.value;$('exp-fadein-dur-val').textContent=this.value+'s'"
+                style="flex:1;accent-color:var(--yellow)"/>
+              <span id="exp-fadein-dur-val" style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--yellow);min-width:32px">0.5s</span>
+            </div>
+            <div id="exp-fadeout-dur-row" style="display:none;align-items:center;gap:8px">
+              <span style="font-size:11px;color:var(--muted);min-width:80px">Ausblenden:</span>
+              <input type="range" id="exp-fadeout-dur" min="0.3" max="3" step="0.1" value="0.5"
+                oninput="fadeOutDuration=+this.value;$('exp-fadeout-dur-val').textContent=this.value+'s'"
+                style="flex:1;accent-color:var(--yellow)"/>
+              <span id="exp-fadeout-dur-val" style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--yellow);min-width:32px">0.5s</span>
             </div>
           </div>
 
@@ -6187,6 +6201,8 @@ let brightnessVal    = 0;
 let contrastVal      = 0;
 let fadeIn           = false;
 let fadeOut          = false;
+let fadeInDuration   = 0.5;  // seconds for video fade in
+let fadeOutDuration  = 0.5;  // seconds for video fade out
 let dragSrc          = null;
 let voRecorder       = null;
 let voChunks         = [];
@@ -6683,10 +6699,24 @@ function startPrevAudio() {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             ctx.decodeAudioData(buffer.slice(0), decoded => {
               const gain = ctx.createGain();
-              gain.gain.value = (track.vol || 80) / 100;
+              const vol = (track.vol || 80) / 100;
+              gain.gain.value = vol;
               const src = ctx.createBufferSource();
               src.buffer = decoded;
               src.loop = !!(track.fx && track.fx.loop);
+              // Apply fade in/out via gain ramps
+              const startSec = (track.startFrame || 0) / fps;
+              const fadeDur = track.fadeDuration || 1;
+              if (track.fx && track.fx.fadein) {
+                gain.gain.setValueAtTime(0, ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + fadeDur);
+              }
+              if (track.fx && track.fx.fadeout) {
+                const totalDur = S.shots.length / fps;
+                const trackEndSec = durationMs > 0 ? durationMs / 1000 : (src.loop ? totalDur - startSec : decoded.duration);
+                gain.gain.setValueAtTime(vol, ctx.currentTime + Math.max(0, trackEndSec - fadeDur));
+                gain.gain.linearRampToValueAtTime(0, ctx.currentTime + trackEndSec);
+              }
               src.connect(gain); gain.connect(ctx.destination);
               const el = { audio: null, ctx, src, timeout: null, stopTimeout: null };
               const startFn = () => {
@@ -6734,12 +6764,12 @@ function drawPrevFrame(shot) {
     ctx.drawImage(img, 0, 0);
     ctx.filter = 'none';
     // Fade in/out
-    if (fadeIn && prevIdx <= Math.ceil(S.fps * 0.5) && prevIdx === 0) {
-      ctx.fillStyle = 'rgba(0,0,0,' + (1 - prevIdx / (S.fps*0.5)) + ')';
+    if (fadeIn && prevIdx < Math.ceil(S.fps * fadeInDuration)) {
+      ctx.fillStyle = 'rgba(0,0,0,' + (1 - prevIdx / (S.fps * fadeInDuration)) + ')';
       ctx.fillRect(0,0,cv.width,cv.height);
     }
-    if (fadeOut && prevIdx >= S.shots.length - Math.ceil(S.fps * 0.5)) {
-      const t = (prevIdx - (S.shots.length - Math.ceil(S.fps*0.5))) / (S.fps*0.5);
+    if (fadeOut && prevIdx >= S.shots.length - Math.ceil(S.fps * fadeOutDuration)) {
+      const t = (prevIdx - (S.shots.length - Math.ceil(S.fps * fadeOutDuration))) / (S.fps * fadeOutDuration);
       ctx.fillStyle = `rgba(0,0,0,${Math.min(1,t)})`;
       ctx.fillRect(0,0,cv.width,cv.height);
     }
@@ -7380,10 +7410,20 @@ function renderAudioTracks() {
         <span style="min-width:32px;font-family:'Fredoka One',cursive;color:var(--teal);font-size:12px">${track.vol}%</span>
       </div>
       <!-- Per-track FX -->
-      <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:8px;display:flex;gap:6px;flex-wrap:wrap">
-        <button class="audio-fx-btn${fx.fadein?' active':''}" onclick="toggleTrackFx('${track.id}','fadein')">⬛→🌅 Fade In</button>
-        <button class="audio-fx-btn${fx.fadeout?' active':''}" onclick="toggleTrackFx('${track.id}','fadeout')">🌅→⬛ Fade Out</button>
-        <button class="audio-fx-btn${fx.loop?' active':''}" onclick="toggleTrackFx('${track.id}','loop')">🔁 Loop</button>
+      <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:8px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="audio-fx-btn${fx.fadein?' active':''}" onclick="toggleTrackFx('${track.id}','fadein')">⬛→🌅 Fade In</button>
+          <button class="audio-fx-btn${fx.fadeout?' active':''}" onclick="toggleTrackFx('${track.id}','fadeout')">🌅→⬛ Fade Out</button>
+          <button class="audio-fx-btn${fx.loop?' active':''}" onclick="toggleTrackFx('${track.id}','loop')">🔁 Loop</button>
+        </div>
+        ${(fx.fadein || fx.fadeout) ? `
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 0">
+          <span style="font-size:11px;color:var(--muted);min-width:72px">Fade-Dauer:</span>
+          <input type="range" min="0.3" max="5" step="0.1" value="${track.fadeDuration || 1}"
+            oninput="setTrackFadeDuration('${track.id}',+this.value);this.nextElementSibling.textContent=this.value+'s'"
+            style="flex:1;accent-color:var(--teal)"/>
+          <span style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--teal);min-width:32px">${track.fadeDuration || 1}s</span>
+        </div>` : ''}
       </div>
     `;
     if (track.sceneIdx !== undefined && track.sceneIdx >= 0) {
@@ -7434,6 +7474,11 @@ function setTrackEndFrame(id, frame) {
 function setTrackVol(id, vol) {
   const track = window.audioTracks.find(t => t.id === id);
   if (track) track.vol = vol;
+}
+
+function setTrackFadeDuration(id, dur) {
+  const track = window.audioTracks.find(t => t.id === id);
+  if (track) track.fadeDuration = dur;
 }
 
 function assignCurrentMusicToTrack(id) {
@@ -7592,10 +7637,6 @@ function renderMusLib() {
         <div id="mus-lib-btns-${track.key}" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
           ${has ? `
             <button class="mus-prev-btn btn-outline" data-key="${track.key}" onclick="musPreview('${track.key}',this)" style="font-size:12px;padding:6px 12px">▶ Vorschau</button>
-            <button class="btn-outline" onclick="musSelectTrack('${track.key}','${track.name}','${track.artist}')"
-              style="font-size:12px;padding:6px 12px;${isSelected?'border-color:var(--yellow);color:var(--yellow)':''}">
-              ${isSelected ? '✅ Ausgewählt' : '✅ Auswählen'}
-            </button>
             <button class="btn-outline" onclick="assignLibTrackToNewTrack('${track.name}','${track.key}')"
               style="font-size:12px;padding:6px 10px;border-color:rgba(45,212,191,.35);color:var(--teal)">
               + Spur
@@ -7736,9 +7777,9 @@ function updateCustomCard(key, name, isSelected, durStr) {
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">
       <button class="mus-prev-btn btn-outline" data-key="${key}" onclick="musPreview('${key}',this)" style="font-size:12px;padding:6px 12px">▶ Vorschau</button>
-      <button class="btn-outline" onclick="musSelectTrack('${key}','${name}','')"
-        style="font-size:12px;padding:6px 12px;${isSelected?'border-color:var(--yellow);color:var(--yellow)':''}">
-        ${isSelected ? '✅ Ausgewählt' : '✅ Auswählen'}
+      <button class="btn-outline" onclick="assignLibTrackToNewTrack('${name}','${key}')"
+        style="font-size:12px;padding:6px 10px;border-color:rgba(45,212,191,.35);color:var(--teal)">
+        + Spur
       </button>
       <button class="btn-red" onclick="musDeleteCustom('${key}')" style="font-size:12px;padding:6px 10px">🗑</button>
     </div>
@@ -7880,9 +7921,12 @@ function drawSubtitles(ctx, frameIdx, w, h) {
 }
 function applyFade(ctx, frameIdx, w, h) {
   const total = S.shots.length;
+  const fps = S.fps || 8;
+  const fadeInFrames = Math.ceil(fps * fadeInDuration);
+  const fadeOutFrames = Math.ceil(fps * fadeOutDuration);
   let alpha = 0;
-  if (fadeIn  && frameIdx < 3)          alpha = 1 - frameIdx / 3;
-  if (fadeOut && frameIdx > total - 4)  alpha = (frameIdx - (total - 4)) / 3;
+  if (fadeIn  && frameIdx < fadeInFrames)           alpha = 1 - frameIdx / fadeInFrames;
+  if (fadeOut && frameIdx > total - 1 - fadeOutFrames)  alpha = (frameIdx - (total - 1 - fadeOutFrames)) / fadeOutFrames;
   if (alpha > 0) {
     ctx.save();
     ctx.globalAlpha = Math.min(1, Math.max(0, alpha));
@@ -8121,6 +8165,106 @@ function deleteSubtitle(i) {
 }
 
 // ── Export dispatcher ────────────────────────────
+// ── Multi-track audio mixer for export ──────────
+async function mixAudioTracksIntoStream(stream) {
+  const tracks = window.audioTracks || [];
+  // Also consider legacy S.music if no audioTracks exist
+  const hasAudioTracks = tracks.some(t => t.musicKey || t.voiceover);
+  if (!hasAudioTracks && !S.music) return;
+
+  try {
+    const actx = new (window.AudioContext || window.webkitAudioContext)();
+    const dest = actx.createMediaStreamDestination();
+    const fps = S.fps || 8;
+    const totalDuration = S.shots.length / fps;
+
+    // Helper to load and schedule a single track
+    const scheduleTrack = (track) => new Promise(resolve => {
+      const startSec = (track.startFrame || 0) / fps;
+      const vol = (track.vol || 80) / 100;
+      const fx = track.fx || {};
+
+      if (track.type === 'voiceover' && track.voiceover) {
+        // Voiceover: decode data URL
+        fetch(track.voiceover).then(r => r.arrayBuffer()).then(buf => {
+          actx.decodeAudioData(buf, decoded => {
+            const src = actx.createBufferSource();
+            src.buffer = decoded;
+            if (fx.loop) src.loop = true;
+            const gain = actx.createGain();
+            gain.gain.value = vol;
+            // Audio fade in/out
+            if (fx.fadein) {
+              const fadeDur = track.fadeDuration || 1;
+              gain.gain.setValueAtTime(0, startSec);
+              gain.gain.linearRampToValueAtTime(vol, startSec + fadeDur);
+            }
+            if (fx.fadeout) {
+              const fadeDur = track.fadeDuration || 1;
+              const endTime = fx.loop ? totalDuration : Math.min(startSec + decoded.duration, totalDuration);
+              gain.gain.setValueAtTime(vol, Math.max(0, endTime - fadeDur));
+              gain.gain.linearRampToValueAtTime(0, endTime);
+            }
+            src.connect(gain); gain.connect(dest);
+            src.start(startSec);
+            resolve();
+          }, () => resolve());
+        }).catch(() => resolve());
+      } else if (track.musicKey) {
+        idbGetMusic(track.musicKey, buffer => {
+          if (!buffer) { resolve(); return; }
+          actx.decodeAudioData(buffer.slice(0), decoded => {
+            const src = actx.createBufferSource();
+            src.buffer = decoded;
+            if (fx.loop) src.loop = true;
+            const gain = actx.createGain();
+            gain.gain.value = vol;
+            // Audio fade in/out
+            if (fx.fadein) {
+              const fadeDur = track.fadeDuration || 1;
+              gain.gain.setValueAtTime(0, startSec);
+              gain.gain.linearRampToValueAtTime(vol, startSec + fadeDur);
+            }
+            if (fx.fadeout) {
+              const fadeDur = track.fadeDuration || 1;
+              const endTime = fx.loop ? totalDuration : Math.min(startSec + decoded.duration, totalDuration);
+              gain.gain.setValueAtTime(vol, Math.max(0, endTime - fadeDur));
+              gain.gain.linearRampToValueAtTime(0, endTime);
+            }
+            src.connect(gain); gain.connect(dest);
+            src.start(startSec);
+            resolve();
+          }, () => resolve());
+        });
+      } else { resolve(); }
+    });
+
+    if (hasAudioTracks) {
+      await Promise.all(tracks.filter(t => t.musicKey || t.voiceover).map(scheduleTrack));
+    } else if (S.music) {
+      // Legacy fallback: single S.music track
+      const buf = await loadMusicBuffer();
+      if (buf) {
+        await new Promise(resolve => {
+          actx.decodeAudioData(buf.slice(0), decoded => {
+            const src = actx.createBufferSource();
+            src.buffer = decoded; src.loop = true;
+            const gain = actx.createGain();
+            gain.gain.value = S.vol || 0.8;
+            src.connect(gain); gain.connect(dest);
+            src.start();
+            resolve();
+          }, () => resolve());
+        });
+      }
+    }
+
+    dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+    // Store context reference so it stays alive during export
+    window._exportAudioCtx = actx;
+  } catch(e) { console.error('Audio mix error:', e); }
+}
+
 function startExport(fmt) {
   if (S.shots.length === 0) { showToast('⚠️ Keine Fotos zum Exportieren!'); return; }
   exportAborted = false;
@@ -8150,24 +8294,8 @@ async function doWebM() {
   const ctx    = canvas.getContext('2d');
   const stream = canvas.captureStream(S.fps);
 
-  if (S.music) {
-    try {
-      const buf = await loadMusicBuffer();
-      if (buf) {
-        const actx = new (window.AudioContext || window.webkitAudioContext)();
-        const dest = actx.createMediaStreamDestination();
-        actx.decodeAudioData(buf.slice(0), decoded => {
-          const src = actx.createBufferSource();
-          src.buffer = decoded; src.loop = true;
-          const gainNode = actx.createGain();
-          gainNode.gain.value = S.vol || 0.8;
-          src.connect(gainNode); gainNode.connect(dest);
-          src.start();
-        });
-        dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
-      }
-    } catch(e) {}
-  }
+  // ── Mix all audioTracks into the export stream ──
+  await mixAudioTracksIntoStream(stream);
 
   const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
     ? 'video/webm;codecs=vp9' : 'video/webm';
@@ -8239,23 +8367,8 @@ async function doMP4Native(mimeType) {
   const ctx    = canvas.getContext('2d');
   const stream = canvas.captureStream(S.fps);
 
-  if (S.music) {
-    try {
-      const buf = await loadMusicBuffer();
-      if (buf) {
-        const actx = new (window.AudioContext || window.webkitAudioContext)();
-        const dest = actx.createMediaStreamDestination();
-        actx.decodeAudioData(buf.slice(0), decoded => {
-          const src = actx.createBufferSource();
-          src.buffer = decoded; src.loop = true;
-          const gainNode = actx.createGain();
-          gainNode.gain.value = S.vol || 0.8;
-          src.connect(gainNode); gainNode.connect(dest); src.start();
-        });
-        dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
-      }
-    } catch(e) {}
-  }
+  // ── Mix all audioTracks into the export stream ──
+  await mixAudioTracksIntoStream(stream);
 
   let recorder;
   try {
@@ -8308,7 +8421,17 @@ async function doMP4FFmpeg() {
   }
 
   let audioArgs = [];
-  if (S.music) {
+  // Try to get audio from audioTracks (first music track with a musicKey)
+  const firstMusicTrack = (window.audioTracks || []).find(t => t.musicKey);
+  if (firstMusicTrack) {
+    try {
+      const buf = await new Promise(res => idbGetMusic(firstMusicTrack.musicKey, res));
+      if (buf) {
+        await ffmpeg.writeFile('music.mp3', new Uint8Array(buf));
+        audioArgs = ['-i', 'music.mp3', '-shortest'];
+      }
+    } catch(e) {}
+  } else if (S.music) {
     try {
       const buf = await loadMusicBuffer();
       if (buf) {
@@ -8667,6 +8790,15 @@ function initExportTab() {
   const fo = $('exp-fadeout');
   if (fi) fi.checked = fadeIn;
   if (fo) fo.checked = fadeOut;
+  // Restore fade duration UI
+  const fiDurRow = $('exp-fadein-dur-row');
+  const foDurRow = $('exp-fadeout-dur-row');
+  if (fiDurRow) fiDurRow.style.display = fadeIn ? 'flex' : 'none';
+  if (foDurRow) foDurRow.style.display = fadeOut ? 'flex' : 'none';
+  const fiDur = $('exp-fadein-dur');
+  const foDur = $('exp-fadeout-dur');
+  if (fiDur) { fiDur.value = fadeInDuration; $('exp-fadein-dur-val').textContent = fadeInDuration + 's'; }
+  if (foDur) { foDur.value = fadeOutDuration; $('exp-fadeout-dur-val').textContent = fadeOutDuration + 's'; }
 
   updExpSum();
   renderSubList();
