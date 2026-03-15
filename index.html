@@ -960,6 +960,60 @@ textarea.field-input{min-height:80px;line-height:1.5}
 .grp-del:hover{opacity:1}
 
 /* ── Modals shared ── */
+/* ══════════════════════════════════════
+   SPEECH BUBBLE EDITOR STYLES
+══════════════════════════════════════ */
+#bubble-editor-modal{position:fixed;inset:0;z-index:5500;background:rgba(4,7,16,.92);
+  display:flex;align-items:center;justify-content:center;padding:10px;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+#bubble-editor-modal.hidden{display:none}
+.bubble-editor-card{background:rgba(13,17,27,.97);border:1px solid rgba(255,255,255,.1);border-radius:20px;
+  padding:18px;width:100%;max-width:680px;max-height:95vh;overflow-y:auto;
+  box-shadow:0 24px 64px rgba(0,0,0,.75),0 0 0 1px rgba(251,191,36,.05)}
+.bub-canvas-wrap{position:relative;border-radius:12px;overflow:hidden;border:2px solid var(--border);
+  background:#111;margin-bottom:14px;cursor:crosshair;touch-action:none}
+.bub-canvas-wrap canvas{display:block;width:100%;height:auto}
+.bub-toolbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.bub-tool-btn{padding:7px 12px;border-radius:9px;border:1px solid var(--glass-border);
+  background:rgba(255,255,255,.04);color:var(--muted);font-family:'Fredoka One',cursive;
+  font-size:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
+.bub-tool-btn:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.bub-tool-btn.active{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.5);
+  color:var(--yellow);box-shadow:0 0 10px rgba(251,191,36,.12)}
+.bub-style-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.bub-style-opt{padding:10px 6px;border-radius:10px;border:1px solid var(--glass-border);
+  background:rgba(255,255,255,.03);color:var(--muted);font-family:'Fredoka One',cursive;
+  font-size:11px;cursor:pointer;transition:all .2s;text-align:center;line-height:1.3}
+.bub-style-opt:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.bub-style-opt.active{border-color:rgba(251,191,36,.5);color:var(--yellow);
+  background:rgba(251,191,36,.1)}
+.bub-style-opt .bub-style-icon{font-size:22px;display:block;margin-bottom:3px}
+.bub-list{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;max-height:140px;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.bub-list-item{background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:8px 10px;display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;
+  transition:all .15s}
+.bub-list-item:hover{border-color:rgba(251,191,36,.4)}
+.bub-list-item.selected{border-color:var(--yellow);background:rgba(251,191,36,.08)}
+.bub-props{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.bub-prop-group{display:flex;flex-direction:column;gap:4px}
+.bub-prop-group label{font-size:10px;color:var(--muted);font-family:'Fredoka One',cursive;letter-spacing:.5px}
+.bub-prop-group input,.bub-prop-group select{width:100%;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px 8px;color:var(--text);
+  font-size:12px;font-family:inherit}
+.bub-prop-group input:focus,.bub-prop-group select:focus{border-color:rgba(251,191,36,.5);
+  outline:none;box-shadow:0 0 0 2px rgba(251,191,36,.1)}
+.bub-section-title{font-family:'Fredoka One',cursive;font-size:13px;color:var(--teal);
+  margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.bub-frame-apply{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.bub-frame-opt{flex:1;min-width:100px;padding:8px 6px;border-radius:10px;
+  border:1px solid var(--glass-border);background:rgba(255,255,255,.03);
+  color:var(--muted);font-family:'Fredoka One',cursive;font-size:11px;
+  cursor:pointer;transition:all .2s;text-align:center}
+.bub-frame-opt:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.bub-frame-opt.active{border-color:rgba(45,212,191,.5);color:var(--teal);
+  background:rgba(45,212,191,.1)}
+
 .ed-modal{position:fixed;inset:0;z-index:5500;background:rgba(4,7,16,.88);
   display:flex;align-items:center;justify-content:center;padding:16px;
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
@@ -2946,6 +3000,10 @@ textarea.field-input{min-height:80px;line-height:1.5}
             <button class="etb" onclick="openFreistellenModal()" style="background:linear-gradient(135deg,rgba(34,197,94,.18),rgba(45,212,191,.12));border-color:rgba(34,197,94,.45);color:#4ade80">
               <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M3 13l4-4M7 9l2-6 1 3 3-1-2 2 3 3-3-1-1 3-2-2-1 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2 1.5"/></svg>
               Freistellen
+            </button>
+            <button class="etb" onclick="openBubbleEditor()" style="background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(168,85,247,.12));border-color:rgba(251,191,36,.45);color:#fbbf24">
+              <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M2 2.5C2 1.7 2.7 1 3.5 1h9c.8 0 1.5.7 1.5 1.5v7c0 .8-.7 1.5-1.5 1.5H6l-3 2.5V11H3.5C2.7 11 2 10.3 2 9.5v-7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5 5h6M5 7.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/></svg>
+              Sprechblasen
             </button>
             <button class="etb" onclick="ckTogglePanel('right',true)">
               <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/></svg>
@@ -10940,6 +10998,711 @@ function hexToRgb(hex) {
         <span class="prev-val" id="cr-frames-val">32</span>
       </div>
       <button class="btn-primary sm" onclick="doInsertCredits()" style="width:100%">🎬 Abspann einfügen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SPEECH BUBBLE EDITOR MODAL
+══════════════════════════════════════ -->
+<!-- ══════════════════════════════════════
+     SPEECH BUBBLE EDITOR MODAL
+══════════════════════════════════════ -->
+<script>
+/* ═══════════════════════════════════════════════
+   SPEECH BUBBLE EDITOR — Sprechblasen auf Frames
+   ═══════════════════════════════════════════════ */
+let bubBubbles = [];
+let bubSelectedIdx = -1;
+let bubDragging = false;
+let bubDragOffX = 0, bubDragOffY = 0;
+let bubImgW = 1, bubImgH = 1, bubScale = 1;
+let bubApplyMode = 'selected';
+let bubBgImage = null;
+
+function openBubbleEditor() {
+  const modal = document.getElementById('bubble-editor-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  const hasSel = typeof selFrames !== 'undefined' && selFrames.size > 0;
+  document.getElementById('bub-no-sel').style.display = hasSel ? 'none' : '';
+  document.getElementById('bub-main').style.display = hasSel ? '' : 'none';
+  if (!hasSel) return;
+
+  bubBubbles = [];
+  bubSelectedIdx = -1;
+  bubApplyMode = 'selected';
+
+  // Load the first selected frame as background
+  const firstShot = S.shots.find(s => selFrames.has(s.id));
+  if (firstShot) bubLoadPreview(firstShot.data);
+  bubRenderList();
+  bubResetStyleBtns();
+}
+
+function closeBubbleEditor() {
+  document.getElementById('bubble-editor-modal').classList.add('hidden');
+}
+
+function bubLoadPreview(dataUrl) {
+  const img = new Image();
+  img.onload = () => {
+    bubBgImage = img;
+    bubImgW = img.width;
+    bubImgH = img.height;
+    const wrap = document.getElementById('bub-canvas-wrap');
+    const maxW = Math.min(wrap.clientWidth || 640, 640);
+    bubScale = Math.min(1, maxW / img.width);
+    const cv = document.getElementById('bub-canvas');
+    cv.width = Math.round(img.width * bubScale);
+    cv.height = Math.round(img.height * bubScale);
+    cv.style.width = cv.width + 'px';
+    cv.style.height = cv.height + 'px';
+    bubDrawAll();
+    bubSetupCanvasEvents();
+  };
+  img.src = dataUrl;
+}
+
+function bubDrawAll() {
+  const cv = document.getElementById('bub-canvas');
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  if (bubBgImage) ctx.drawImage(bubBgImage, 0, 0, cv.width, cv.height);
+
+  bubBubbles.forEach((b, i) => {
+    const x = b.x * bubScale, y = b.y * bubScale;
+    const w = b.w * bubScale, h = b.h * bubScale;
+    const fs = b.fontSize * bubScale;
+    const bw = b.borderWidth * bubScale;
+    const isSel = (i === bubSelectedIdx);
+
+    ctx.save();
+    bubDrawShape(ctx, b.style, x, y, w, h, b.bgColor, b.borderColor, bw, b.tail);
+
+    // Text
+    ctx.fillStyle = b.textColor;
+    ctx.font = (b.style === 'shout' || b.style === 'comic' ? 'bold ' : '') + Math.round(fs) + 'px ' +
+      (b.style === 'narrator' ? 'Georgia,serif' :
+       b.style === 'comic' ? "'Fredoka One',cursive" : 'sans-serif');
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const lines = bubWrapText(ctx, b.text || '', w * 0.82);
+    const lh = fs * 1.25;
+    const startY = y + h / 2 - ((lines.length - 1) * lh) / 2;
+    lines.forEach((line, li) => {
+      ctx.fillText(line, x + w / 2, startY + li * lh);
+    });
+
+    // Selection highlight
+    if (isSel) {
+      ctx.strokeStyle = 'rgba(251,191,36,.8)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 3]);
+      ctx.strokeRect(x - 3, y - 3, w + 6, h + 6);
+      ctx.setLineDash([]);
+      // Resize handles
+      [[x - 4, y - 4], [x + w - 4, y - 4], [x - 4, y + h - 4], [x + w - 4, y + h - 4]].forEach(([hx, hy]) => {
+        ctx.fillStyle = 'var(--yellow)';
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(hx, hy, 8, 8);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(hx, hy, 8, 8);
+      });
+    }
+    ctx.restore();
+  });
+}
+
+function bubDrawShape(ctx, style, x, y, w, h, bg, border, bw, tail) {
+  ctx.save();
+  switch (style) {
+    case 'speech': bubDrawRoundRect(ctx, x, y, w, h, 16 * bubScale, bg, border, bw); break;
+    case 'thought': bubDrawThought(ctx, x, y, w, h, bg, border, bw); break;
+    case 'shout': bubDrawShout(ctx, x, y, w, h, bg, border, bw); break;
+    case 'narrator': bubDrawNarrator(ctx, x, y, w, h, bg, border, bw); break;
+    case 'whisper': bubDrawWhisper(ctx, x, y, w, h, bg, border, bw); break;
+    case 'cloud': bubDrawCloud(ctx, x, y, w, h, bg, border, bw); break;
+    case 'box': bubDrawBox(ctx, x, y, w, h, bg, border, bw); break;
+    case 'comic': bubDrawComic(ctx, x, y, w, h, bg, border, bw); break;
+    default: bubDrawRoundRect(ctx, x, y, w, h, 16 * bubScale, bg, border, bw);
+  }
+  // Draw tail
+  if (tail !== 'none') bubDrawTail(ctx, style, x, y, w, h, bg, border, bw, tail);
+  ctx.restore();
+}
+
+function bubDrawRoundRect(ctx, x, y, w, h, r, bg, border, bw) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  ctx.fillStyle = bg; ctx.fill();
+  if (bw > 0) { ctx.strokeStyle = border; ctx.lineWidth = bw; ctx.stroke(); }
+}
+
+function bubDrawThought(ctx, x, y, w, h, bg, border, bw) {
+  const rx = w / 2, ry = h / 2, cx = x + rx, cy = y + ry;
+  ctx.beginPath();
+  const bumps = 14;
+  for (let i = 0; i <= bumps; i++) {
+    const a = (i / bumps) * Math.PI * 2 - Math.PI / 2;
+    const bumpR = 8 * bubScale;
+    const px = cx + (rx + bumpR * Math.sin(i * 5)) * Math.cos(a);
+    const py = cy + (ry + bumpR * Math.sin(i * 5)) * Math.sin(a);
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fillStyle = bg; ctx.fill();
+  if (bw > 0) { ctx.strokeStyle = border; ctx.lineWidth = bw; ctx.stroke(); }
+}
+
+function bubDrawShout(ctx, x, y, w, h, bg, border, bw) {
+  const cx = x + w / 2, cy = y + h / 2;
+  const spikes = 12;
+  ctx.beginPath();
+  for (let i = 0; i < spikes * 2; i++) {
+    const a = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
+    const r = i % 2 === 0 ? 1 : 0.72;
+    const px = cx + (w / 2) * r * Math.cos(a);
+    const py = cy + (h / 2) * r * Math.sin(a);
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fillStyle = bg; ctx.fill();
+  if (bw > 0) { ctx.strokeStyle = border; ctx.lineWidth = bw; ctx.stroke(); }
+}
+
+function bubDrawNarrator(ctx, x, y, w, h, bg, border, bw) {
+  ctx.fillStyle = bg;
+  ctx.fillRect(x, y, w, h);
+  if (bw > 0) { ctx.strokeStyle = border; ctx.lineWidth = bw; ctx.strokeRect(x, y, w, h); }
+  // Inner frame
+  const m = 4 * bubScale;
+  ctx.strokeStyle = border; ctx.lineWidth = Math.max(1, bw * 0.5);
+  ctx.strokeRect(x + m, y + m, w - m * 2, h - m * 2);
+}
+
+function bubDrawWhisper(ctx, x, y, w, h, bg, border, bw) {
+  const r = Math.min(20 * bubScale, w / 2, h / 2);
+  ctx.setLineDash([6 * bubScale, 4 * bubScale]);
+  bubDrawRoundRect(ctx, x, y, w, h, r, bg, border, bw);
+  ctx.setLineDash([]);
+}
+
+function bubDrawCloud(ctx, x, y, w, h, bg, border, bw) {
+  ctx.beginPath();
+  const cx = x + w / 2, cy = y + h / 2;
+  const steps = 24;
+  for (let i = 0; i <= steps; i++) {
+    const a = (i / steps) * Math.PI * 2;
+    const wobble = Math.sin(a * 6) * 6 * bubScale;
+    const px = cx + (w / 2 + wobble) * Math.cos(a);
+    const py = cy + (h / 2 + wobble) * Math.sin(a);
+    if (i === 0) ctx.moveTo(px, py); else ctx.quadraticCurveTo(
+      cx + (w / 2 + wobble + 5 * bubScale) * Math.cos(a - 0.1),
+      cy + (h / 2 + wobble + 5 * bubScale) * Math.sin(a - 0.1), px, py);
+  }
+  ctx.closePath();
+  ctx.fillStyle = bg; ctx.fill();
+  if (bw > 0) { ctx.strokeStyle = border; ctx.lineWidth = bw; ctx.stroke(); }
+}
+
+function bubDrawBox(ctx, x, y, w, h, bg, border, bw) {
+  ctx.fillStyle = bg;
+  ctx.fillRect(x, y, w, h);
+  if (bw > 0) { ctx.strokeStyle = border; ctx.lineWidth = bw; ctx.strokeRect(x, y, w, h); }
+}
+
+function bubDrawComic(ctx, x, y, w, h, bg, border, bw) {
+  const cx = x + w / 2, cy = y + h / 2;
+  const pts = 16;
+  ctx.beginPath();
+  for (let i = 0; i < pts * 2; i++) {
+    const a = (i / (pts * 2)) * Math.PI * 2 - Math.PI / 2;
+    const jag = i % 2 === 0 ? 1 : 0.84;
+    const px = cx + (w / 2) * jag * Math.cos(a);
+    const py = cy + (h / 2) * jag * Math.sin(a);
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fillStyle = bg; ctx.fill();
+  if (bw > 0) { ctx.strokeStyle = border; ctx.lineWidth = bw + 1; ctx.stroke(); }
+}
+
+function bubDrawTail(ctx, style, x, y, w, h, bg, border, bw, tail) {
+  let tx, ty, bx1, by1, bx2, by2;
+  const ts = 18 * bubScale; // tail size
+  const tw = 10 * bubScale; // tail width at base
+
+  switch (tail) {
+    case 'bottom-left':   bx1 = x + w * 0.2 - tw; by1 = y + h; bx2 = x + w * 0.2 + tw; by2 = y + h; tx = x + w * 0.1; ty = y + h + ts; break;
+    case 'bottom-right':  bx1 = x + w * 0.8 - tw; by1 = y + h; bx2 = x + w * 0.8 + tw; by2 = y + h; tx = x + w * 0.9; ty = y + h + ts; break;
+    case 'bottom-center': bx1 = x + w * 0.45; by1 = y + h; bx2 = x + w * 0.55; by2 = y + h; tx = x + w * 0.5; ty = y + h + ts; break;
+    case 'top-left':      bx1 = x + w * 0.2 - tw; by1 = y; bx2 = x + w * 0.2 + tw; by2 = y; tx = x + w * 0.1; ty = y - ts; break;
+    case 'top-right':     bx1 = x + w * 0.8 - tw; by1 = y; bx2 = x + w * 0.8 + tw; by2 = y; tx = x + w * 0.9; ty = y - ts; break;
+    case 'top-center':    bx1 = x + w * 0.45; by1 = y; bx2 = x + w * 0.55; by2 = y; tx = x + w * 0.5; ty = y - ts; break;
+    case 'left':          bx1 = x; by1 = y + h * 0.4; bx2 = x; by2 = y + h * 0.6; tx = x - ts; ty = y + h * 0.5; break;
+    case 'right':         bx1 = x + w; by1 = y + h * 0.4; bx2 = x + w; by2 = y + h * 0.6; tx = x + w + ts; ty = y + h * 0.5; break;
+    default: return;
+  }
+
+  if (style === 'thought') {
+    // Thought bubbles get dots instead of a tail
+    const steps = 3;
+    for (let i = 1; i <= steps; i++) {
+      const t = i / (steps + 1);
+      const dx = bx1 + (tx - bx1) * t;
+      const dy = by1 + (ty - by1) * t;
+      const r = (4 - i) * 2.5 * bubScale;
+      ctx.beginPath(); ctx.arc(dx, dy, r, 0, Math.PI * 2); ctx.closePath();
+      ctx.fillStyle = bg; ctx.fill();
+      if (bw > 0) { ctx.strokeStyle = border; ctx.lineWidth = bw; ctx.stroke(); }
+    }
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(bx1, by1);
+    ctx.lineTo(tx, ty);
+    ctx.lineTo(bx2, by2);
+    ctx.closePath();
+    ctx.fillStyle = bg; ctx.fill();
+    if (bw > 0) { ctx.strokeStyle = border; ctx.lineWidth = bw; ctx.stroke(); }
+  }
+}
+
+function bubWrapText(ctx, text, maxW) {
+  if (!text) return [''];
+  const words = text.split(/\s+/);
+  const lines = [];
+  let cur = '';
+  words.forEach(w => {
+    const test = cur ? cur + ' ' + w : w;
+    if (ctx.measureText(test).width > maxW && cur) {
+      lines.push(cur);
+      cur = w;
+    } else {
+      cur = test;
+    }
+  });
+  if (cur) lines.push(cur);
+  return lines.length ? lines : [''];
+}
+
+// ── Canvas interaction (drag to move bubbles) ──
+function bubSetupCanvasEvents() {
+  const cv = document.getElementById('bub-canvas');
+  const events = { mousedown: bubOnDown, mousemove: bubOnMove, mouseup: bubOnUp,
+    touchstart: bubOnDown, touchmove: bubOnMove, touchend: bubOnUp };
+  Object.entries(events).forEach(([e, fn]) => {
+    cv.removeEventListener(e, fn);
+    cv.addEventListener(e, fn, { passive: false });
+  });
+}
+
+function bubGetPos(e) {
+  const cv = document.getElementById('bub-canvas');
+  const rect = cv.getBoundingClientRect();
+  const t = e.touches ? e.touches[0] : e;
+  return { x: (t.clientX - rect.left), y: (t.clientY - rect.top) };
+}
+
+function bubOnDown(e) {
+  e.preventDefault();
+  const pos = bubGetPos(e);
+  // Check if we clicked on a bubble (reverse order for z-index)
+  for (let i = bubBubbles.length - 1; i >= 0; i--) {
+    const b = bubBubbles[i];
+    const bx = b.x * bubScale, by = b.y * bubScale;
+    const bw = b.w * bubScale, bh = b.h * bubScale;
+    if (pos.x >= bx && pos.x <= bx + bw && pos.y >= by && pos.y <= by + bh) {
+      bubSelectedIdx = i;
+      bubDragging = true;
+      bubDragOffX = pos.x - bx;
+      bubDragOffY = pos.y - by;
+      bubLoadPropsFromSelected();
+      bubRenderList();
+      bubDrawAll();
+      return;
+    }
+  }
+  bubSelectedIdx = -1;
+  bubRenderList();
+  bubDrawAll();
+}
+
+function bubOnMove(e) {
+  if (!bubDragging || bubSelectedIdx < 0) return;
+  e.preventDefault();
+  const pos = bubGetPos(e);
+  const b = bubBubbles[bubSelectedIdx];
+  b.x = Math.max(0, Math.min(bubImgW - b.w, (pos.x - bubDragOffX) / bubScale));
+  b.y = Math.max(0, Math.min(bubImgH - b.h, (pos.y - bubDragOffY) / bubScale));
+  bubDrawAll();
+}
+
+function bubOnUp(e) {
+  bubDragging = false;
+}
+
+// ── Bubble management ──
+function bubAddBubble() {
+  const b = {
+    text: 'Hallo!',
+    x: 40 + bubBubbles.length * 20,
+    y: 40 + bubBubbles.length * 15,
+    w: 180, h: 100,
+    fontSize: 18,
+    style: 'speech',
+    tail: 'bottom-center',
+    bgColor: '#ffffff',
+    textColor: '#000000',
+    borderColor: '#000000',
+    borderWidth: 2
+  };
+  bubBubbles.push(b);
+  bubSelectedIdx = bubBubbles.length - 1;
+  bubLoadPropsFromSelected();
+  bubRenderList();
+  bubDrawAll();
+}
+
+function bubDeleteSelected() {
+  if (bubSelectedIdx < 0 || bubSelectedIdx >= bubBubbles.length) return;
+  bubBubbles.splice(bubSelectedIdx, 1);
+  bubSelectedIdx = Math.min(bubSelectedIdx, bubBubbles.length - 1);
+  if (bubSelectedIdx >= 0) bubLoadPropsFromSelected();
+  bubRenderList();
+  bubDrawAll();
+}
+
+function bubSelectBubble(idx) {
+  bubSelectedIdx = idx;
+  bubLoadPropsFromSelected();
+  bubRenderList();
+  bubDrawAll();
+}
+
+function bubRenderList() {
+  const list = document.getElementById('bub-list');
+  const empty = document.getElementById('bub-list-empty');
+  list.querySelectorAll('.bub-list-item').forEach(e => e.remove());
+  if (bubBubbles.length === 0) { empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  bubBubbles.forEach((b, i) => {
+    const d = document.createElement('div');
+    d.className = 'bub-list-item' + (i === bubSelectedIdx ? ' selected' : '');
+    const styleIcons = { speech: '💬', thought: '💭', shout: '💥', narrator: '📜', whisper: '🤫', cloud: '☁️', box: '🏷️', comic: '⚡' };
+    d.innerHTML = `<span style="font-size:18px">${styleIcons[b.style] || '💬'}</span>
+      <span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.text || '(leer)'}</span>
+      <span style="font-size:10px;color:var(--muted)">${Math.round(b.w)}×${Math.round(b.h)}</span>`;
+    d.onclick = () => bubSelectBubble(i);
+    list.appendChild(d);
+  });
+}
+
+function bubLoadPropsFromSelected() {
+  if (bubSelectedIdx < 0 || bubSelectedIdx >= bubBubbles.length) return;
+  const b = bubBubbles[bubSelectedIdx];
+  document.getElementById('bub-text').value = b.text;
+  document.getElementById('bub-width').value = b.w;
+  document.getElementById('bub-height').value = b.h;
+  document.getElementById('bub-fontsize').value = b.fontSize;
+  document.getElementById('bub-tail').value = b.tail;
+  document.getElementById('bub-bg-color').value = b.bgColor;
+  document.getElementById('bub-text-color').value = b.textColor;
+  document.getElementById('bub-border-color').value = b.borderColor;
+  document.getElementById('bub-border-width').value = b.borderWidth;
+  // Update style buttons
+  document.querySelectorAll('#bub-style-grid .bub-style-opt').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.style === b.style);
+  });
+}
+
+function bubUpdateText() {
+  if (bubSelectedIdx < 0) return;
+  bubBubbles[bubSelectedIdx].text = document.getElementById('bub-text').value;
+  bubDrawAll();
+}
+
+function bubUpdateProp() {
+  if (bubSelectedIdx < 0) return;
+  const b = bubBubbles[bubSelectedIdx];
+  b.w = +document.getElementById('bub-width').value;
+  b.h = +document.getElementById('bub-height').value;
+  b.fontSize = +document.getElementById('bub-fontsize').value;
+  b.tail = document.getElementById('bub-tail').value;
+  b.bgColor = document.getElementById('bub-bg-color').value;
+  b.textColor = document.getElementById('bub-text-color').value;
+  b.borderColor = document.getElementById('bub-border-color').value;
+  b.borderWidth = +document.getElementById('bub-border-width').value;
+  bubDrawAll();
+}
+
+function bubSetStyle(style, btn) {
+  if (bubSelectedIdx < 0 && bubBubbles.length === 0) {
+    bubAddBubble();
+  }
+  if (bubSelectedIdx < 0) return;
+  bubBubbles[bubSelectedIdx].style = style;
+  document.querySelectorAll('#bub-style-grid .bub-style-opt').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  bubDrawAll();
+}
+
+function bubResetStyleBtns() {
+  document.querySelectorAll('#bub-style-grid .bub-style-opt').forEach(b => {
+    b.classList.toggle('active', b.dataset.style === 'speech');
+  });
+}
+
+function bubSetApply(mode, btn) {
+  bubApplyMode = mode;
+  document.querySelectorAll('.bub-frame-opt').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('bub-range-row').style.display = mode === 'range' ? '' : 'none';
+}
+
+// ── Draw bubbles onto a canvas at full resolution ──
+function bubDrawBubblesOnCtx(ctx, w, h) {
+  const scaleX = w / bubImgW, scaleY = h / bubImgH;
+  bubBubbles.forEach(b => {
+    const bx = b.x * scaleX, by = b.y * scaleY;
+    const bw = b.w * scaleX, bh = b.h * scaleY;
+    const fs = b.fontSize * Math.min(scaleX, scaleY);
+    const bwid = b.borderWidth * Math.min(scaleX, scaleY);
+    const oldScale = bubScale;
+    bubScale = Math.min(scaleX, scaleY);
+
+    ctx.save();
+    bubDrawShape(ctx, b.style, bx, by, bw, bh, b.bgColor, b.borderColor, bwid, b.tail);
+    ctx.fillStyle = b.textColor;
+    ctx.font = (b.style === 'shout' || b.style === 'comic' ? 'bold ' : '') + Math.round(fs) + 'px ' +
+      (b.style === 'narrator' ? 'Georgia,serif' :
+       b.style === 'comic' ? "'Fredoka One',cursive" : 'sans-serif');
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const lines = bubWrapText(ctx, b.text || '', bw * 0.82);
+    const lh = fs * 1.25;
+    const startY = by + bh / 2 - ((lines.length - 1) * lh) / 2;
+    lines.forEach((line, li) => {
+      ctx.fillText(line, bx + bw / 2, startY + li * lh);
+    });
+    ctx.restore();
+
+    bubScale = oldScale;
+  });
+}
+
+// ── Apply: burn bubbles into frame image data ──
+async function bubApply() {
+  if (bubBubbles.length === 0) {
+    showToast('⚠️ Füge zuerst eine Sprechblase hinzu!');
+    return;
+  }
+
+  let targetIds = [];
+  if (bubApplyMode === 'all') {
+    targetIds = S.shots.map(s => s.id);
+  } else if (bubApplyMode === 'range') {
+    const from = Math.max(0, (+document.getElementById('bub-range-from').value || 1) - 1);
+    const to = Math.min(S.shots.length, +document.getElementById('bub-range-to').value || S.shots.length);
+    for (let i = from; i < to; i++) targetIds.push(S.shots[i].id);
+  } else {
+    targetIds = [...selFrames];
+  }
+
+  if (targetIds.length === 0) {
+    showToast('⚠️ Keine Frames ausgewählt!');
+    return;
+  }
+
+  const confirmed = confirm(`Sprechblasen auf ${targetIds.length} Frame(s) einbrennen?\n\nDieser Vorgang kann nicht rückgängig gemacht werden.`);
+  if (!confirmed) return;
+
+  showToast('💬 Sprechblasen werden eingebrannt…');
+
+  let processed = 0;
+  for (const id of targetIds) {
+    const shot = S.shots.find(s => s.id === id);
+    if (!shot || !shot.data) continue;
+
+    await new Promise(res => {
+      const img = new Image();
+      img.onload = () => {
+        const cv = document.createElement('canvas');
+        cv.width = img.width; cv.height = img.height;
+        const ctx = cv.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        bubDrawBubblesOnCtx(ctx, img.width, img.height);
+        shot.data = cv.toDataURL('image/jpeg', 0.92);
+        processed++;
+        res();
+      };
+      img.onerror = res;
+      img.src = shot.data;
+    });
+  }
+
+  // Save to IDB
+  idbOpen(db => {
+    if (!db) return;
+    const tx = db.transaction('shots', 'readwrite');
+    const store = tx.objectStore('shots');
+    targetIds.forEach(id => {
+      const shot = S.shots.find(s => s.id === id);
+      if (shot) store.put(shot);
+    });
+  });
+
+  persist();
+  try { renderStrip(); } catch(e) {}
+  try { renderFrames(); } catch(e) {}
+  showToast(`✅ Sprechblasen auf ${processed} Frame(s) angewendet!`);
+  closeBubbleEditor();
+}
+</script>
+
+<div id="bubble-editor-modal" class="hidden">
+  <div class="bubble-editor-card">
+    <div class="ed-card-title">
+      💬 Sprechblasen-Editor
+      <button onclick="closeBubbleEditor()" style="margin-left:auto;font-size:18px;color:var(--muted)">✕</button>
+    </div>
+
+    <div id="bub-no-sel" style="display:none;color:var(--muted);font-size:13px;text-align:center;padding:16px 0">
+      ⚠️ Bitte wähle zuerst einen oder mehrere Frames im Editor aus.
+    </div>
+
+    <div id="bub-main">
+      <!-- Canvas preview -->
+      <div class="bub-canvas-wrap" id="bub-canvas-wrap">
+        <canvas id="bub-canvas"></canvas>
+      </div>
+
+      <!-- Bubble list -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="bub-section-title">📋 Sprechblasen</div>
+        <div style="display:flex;gap:6px">
+          <button class="bub-tool-btn" onclick="bubAddBubble()" style="font-size:11px;padding:5px 10px">+ Neue Blase</button>
+          <button class="bub-tool-btn" onclick="bubDeleteSelected()" style="font-size:11px;padding:5px 10px;color:var(--red);border-color:rgba(239,68,68,.3)">🗑</button>
+        </div>
+      </div>
+      <div class="bub-list" id="bub-list">
+        <div id="bub-list-empty" style="font-size:12px;color:var(--muted);text-align:center;padding:10px">
+          Noch keine Sprechblasen – klicke „+ Neue Blase"
+        </div>
+      </div>
+
+      <!-- Style chooser -->
+      <div class="bub-section-title">🎨 Stil</div>
+      <div class="bub-style-grid" id="bub-style-grid">
+        <button class="bub-style-opt active" data-style="speech" onclick="bubSetStyle('speech',this)">
+          <span class="bub-style-icon">💬</span>Sprech
+        </button>
+        <button class="bub-style-opt" data-style="thought" onclick="bubSetStyle('thought',this)">
+          <span class="bub-style-icon">💭</span>Denk
+        </button>
+        <button class="bub-style-opt" data-style="shout" onclick="bubSetStyle('shout',this)">
+          <span class="bub-style-icon">💥</span>Schrei
+        </button>
+        <button class="bub-style-opt" data-style="narrator" onclick="bubSetStyle('narrator',this)">
+          <span class="bub-style-icon">📜</span>Erzähler
+        </button>
+        <button class="bub-style-opt" data-style="whisper" onclick="bubSetStyle('whisper',this)">
+          <span class="bub-style-icon">🤫</span>Flüster
+        </button>
+        <button class="bub-style-opt" data-style="cloud" onclick="bubSetStyle('cloud',this)">
+          <span class="bub-style-icon">☁️</span>Wolke
+        </button>
+        <button class="bub-style-opt" data-style="box" onclick="bubSetStyle('box',this)">
+          <span class="bub-style-icon">🏷️</span>Box
+        </button>
+        <button class="bub-style-opt" data-style="comic" onclick="bubSetStyle('comic',this)">
+          <span class="bub-style-icon">⚡</span>Comic
+        </button>
+      </div>
+
+      <!-- Properties -->
+      <div class="bub-section-title">⚙️ Eigenschaften</div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:10px;color:var(--muted);font-family:'Fredoka One',cursive;letter-spacing:.5px;display:block;margin-bottom:4px">TEXT</label>
+        <textarea id="bub-text" class="field-input" rows="2" placeholder="Hallo Welt!" style="min-height:50px;font-size:13px" oninput="bubUpdateText()"></textarea>
+      </div>
+      <div class="bub-props">
+        <div class="bub-prop-group">
+          <label>BREITE</label>
+          <input type="range" id="bub-width" min="60" max="400" value="180" oninput="bubUpdateProp()"/>
+        </div>
+        <div class="bub-prop-group">
+          <label>HÖHE</label>
+          <input type="range" id="bub-height" min="40" max="300" value="100" oninput="bubUpdateProp()"/>
+        </div>
+        <div class="bub-prop-group">
+          <label>SCHRIFTGRÖSSE</label>
+          <input type="range" id="bub-fontsize" min="10" max="60" value="18" oninput="bubUpdateProp()"/>
+        </div>
+        <div class="bub-prop-group">
+          <label>SCHWANZ-RICHTUNG</label>
+          <select id="bub-tail" onchange="bubUpdateProp()">
+            <option value="bottom-left">↙ Unten Links</option>
+            <option value="bottom-right">↘ Unten Rechts</option>
+            <option value="bottom-center" selected>↓ Unten Mitte</option>
+            <option value="top-left">↖ Oben Links</option>
+            <option value="top-right">↗ Oben Rechts</option>
+            <option value="top-center">↑ Oben Mitte</option>
+            <option value="left">← Links</option>
+            <option value="right">→ Rechts</option>
+            <option value="none">Kein Schwanz</option>
+          </select>
+        </div>
+        <div class="bub-prop-group">
+          <label>BLASENFARBE</label>
+          <input type="color" id="bub-bg-color" value="#ffffff" onchange="bubUpdateProp()" style="height:32px;cursor:pointer"/>
+        </div>
+        <div class="bub-prop-group">
+          <label>TEXTFARBE</label>
+          <input type="color" id="bub-text-color" value="#000000" onchange="bubUpdateProp()" style="height:32px;cursor:pointer"/>
+        </div>
+        <div class="bub-prop-group">
+          <label>RANDFARBE</label>
+          <input type="color" id="bub-border-color" value="#000000" onchange="bubUpdateProp()" style="height:32px;cursor:pointer"/>
+        </div>
+        <div class="bub-prop-group">
+          <label>RANDSTÄRKE</label>
+          <input type="range" id="bub-border-width" min="0" max="8" value="2" oninput="bubUpdateProp()"/>
+        </div>
+      </div>
+
+      <!-- Apply to frames -->
+      <div class="bub-section-title">🎞 Anwenden auf</div>
+      <div class="bub-frame-apply">
+        <button class="bub-frame-opt active" data-apply="selected" onclick="bubSetApply('selected',this)">Ausgewählte Frames</button>
+        <button class="bub-frame-opt" data-apply="all" onclick="bubSetApply('all',this)">Alle Frames</button>
+        <button class="bub-frame-opt" data-apply="range" onclick="bubSetApply('range',this)">Frame-Bereich</button>
+      </div>
+      <div id="bub-range-row" style="display:none;margin-bottom:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="bub-prop-group">
+            <label>VON FRAME</label>
+            <input type="number" id="bub-range-from" value="1" min="1" class="field-input" style="font-size:12px;padding:6px 8px"/>
+          </div>
+          <div class="bub-prop-group">
+            <label>BIS FRAME</label>
+            <input type="number" id="bub-range-to" value="10" min="1" class="field-input" style="font-size:12px;padding:6px 8px"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:8px">
+        <button class="btn-primary sm" onclick="bubApply()" style="flex:1">💬 Sprechblasen einbrennen</button>
+        <button class="btn-outline" onclick="closeBubbleEditor()" style="font-size:13px;padding:8px 14px">Abbrechen</button>
+      </div>
     </div>
   </div>
 </div>
