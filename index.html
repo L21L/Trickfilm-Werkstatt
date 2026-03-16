@@ -1385,9 +1385,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
    KAMERA-KARL AI ASSISTANT
    ═══════════════════════════ */
 #ai-bubble {
-  position: fixed;
-  bottom: calc(var(--timeline-h) + 16px);
-  right: 16px;
+  position: relative;
   width: 52px;
   height: 52px;
   border-radius: 50%;
@@ -1573,34 +1571,9 @@ textarea.field-input{min-height:80px;line-height:1.5}
 
 /* ── Floating Help Button ── */
 #help-float-btn {
-  position: fixed;
-  bottom: calc(var(--timeline-h) + 16px);
-  left: 16px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #2dd4bf, #06d6a0);
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  z-index: 500;
-  box-shadow: 0 4px 20px rgba(45,212,191,0.4);
-  animation: helpFloat 3.2s ease-in-out infinite;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform .15s, box-shadow .15s;
+  display: none !important;
 }
-#help-float-btn:hover {
-  transform: scale(1.12);
-  box-shadow: 0 6px 28px rgba(45,212,191,0.6);
-}
-#help-float-btn:active { transform: scale(.92); }
-@keyframes helpFloat {
-  0%,100% { transform: translateY(0) rotate(0deg); }
-  30%     { transform: translateY(-5px) rotate(-4deg); }
-  60%     { transform: translateY(-3px) rotate(3deg); }
-}
+/* help-float-btn removed - merged into combined helper */
 
 /* ── Enhanced Intro Animations ── */
 @keyframes curtainUp{0%{transform:translateY(0)}100%{transform:translateY(-100%)}}
@@ -1989,8 +1962,8 @@ textarea.field-input{min-height:80px;line-height:1.5}
   .intro-skip{ font-size: 12px; padding: 6px 12px; }
 
   /* ── AI Assistent ── */
-  #ai-bubble{ width: 46px; height: 46px; font-size: 20px; bottom: calc(var(--timeline-h) + 12px); }
-  #help-float-btn{ width: 46px; height: 46px; font-size: 20px; bottom: calc(var(--timeline-h) + 12px); }
+  #ai-bubble{ width: 46px; height: 46px; font-size: 20px; }
+  #float-helper-wrap{ bottom: calc(var(--timeline-h) + 12px); }
   #ai-panel{
     right: 8px;
     bottom: calc(var(--timeline-h) + 64px);
@@ -2815,6 +2788,14 @@ textarea.field-input{min-height:80px;line-height:1.5}
               <path d="M7.5 1.5H12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               <path d="M10 1.5V3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>Timer</button>
+        </div>
+        <!-- Profi-Kameratools (versteckt) -->
+        <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:8px;margin-bottom:10px">
+          <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'grid':'none';this.querySelector('span:last-child').textContent=this.nextElementSibling.style.display==='none'?'▼':'▲'" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:6px 0;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Fredoka One',cursive;font-size:11px">
+            <span>🔧 Mehr Kamera-Tools</span>
+            <span>▼</span>
+          </button>
+          <div style="display:none;grid-template-columns:1fr 1fr;gap:6px">
           <button class="cch" id="btn-tl-s" onclick="togTimelapse()">
             <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;display:inline-block;vertical-align:-3px;margin-right:5px">
               <path d="M10 3L12.5 8H17L13.5 11L15 16L10 13L5 16L6.5 11L3 8H7.5L10 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
@@ -2840,6 +2821,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
               <rect x="7" y="13" width="6" height="5" rx="1.5" stroke="currentColor" stroke-width="1.4" fill="none"/>
               <path d="M8.5 13V12a1.5 1.5 0 013 0v1" stroke="currentColor" stroke-width="1.3"/>
             </svg>Belichtung</button>
+          </div>
         </div>
         <!-- Timelapse Panel (shown when Zeitraffer is active) -->
         <div id="tl-panel" style="display:none;margin-bottom:10px">
@@ -2865,22 +2847,31 @@ textarea.field-input{min-height:80px;line-height:1.5}
               <span class="adj-val" id="adj-bri-val-s">0</span>
             </div>
             <div class="adj-row">
-              <span class="adj-icon">◑</span>
-              <span class="adj-label">Kontrast</span>
-              <input type="range" class="adj-slider" id="adj-con-s" min="-100" max="100" value="0" oninput="syncAdjSettings('con',this.value)"/>
-              <span class="adj-val" id="adj-con-val-s">0</span>
-            </div>
-            <div class="adj-row">
               <span class="adj-icon">🔍</span>
               <span class="adj-label">Zoom</span>
               <input type="range" class="adj-slider" id="adj-zoom-s" min="100" max="300" value="100" oninput="syncAdjSettings('zoom',this.value)"/>
               <span class="adj-val" id="adj-zoom-val-s">1×</span>
             </div>
-            <div class="adj-row">
-              <span class="adj-icon">🌡️</span>
-              <span class="adj-label">Weißabgl.</span>
-              <input type="range" class="adj-slider" id="adj-wb-s" min="-50" max="50" value="0" oninput="syncAdjSettings('wb',this.value)"/>
-              <span class="adj-val" id="adj-wb-val-s">0</span>
+          </div>
+          <!-- Weitere Regler versteckt -->
+          <div style="margin-top:6px">
+            <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'grid':'none';this.querySelector('span:last-child').textContent=this.nextElementSibling.style.display==='none'?'▼':'▲'" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:4px 0;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Fredoka One',cursive;font-size:10px">
+              <span>Mehr Regler</span>
+              <span>▼</span>
+            </button>
+            <div class="adj-grid" style="display:none;margin-top:6px">
+              <div class="adj-row">
+                <span class="adj-icon">◑</span>
+                <span class="adj-label">Kontrast</span>
+                <input type="range" class="adj-slider" id="adj-con-s" min="-100" max="100" value="0" oninput="syncAdjSettings('con',this.value)"/>
+                <span class="adj-val" id="adj-con-val-s">0</span>
+              </div>
+              <div class="adj-row">
+                <span class="adj-icon">🌡️</span>
+                <span class="adj-label">Weißabgl.</span>
+                <input type="range" class="adj-slider" id="adj-wb-s" min="-50" max="50" value="0" oninput="syncAdjSettings('wb',this.value)"/>
+                <span class="adj-val" id="adj-wb-val-s">0</span>
+              </div>
             </div>
           </div>
         </div>
@@ -2904,17 +2895,18 @@ textarea.field-input{min-height:80px;line-height:1.5}
       <button id="prev-play" onclick="togglePrev()">▶</button>
     </div>
 
-    <!-- Preview Controls: nur FPS sichtbar, rest einklappbar -->
+    <!-- Preview Controls: kid-friendly speed slider -->
     <div class="prev-controls">
-      <div class="prev-row">
-        <span class="prev-label">⚡ FPS</span>
+      <div class="prev-row" style="gap:10px">
+        <span style="font-size:20px;flex-shrink:0;line-height:1" title="Langsam">🐢</span>
         <input type="range" class="prev-slider" id="fps-slider" min="2" max="24" value="8"/>
+        <span style="font-size:20px;flex-shrink:0;line-height:1" title="Schnell">🐇</span>
         <span class="prev-val" id="fps-val">8 fps</span>
       </div>
-      <!-- Erweiterte Optionen (eingeklappt) -->
+      <!-- Erweiterte Optionen (versteckt für Profis) -->
       <div style="border-top:1px solid var(--glass-border);margin-top:2px">
-        <button onclick="toggleEditAdvanced()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 0;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Fredoka One',cursive;font-size:12px">
-          <span>Mehr Einstellungen</span>
+        <button onclick="toggleEditAdvanced()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:6px 0;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Fredoka One',cursive;font-size:11px">
+          <span>🔧 Profi-Einstellungen</span>
           <span id="edit-adv-arrow" style="font-size:11px;transition:transform .2s">▼</span>
         </button>
         <div id="edit-advanced-body" style="display:none">
@@ -2950,17 +2942,13 @@ textarea.field-input{min-height:80px;line-height:1.5}
       </div>
     </div>
 
-    <!-- Toolbar: aufgeräumt mit Hauptaktionen oben, Extras einklappbar -->
+    <!-- Toolbar: 3 Hauptaktionen + Gruppe erstellen oben -->
     <div class="edit-toolbar">
       <!-- Primäre Aktionen immer sichtbar -->
       <div class="edit-tool-row">
-        <button class="etb" onclick="selAll()">
-          <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><rect x="1" y="1" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="9" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5l4 4M10.5 14.5l4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity="0"/><circle cx="11.5" cy="11.5" r="2.5" fill="currentColor" opacity="0.45"/><path d="M10.5 11.5l.8.8 1.5-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Alle
-        </button>
-        <button class="etb" onclick="deselAll()">
-          <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><rect x="1" y="1" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.2"/></svg>
-          Keine
+        <button class="etb" onclick="undoLastFrame()">
+          <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M2.5 6.5C3.5 4 6 2.5 8.8 2.5C12.2 2.5 15 5.3 15 8.7C15 12.1 12.2 15 8.8 15C6.2 15 4 13.5 3 11.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2.5 2.5V6.5H6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Rückgängig
         </button>
         <button class="etb danger" onclick="delSel()">
           <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M3 4.5h10M6.5 4.5V3h3v1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 4.5l.6 8.5a1.2 1.2 0 001.2 1.2h3.4a1.2 1.2 0 001.2-1.2l.6-8.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M6.5 7.5v3.5M9.5 7.5v3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/></svg>
@@ -2970,19 +2958,35 @@ textarea.field-input{min-height:80px;line-height:1.5}
           <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><rect x="1" y="4" width="9" height="11" rx="1.5" stroke="currentColor" stroke-width="1.4" fill="none"/><rect x="6" y="1" width="9" height="11" rx="1.5" stroke="currentColor" stroke-width="1.4" fill="none" opacity="0.5"/><path d="M8.5 7.5H11M9.75 6.25V8.75" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity="0.7"/></svg>
           Kopieren
         </button>
-        <button class="etb" onclick="undoLastFrame()">
-          <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M2.5 6.5C3.5 4 6 2.5 8.8 2.5C12.2 2.5 15 5.3 15 8.7C15 12.1 12.2 15 8.8 15C6.2 15 4 13.5 3 11.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2.5 2.5V6.5H6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Rückgängig
+        <button class="etb" onclick="createGroup()" style="background:rgba(45,212,191,.12);border-color:rgba(45,212,191,.35);color:var(--teal)">
+          <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><rect x="1" y="5" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 8h14" stroke="currentColor" stroke-width="1.2" opacity="0.4"/><rect x="3" y="2" width="10" height="4" rx="1" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.55"/><path d="M7 10.5h2M8 9.5v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Gruppe
+        </button>
+        <button class="etb" onclick="ckTogglePanel('right',true)">
+          <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/></svg>
+          Export
         </button>
       </div>
-      <!-- Szenen & Extras einklappbar -->
+      <!-- Werkzeugkasten: alle weiteren Tools versteckt -->
       <div style="border-top:1px solid rgba(255,255,255,.05)">
-        <button onclick="toggleEditToolsExtra()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:7px 4px;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Fredoka One',cursive;font-size:12px">
-          <span>Gruppen &amp; Extras</span>
+        <button onclick="toggleEditToolsExtra()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:7px 4px;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Fredoka One',cursive;font-size:11px">
+          <span>🧰 Werkzeugkasten</span>
           <span id="edit-tools-arrow" style="font-size:11px;transition:transform .2s">▼</span>
         </button>
         <div id="edit-tools-extra" style="display:none">
           <div class="edit-tool-row">
+            <button class="etb" onclick="selAll()">
+              <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><rect x="1" y="1" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="9" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4"/><circle cx="11.5" cy="11.5" r="2.5" fill="currentColor" opacity="0.45"/><path d="M10.5 11.5l.8.8 1.5-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Alle wählen
+            </button>
+            <button class="etb" onclick="deselAll()">
+              <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><rect x="1" y="1" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 1.2"/></svg>
+              Keine
+            </button>
+            <button class="etb" onclick="dissolveGroup()">
+              <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><rect x="1" y="5" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2.5 1.5"/><rect x="3" y="2" width="10" height="4" rx="1" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.45" stroke-dasharray="2 1.5"/><path d="M5 10.5l6 0M5 12.5l3-4 3 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/></svg>
+              Auflösen
+            </button>
             <button class="etb" onclick="revFrames()">
               <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M1 8h14M3 5l-2 3 2 3M13 5l2 3-2 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Umkehren
@@ -2991,23 +2995,15 @@ textarea.field-input{min-height:80px;line-height:1.5}
               <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M13.5 6C12.5 3.5 10 2 7 2.5C4.2 3 2 5.5 2 8.5C2 11.8 4.7 14.5 8 14.5C11.3 14.5 14 11.8 14 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M13.5 2V6H9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Drehen
             </button>
-            <button class="etb" onclick="createGroup()">
-              <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><rect x="1" y="5" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 8h14" stroke="currentColor" stroke-width="1.2" opacity="0.4"/><rect x="3" y="2" width="10" height="4" rx="1" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.55"/><path d="M7 10.5h2M8 9.5v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-              Gruppe
-            </button>
-            <button class="etb" onclick="dissolveGroup()">
-              <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><rect x="1" y="5" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2.5 1.5"/><rect x="3" y="2" width="10" height="4" rx="1" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.45" stroke-dasharray="2 1.5"/><path d="M5 10.5l6 0M5 12.5l3-4 3 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/></svg>
-              Auflösen
-            </button>
           </div>
           <div class="edit-tool-row">
-            <button class="etb" onclick="insertTitleCard()">
-              <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><rect x="1" y="2" width="14" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M3 8h10M4 5.5h8M5 10.5h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity="0.6"/><rect x="1" y="2" width="14" height="4" rx="1.5" fill="currentColor" opacity="0.15"/></svg>
-              Titelkarte
-            </button>
             <button class="etb" onclick="openFxModal()" style="background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(45,212,191,.12));border-color:rgba(168,85,247,.45);color:#c084fc">
               <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M8 1l1.5 4.5H14l-3.7 2.7 1.4 4.3L8 10l-3.7 2.5 1.4-4.3L2 5.5h4.5L8 1Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="currentColor" opacity="0.3"/></svg>
               FX
+            </button>
+            <button class="etb" onclick="insertTitleCard()">
+              <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><rect x="1" y="2" width="14" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M3 8h10M4 5.5h8M5 10.5h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity="0.6"/><rect x="1" y="2" width="14" height="4" rx="1.5" fill="currentColor" opacity="0.15"/></svg>
+              Titelkarte
             </button>
             <button class="etb" onclick="openFreistellenModal()" style="background:linear-gradient(135deg,rgba(34,197,94,.18),rgba(45,212,191,.12));border-color:rgba(34,197,94,.45);color:#4ade80">
               <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M3 13l4-4M7 9l2-6 1 3 3-1-2 2 3 3-3-1-1 3-2-2-1 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2 1.5"/></svg>
@@ -3016,10 +3012,6 @@ textarea.field-input{min-height:80px;line-height:1.5}
             <button class="etb" onclick="openBubbleEditor()" style="background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(168,85,247,.12));border-color:rgba(251,191,36,.45);color:#fbbf24">
               <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M2 2.5C2 1.7 2.7 1 3.5 1h9c.8 0 1.5.7 1.5 1.5v7c0 .8-.7 1.5-1.5 1.5H6l-3 2.5V11H3.5C2.7 11 2 10.3 2 9.5v-7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5 5h6M5 7.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/></svg>
               Sprechblasen
-            </button>
-            <button class="etb" onclick="ckTogglePanel('right',true)">
-              <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/></svg>
-              Export
             </button>
           </div>
         </div>
@@ -3036,13 +3028,13 @@ textarea.field-input{min-height:80px;line-height:1.5}
     <!-- Frame Grid -->
     <div id="frm-scroll">
       <div id="frm-grid">
-        <div class="frm-empty" id="frm-empty">Noch keine Fotos – geh zum 📷 Kamera-Tab!</div>
+        <div class="frm-empty" id="frm-empty">📷 Noch keine Fotos!<br><span style="font-size:12px;color:var(--muted);font-weight:normal">Wechsle zum Kamera-Tab und mach dein erstes Foto.</span></div>
       </div>
     </div>
 
-    <!-- Group bar -->
+    <!-- Group bar (nur sichtbar wenn Gruppen existieren) -->
     <div id="group-bar">
-      <span class="gb-empty" id="gb-empty">Keine Gruppen – markiere Frames und drücke 📁</span>
+      <span class="gb-empty" id="gb-empty" style="font-size:11px">📁 Tipp: Wähle Frames aus und erstelle Gruppen im 🧰 Werkzeugkasten</span>
     </div>
 
   </section>
@@ -3058,76 +3050,79 @@ textarea.field-input{min-height:80px;line-height:1.5}
   <section id="pg-mus" class="page" aria-label="Musik">
     <div style="padding:14px;display:flex;flex-direction:column;gap:14px">
 
-      <!-- ── MULTITRACK TIMELINE ── -->
+      <!-- ── MEHRSPURIGE TIMELINE (Haupt-Feature) ── -->
       <div style="background:var(--surface);border:1px solid rgba(45,212,191,.3);border-radius:var(--r);padding:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div class="sec-title" style="margin-bottom:0">🎚️ Mehrspurige Timeline</div>
+          <div class="sec-title" style="margin-bottom:0">🎚️ Meine Tonspuren</div>
           <div style="display:flex;gap:6px">
-            <button onclick="addAudioTrack('music')" style="background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.4);color:var(--teal);font-family:'Fredoka One',cursive;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer">🎵 Musik-Spur</button>
-            <button onclick="addAudioTrack('voiceover')" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#c084fc;font-family:'Fredoka One',cursive;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer">🎙 Voiceover</button>
+            <button onclick="addAudioTrack('music')" style="background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.4);color:var(--teal);font-family:'Fredoka One',cursive;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer">🎵 + Musik</button>
+            <button onclick="addAudioTrack('voiceover')" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#c084fc;font-family:'Fredoka One',cursive;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer">🎙 + Voiceover</button>
           </div>
         </div>
         <div id="audio-tracks-container" style="display:flex;flex-direction:column;gap:8px">
           <!-- Tracks injected by JS -->
         </div>
         <div id="audio-no-tracks" style="color:var(--muted);text-align:center;padding:16px;font-size:13px">
-          Keine Spuren – klicke „+ Spur" um eine Audio-Spur hinzuzufügen
-        </div>
-      </div>
-
-      <!-- ── EFFEKTE ── -->
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px">
-        <div class="sec-title" style="margin-bottom:10px">✨ Effekte</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="audio-fx-btn" id="afx-fadein"  onclick="toggleAudioFx('fadein')" >⬛→🌅 Fade In</button>
-          <button class="audio-fx-btn" id="afx-fadeout" onclick="toggleAudioFx('fadeout')">🌅→⬛ Fade Out</button>
-          <button class="audio-fx-btn" id="afx-loop"    onclick="toggleAudioFx('loop')"   >🔁 Wiederholen</button>
-          <button class="audio-fx-btn" id="afx-echo"    onclick="toggleAudioFx('echo')"   >🔊 Echo</button>
-          <button class="audio-fx-btn" id="afx-reverb"  onclick="toggleAudioFx('reverb')" >🏛 Hall</button>
-          <button class="audio-fx-btn" id="afx-reverse" onclick="toggleAudioFx('reverse')">⏪ Rückwärts</button>
+          <div style="font-size:28px;margin-bottom:6px">🎬</div>
+          Noch keine Spuren – füge Musik oder Voiceover hinzu!
         </div>
         <div style="margin-top:10px;display:flex;align-items:center;gap:10px">
-          <span style="font-size:12px;color:var(--muted)">🔊 Master-Lautstärke</span>
+          <span style="font-size:16px;flex-shrink:0">🔊</span>
           <input type="range" id="mus-vol-slider" min="0" max="100" value="80" oninput="musSetVol(this.value)" style="flex:1;accent-color:var(--teal)"/>
           <span id="mus-vol-val" style="font-family:'Fredoka One',cursive;font-size:13px;color:var(--teal);min-width:34px;text-align:right">80%</span>
         </div>
       </div>
 
-      <!-- ── BIBLIOTHEK ── -->
+      <!-- ── MUSIKBIBLIOTHEK ── -->
       <div>
-        <div class="sec-title">📚 Musikbibliothek</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
-          Wähle einen Track und weise ihn einer Spur zu oder setze ihn auf einen bestimmten Frame.
-        </p>
+        <div class="sec-title">🎵 Musikbibliothek</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Wähle einen Track und weise ihn einer Spur zu:</div>
         <div id="mus-lib-list" style="display:flex;flex-direction:column;gap:10px"></div>
-        <div style="margin-top:12px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);display:flex;align-items:center;gap:10px">
-          <span style="font-size:18px">🎼</span>
-          <span style="font-size:12px;color:var(--muted);line-height:1.5">
-            Musik von <a href="https://www.musicfox.com" target="_blank" rel="noopener" style="color:var(--yellow);text-decoration:none;font-family:'Fredoka One',cursive">musicfox.com</a>
-            – lizenzfreie Musik für kreative Projekte.
-          </span>
-        </div>
       </div>
 
       <!-- ── EIGENE MUSIK ── -->
       <div>
-        <div class="sec-title">🎤 Eigene Musik hochladen</div>
-        <div id="mus-drop-zone"
-          style="border:2px dashed var(--border);border-radius:var(--r);padding:28px 16px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px"
-          ondragover="musDragOver(event)" ondragleave="musDragLeave(event)" ondrop="musDrop(event)"
-          onclick="$('mus-file-input').click()">
-          <div style="font-size:36px;margin-bottom:8px">📂</div>
-          <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--muted)">Datei hierher ziehen oder klicken</div>
-          <div style="font-size:12px;color:var(--border);margin-top:4px">MP3, WAV, OGG</div>
-          <input type="file" id="mus-file-input" accept="audio/mp3,audio/mpeg,audio/wav,audio/ogg" multiple style="display:none" onchange="musUploadFiles(this.files)"/>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="sec-title" style="margin-bottom:0;font-size:16px">🎤 Eigene Musik</div>
+          <button onclick="$('mus-file-input').click()" style="background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.3);color:var(--teal);font-family:'Fredoka One',cursive;font-size:12px;padding:6px 14px;border-radius:8px;cursor:pointer">+ Hochladen</button>
         </div>
+        <input type="file" id="mus-file-input" accept="audio/mp3,audio/mpeg,audio/wav,audio/ogg" multiple style="display:none" onchange="musUploadFiles(this.files)"/>
         <div id="mus-custom-list" style="display:flex;flex-direction:column;gap:10px"></div>
-        <div id="mus-custom-empty" style="color:var(--muted);font-size:13px;text-align:center;padding:10px 0;display:none">
-          Noch keine eigenen Tracks hochgeladen.
+        <div id="mus-custom-empty" style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">
+          Noch keine eigenen Tracks.
         </div>
       </div>
 
-      <!-- ── LEGACY: hidden sel-bar for compatibility ── -->
+      <!-- ── AUDIO-EFFEKTE (versteckt) ── -->
+      <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:10px">
+        <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('span:last-child').textContent=this.nextElementSibling.style.display==='none'?'▼':'▲'" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 0;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Fredoka One',cursive;font-size:11px">
+          <span>🔧 Audio-Effekte</span>
+          <span>▼</span>
+        </button>
+        <div style="display:none">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px">
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="audio-fx-btn" id="afx-fadein"  onclick="toggleAudioFx('fadein')" >🌅 Fade In</button>
+              <button class="audio-fx-btn" id="afx-fadeout" onclick="toggleAudioFx('fadeout')">🌅 Fade Out</button>
+              <button class="audio-fx-btn" id="afx-loop"    onclick="toggleAudioFx('loop')"   >🔁 Wiederholen</button>
+              <button class="audio-fx-btn" id="afx-echo"    onclick="toggleAudioFx('echo')"   >🔊 Echo</button>
+              <button class="audio-fx-btn" id="afx-reverb"  onclick="toggleAudioFx('reverb')" >🏛 Hall</button>
+              <button class="audio-fx-btn" id="afx-reverse" onclick="toggleAudioFx('reverse')">⏪ Rückwärts</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hinweis -->
+      <div style="padding:8px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);display:flex;align-items:center;gap:8px">
+        <span style="font-size:16px">🎼</span>
+        <span style="font-size:11px;color:var(--muted);line-height:1.4">
+          Musik von <a href="https://www.musicfox.com" target="_blank" rel="noopener" style="color:var(--yellow);text-decoration:none;font-family:'Fredoka One',cursive">musicfox.com</a>
+          – lizenzfreie Musik für kreative Projekte.
+        </span>
+      </div>
+
+      <!-- LEGACY: hidden sel-bar for compatibility -->
       <div id="sel-bar" style="display:none">
         <div id="sel-bar-empty"></div>
         <div id="sel-bar-active" style="display:none">
@@ -3135,6 +3130,11 @@ textarea.field-input{min-height:80px;line-height:1.5}
           <div id="sel-track-artist"></div>
           <button id="sel-play-btn" onclick="musTogglePlay()"></button>
         </div>
+      </div>
+
+      <!-- Hidden drag zone for compat -->
+      <div id="mus-drop-zone" style="display:none"
+        ondragover="musDragOver(event)" ondragleave="musDragLeave(event)" ondrop="musDrop(event)">
       </div>
 
     </div>
@@ -3145,21 +3145,28 @@ textarea.field-input{min-height:80px;line-height:1.5}
     <div style="padding:14px;display:flex;flex-direction:column;gap:14px">
 
       <!-- ══ HAUPT-EXPORT-BUTTON ══ -->
-      <div style="background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(45,212,191,.08));border:2px solid rgba(251,191,36,.4);border-radius:var(--r);padding:18px">
-        <div style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--yellow);margin-bottom:6px">🎬 Film exportieren</div>
+      <div style="background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(45,212,191,.08));border:2px solid rgba(251,191,36,.4);border-radius:var(--r);padding:18px;text-align:center">
+        <div style="font-size:40px;margin-bottom:8px">🎬</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:20px;color:var(--yellow);margin-bottom:4px">Film exportieren</div>
         <div id="exp-current-config" style="font-size:12px;color:var(--muted);margin-bottom:14px">
           Standard: MP4 · Full HD (1080p) · 8 fps
         </div>
         <button onclick="startExport(window.expFormat||'mp4')"
-          style="width:100%;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#060914;font-family:'Fredoka One',cursive;font-size:18px;padding:14px;border-radius:var(--r);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(251,191,36,.4);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px"
+          style="width:100%;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#060914;font-family:'Fredoka One',cursive;font-size:18px;padding:16px;border-radius:var(--r);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(251,191,36,.4);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px"
           onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 24px rgba(251,191,36,.55)'"
           onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(251,191,36,.4)'">
           ▶ Jetzt exportieren
         </button>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button onclick="startExport('webm')" style="flex:1;background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.35);color:var(--teal);font-family:'Fredoka One',cursive;font-size:12px;padding:8px;border-radius:var(--r-sm);cursor:pointer">🎬 WebM</button>
-          <button onclick="startExport('gif')"  style="flex:1;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:var(--yellow);font-family:'Fredoka One',cursive;font-size:12px;padding:8px;border-radius:var(--r-sm);cursor:pointer">🎨 GIF</button>
-          <button onclick="startExport('zip')"  style="flex:1;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:var(--green);font-family:'Fredoka One',cursive;font-size:12px;padding:8px;border-radius:var(--r-sm);cursor:pointer">🖼 ZIP</button>
+        <!-- Alternative Formate versteckt -->
+        <div style="margin-top:10px">
+          <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'flex':'none'" style="background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Fredoka One',cursive;font-size:11px;padding:4px 0">
+            Anderes Format wählen ▼
+          </button>
+          <div style="display:none;gap:8px;margin-top:6px">
+            <button onclick="startExport('webm')" style="flex:1;background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.35);color:var(--teal);font-family:'Fredoka One',cursive;font-size:12px;padding:8px;border-radius:var(--r-sm);cursor:pointer">🎬 WebM</button>
+            <button onclick="startExport('gif')"  style="flex:1;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:var(--yellow);font-family:'Fredoka One',cursive;font-size:12px;padding:8px;border-radius:var(--r-sm);cursor:pointer">🎨 GIF</button>
+            <button onclick="startExport('zip')"  style="flex:1;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:var(--green);font-family:'Fredoka One',cursive;font-size:12px;padding:8px;border-radius:var(--r-sm);cursor:pointer">🖼 ZIP</button>
+          </div>
         </div>
       </div>
 
@@ -3254,6 +3261,14 @@ textarea.field-input{min-height:80px;line-height:1.5}
         ⚠️ WebM/MP4 werden von deinem Browser nicht unterstützt. Nutze Chrome oder Firefox, oder exportiere als ZIP.
       </div>
 
+      <!-- ══ WEITERE OPTIONEN (versteckt) ══ -->
+      <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:8px">
+        <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'flex':'none';this.querySelector('span:last-child').textContent=this.nextElementSibling.style.display==='none'?'▼':'▲'" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 0;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Fredoka One',cursive;font-size:11px">
+          <span>🔧 Weitere Optionen</span>
+          <span>▼</span>
+        </button>
+        <div style="display:none;flex-direction:column;gap:14px">
+
       <!-- ══ PROJEKT SPEICHERN & LADEN ══ -->
       <div id="project-io" style="background:var(--surface);border:2px solid rgba(251,191,36,.25);border-radius:var(--r);padding:16px">
         <div class="sec-title" style="margin-bottom:12px">💾 Projekt speichern &amp; laden</div>
@@ -3279,6 +3294,9 @@ textarea.field-input{min-height:80px;line-height:1.5}
         </div>
         <div id="sub-list" style="display:flex;flex-direction:column;gap:8px">
           <div id="sub-empty" style="font-size:13px;color:var(--muted);text-align:center;padding:8px 0">Keine Untertitel</div>
+        </div>
+      </div>
+
         </div>
       </div>
 
@@ -3770,7 +3788,7 @@ function initCockpit() {
     {key:'figures',    icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><circle cx="19" cy="7" r="2.5" stroke-width="1.5"/><path d="M21.5 16.5c.9.7 1.5 1.8 1.5 3" stroke-width="1.5"/></svg>`, label:'Figuren',           sub:'sub-figures',    open:false},
     {key:'storyboard', icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="9" height="9" rx="1.5"/><rect x="13" y="2" width="9" height="9" rx="1.5"/><rect x="2" y="13" width="9" height="9" rx="1.5"/><rect x="13" y="13" width="9" height="9" rx="1.5"/><circle cx="17.5" cy="17.5" r="1" fill="currentColor"/></svg>`, label:'Storyboard',        sub:'sub-storyboard', open:false},
     {key:'bg',         icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>`, label:'Hintergrund',       sub:'sub-bg',         open:false},
-    {key:'week',       icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>`, label:'Produktionsplan',   sub:'sub-week',       open:false},
+    {key:'week',       icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>`, label:'Produktionsplan <span style="font-size:9px;background:rgba(168,85,247,.15);color:#c084fc;padding:2px 6px;border-radius:4px;margin-left:4px;vertical-align:middle">Profi</span>',   sub:'sub-week',       open:false},
     {key:'progress',   icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`, label:'Fortschritt',       sub:'sub-progress',   open:false},
   ];
   if (accordion && pgPlan) {
@@ -9342,12 +9360,21 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- ══════════════════════════════════════
      KAMERA-KARL AI CHAT BUBBLE & PANEL
 ══════════════════════════════════════ -->
-<button id="ai-bubble" onclick="aiToggle()" aria-label="Kamera-Karl öffnen">
-  <span id="ai-bubble-icon">🎬</span>
-  <span id="ai-bubble-badge" style="display:none">!</span>
-</button>
-
-<button id="help-float-btn" onclick="showHelp()" aria-label="Hilfe öffnen" title="Hilfe & Tipps">❓</button>
+<!-- Combined floating help/AI button -->
+<div id="float-helper-wrap" style="position:fixed;bottom:calc(var(--timeline-h) + 16px);right:16px;z-index:500;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+  <div id="float-helper-menu" style="display:none;flex-direction:column;gap:6px;animation:popIn .2s ease">
+    <button onclick="showHelp();document.getElementById('float-helper-menu').style.display='none'" style="display:flex;align-items:center;gap:8px;background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.4);color:var(--teal);font-family:'Fredoka One',cursive;font-size:13px;padding:10px 16px;border-radius:14px;cursor:pointer;white-space:nowrap;backdrop-filter:blur(16px);box-shadow:0 4px 20px rgba(0,0,0,.4)">
+      ❓ Hilfe & Tipps
+    </button>
+    <button onclick="aiToggle();document.getElementById('float-helper-menu').style.display='none'" style="display:flex;align-items:center;gap:8px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--yellow);font-family:'Fredoka One',cursive;font-size:13px;padding:10px 16px;border-radius:14px;cursor:pointer;white-space:nowrap;backdrop-filter:blur(16px);box-shadow:0 4px 20px rgba(0,0,0,.4)">
+      🎬 Kamera-Karl
+    </button>
+  </div>
+  <button id="ai-bubble" onclick="var m=document.getElementById('float-helper-menu');m.style.display=m.style.display==='flex'?'none':'flex'" aria-label="Hilfe & Assistent">
+    <span id="ai-bubble-icon">💡</span>
+    <span id="ai-bubble-badge" style="display:none">!</span>
+  </button>
+</div>
 
 <div id="ai-panel" style="display:none" role="dialog" aria-label="Kamera-Karl Chat">
   <div id="ai-header">
