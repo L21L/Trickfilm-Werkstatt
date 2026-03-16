@@ -2934,6 +2934,18 @@ textarea.field-input{min-height:80px;line-height:1.5}
               <button class="prev-tog" id="tog-fadeout" onclick="togFade('out')">🌅→⬛ Fade out</button>
             </div>
           </div>
+          <div class="prev-row" id="edit-fadein-dur-row" style="display:none">
+            <span class="prev-label" style="color:var(--yellow)">⏱ Einblenden</span>
+            <input type="range" class="prev-slider" id="edit-fadein-dur" min="0.3" max="3" step="0.1" value="0.5"
+              oninput="fadeInDuration=+this.value;$('edit-fadein-dur-val').textContent=this.value+'s';syncFadeDurToExport()"/>
+            <span class="prev-val" id="edit-fadein-dur-val" style="color:var(--yellow)">0.5s</span>
+          </div>
+          <div class="prev-row" id="edit-fadeout-dur-row" style="display:none">
+            <span class="prev-label" style="color:var(--yellow)">⏱ Ausblenden</span>
+            <input type="range" class="prev-slider" id="edit-fadeout-dur" min="0.3" max="3" step="0.1" value="0.5"
+              oninput="fadeOutDuration=+this.value;$('edit-fadeout-dur-val').textContent=this.value+'s';syncFadeDurToExport()"/>
+            <span class="prev-val" id="edit-fadeout-dur-val" style="color:var(--yellow)">0.5s</span>
+          </div>
         </div>
       </div>
     </div>
@@ -3070,6 +3082,9 @@ textarea.field-input{min-height:80px;line-height:1.5}
           <button class="audio-fx-btn" id="afx-fadein"  onclick="toggleAudioFx('fadein')" >⬛→🌅 Fade In</button>
           <button class="audio-fx-btn" id="afx-fadeout" onclick="toggleAudioFx('fadeout')">🌅→⬛ Fade Out</button>
           <button class="audio-fx-btn" id="afx-loop"    onclick="toggleAudioFx('loop')"   >🔁 Wiederholen</button>
+          <button class="audio-fx-btn" id="afx-echo"    onclick="toggleAudioFx('echo')"   >🔊 Echo</button>
+          <button class="audio-fx-btn" id="afx-reverb"  onclick="toggleAudioFx('reverb')" >🏛 Hall</button>
+          <button class="audio-fx-btn" id="afx-reverse" onclick="toggleAudioFx('reverse')">⏪ Rückwärts</button>
         </div>
         <div style="margin-top:10px;display:flex;align-items:center;gap:10px">
           <span style="font-size:12px;color:var(--muted)">🔊 Master-Lautstärke</span>
@@ -3190,19 +3205,19 @@ textarea.field-input{min-height:80px;line-height:1.5}
                 <input type="checkbox" id="exp-fadeout" onchange="fadeOut=this.checked;$('exp-fadeout-dur-row').style.display=this.checked?'flex':'none'" style="accent-color:var(--yellow)"/> Ausblenden
               </label>
             </div>
-            <div id="exp-fadein-dur-row" style="display:none;align-items:center;gap:8px;margin-bottom:6px">
-              <span style="font-size:11px;color:var(--muted);min-width:80px">Einblenden:</span>
+            <div id="exp-fadein-dur-row" style="display:none;align-items:center;gap:8px;margin-bottom:6px;padding:6px 10px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);border-radius:8px">
+              <span style="font-size:11px;color:var(--yellow);min-width:80px;font-family:'Fredoka One',cursive">⏱ Dauer:</span>
               <input type="range" id="exp-fadein-dur" min="0.3" max="3" step="0.1" value="0.5"
                 oninput="fadeInDuration=+this.value;$('exp-fadein-dur-val').textContent=this.value+'s'"
                 style="flex:1;accent-color:var(--yellow)"/>
-              <span id="exp-fadein-dur-val" style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--yellow);min-width:32px">0.5s</span>
+              <span id="exp-fadein-dur-val" style="font-family:'Fredoka One',cursive;font-size:13px;color:var(--yellow);min-width:36px">0.5s</span>
             </div>
-            <div id="exp-fadeout-dur-row" style="display:none;align-items:center;gap:8px">
-              <span style="font-size:11px;color:var(--muted);min-width:80px">Ausblenden:</span>
+            <div id="exp-fadeout-dur-row" style="display:none;align-items:center;gap:8px;padding:6px 10px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);border-radius:8px">
+              <span style="font-size:11px;color:var(--yellow);min-width:80px;font-family:'Fredoka One',cursive">⏱ Dauer:</span>
               <input type="range" id="exp-fadeout-dur" min="0.3" max="3" step="0.1" value="0.5"
                 oninput="fadeOutDuration=+this.value;$('exp-fadeout-dur-val').textContent=this.value+'s'"
                 style="flex:1;accent-color:var(--yellow)"/>
-              <span id="exp-fadeout-dur-val" style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--yellow);min-width:32px">0.5s</span>
+              <span id="exp-fadeout-dur-val" style="font-family:'Fredoka One',cursive;font-size:13px;color:var(--yellow);min-width:36px">0.5s</span>
             </div>
           </div>
 
@@ -6643,14 +6658,15 @@ function deleteGroup(id, e) {
 function togglePrev() {
   if (prevRunning) stopPrev(); else startPrev();
 }
-function startPrev() {
+async function startPrev() {
   if (S.shots.length === 0) return;
   prevRunning = true; prevIdx = 0;
   prevGroupsPlayed = new Set();
   $('prev-play').style.opacity = '0';
   $('prev-play').style.pointerEvents = 'none';
-  // Start audio tracks
-  startPrevAudio();
+  // Wait for all audio tracks to decode before starting playback
+  await startPrevAudio();
+  if (!prevRunning) return; // stopped while loading
   prevStep();
 }
 function stopPrev() {
@@ -6668,21 +6684,26 @@ function stopPrev() {
 
 // Preview audio helpers
 window._prevAudioEls = [];
-function startPrevAudio() {
+async function startPrevAudio() {
   stopPrevAudio();
   if (!window.audioTracks || window.audioTracks.length === 0) return;
   const fps = S.fps || 8;
-  window.audioTracks.forEach(track => {
+  const totalFilmDur = S.shots.length / fps;
+
+  const promises = window.audioTracks.map(track => new Promise(resolve => {
     try {
-      const fps = S.fps || 8;
       const delayMs = ((track.startFrame || 0) / fps) * 1000;
       const endFrame = (track.endFrame !== undefined && track.endFrame >= 0) ? track.endFrame : -1;
       const durationMs = endFrame >= 0 ? Math.max(0, (endFrame - (track.startFrame || 0)) / fps * 1000) : -1;
+      const fx = track.fx || {};
+      const fadeDur = track.fadeDuration || 1;
+      const vol = (track.vol || 80) / 100;
+
       if (track.type === 'voiceover' && track.voiceover) {
-        // Voiceover track – data URL
         const audio = new Audio(track.voiceover);
-        audio.volume = (track.vol || 80) / 100;
-        if (track.fx && track.fx.loop) audio.loop = true;
+        audio.volume = vol;
+        if (fx.loop) audio.loop = true;
+        if (fx.speed && fx.speed !== 1) audio.playbackRate = fx.speed;
         const el = { audio, timeout: null, stopTimeout: null };
         const playFn = () => {
           try { audio.play(); } catch(e){}
@@ -6691,47 +6712,99 @@ function startPrevAudio() {
         if (delayMs > 0) el.timeout = setTimeout(playFn, delayMs);
         else playFn();
         window._prevAudioEls.push(el);
+        resolve();
       } else if (track.musicKey) {
-        // Music from IDB
         idbGetMusic(track.musicKey, buffer => {
-          if (!buffer) return;
+          if (!buffer) { resolve(); return; }
           try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             ctx.decodeAudioData(buffer.slice(0), decoded => {
-              const gain = ctx.createGain();
-              const vol = (track.vol || 80) / 100;
-              gain.gain.value = vol;
+              // Reverse: flip the buffer data
+              if (fx.reverse) {
+                for (let ch = 0; ch < decoded.numberOfChannels; ch++) {
+                  decoded.getChannelData(ch).reverse();
+                }
+              }
+
               const src = ctx.createBufferSource();
               src.buffer = decoded;
-              src.loop = !!(track.fx && track.fx.loop);
-              // Apply fade in/out via gain ramps
-              const startSec = (track.startFrame || 0) / fps;
-              const fadeDur = track.fadeDuration || 1;
-              if (track.fx && track.fx.fadein) {
-                gain.gain.setValueAtTime(0, ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + fadeDur);
+              src.loop = !!fx.loop;
+              if (fx.speed && fx.speed !== 1) src.playbackRate.value = fx.speed;
+
+              const gain = ctx.createGain();
+              const now = ctx.currentTime;
+              const delaySec = delayMs / 1000;
+              const startAt = now + delaySec;
+              const trackDurSec = durationMs > 0 ? durationMs / 1000 : (src.loop ? totalFilmDur - delaySec : decoded.duration / (fx.speed || 1));
+              const endAt = startAt + trackDurSec;
+
+              // Fade in
+              if (fx.fadein) {
+                gain.gain.setValueAtTime(0, startAt);
+                gain.gain.linearRampToValueAtTime(vol, startAt + fadeDur);
+                if (!fx.fadeout) gain.gain.setValueAtTime(vol, startAt + fadeDur + 0.001);
+              } else {
+                gain.gain.setValueAtTime(vol, startAt);
               }
-              if (track.fx && track.fx.fadeout) {
-                const totalDur = S.shots.length / fps;
-                const trackEndSec = durationMs > 0 ? durationMs / 1000 : (src.loop ? totalDur - startSec : decoded.duration);
-                gain.gain.setValueAtTime(vol, ctx.currentTime + Math.max(0, trackEndSec - fadeDur));
-                gain.gain.linearRampToValueAtTime(0, ctx.currentTime + trackEndSec);
+              // Fade out
+              if (fx.fadeout) {
+                const fadeStart = Math.max(startAt, endAt - fadeDur);
+                if (!fx.fadein || fadeStart > startAt + fadeDur) gain.gain.setValueAtTime(vol, fadeStart);
+                gain.gain.linearRampToValueAtTime(0, endAt);
               }
-              src.connect(gain); gain.connect(ctx.destination);
+
+              src.connect(gain);
+              // Echo
+              if (fx.echo) {
+                const delay = ctx.createDelay(1.0);
+                delay.delayTime.value = 0.25;
+                const feedback = ctx.createGain();
+                feedback.gain.value = 0.35;
+                const wet = ctx.createGain();
+                wet.gain.value = 0.4;
+                gain.connect(delay);
+                delay.connect(feedback);
+                feedback.connect(delay);
+                delay.connect(wet);
+                wet.connect(ctx.destination);
+              }
+              // Reverb
+              if (fx.reverb) {
+                try {
+                  const convolver = ctx.createConvolver();
+                  const len = ctx.sampleRate * 2;
+                  const impulse = ctx.createBuffer(2, len, ctx.sampleRate);
+                  for (let c = 0; c < 2; c++) {
+                    const d = impulse.getChannelData(c);
+                    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5);
+                  }
+                  convolver.buffer = impulse;
+                  const wet = ctx.createGain();
+                  wet.gain.value = 0.3;
+                  gain.connect(convolver);
+                  convolver.connect(wet);
+                  wet.connect(ctx.destination);
+                } catch(e){}
+              }
+
+              gain.connect(ctx.destination);
               const el = { audio: null, ctx, src, timeout: null, stopTimeout: null };
               const startFn = () => {
-                try { src.start(); } catch(e){}
+                try { src.start(0); } catch(e){}
                 if (durationMs > 0) el.stopTimeout = setTimeout(() => { try { src.stop(); } catch(e){} }, durationMs);
               };
               if (delayMs > 0) el.timeout = setTimeout(startFn, delayMs);
               else startFn();
               window._prevAudioEls.push(el);
-            });
-          } catch(e){}
+              resolve();
+            }, () => resolve());
+          } catch(e){ resolve(); }
         });
-      }
-    } catch(e){}
-  });
+      } else { resolve(); }
+    } catch(e){ resolve(); }
+  }));
+
+  await Promise.all(promises);
 }
 function stopPrevAudio() {
   (window._prevAudioEls || []).forEach(el => {
@@ -6796,6 +6869,23 @@ function checkVoiceoverTrigger(idx) {
 function togFade(which) {
   if (which === 'in')  { fadeIn  = !fadeIn;  $('tog-fadein').classList.toggle('on',  fadeIn); }
   if (which === 'out') { fadeOut = !fadeOut; $('tog-fadeout').classList.toggle('on', fadeOut); }
+  // Show/hide duration sliders in editor
+  const fiRow = $('edit-fadein-dur-row');
+  const foRow = $('edit-fadeout-dur-row');
+  if (fiRow) fiRow.style.display = fadeIn  ? '' : 'none';
+  if (foRow) foRow.style.display = fadeOut ? '' : 'none';
+  // Sync values to export tab
+  syncFadeDurToExport();
+}
+function syncFadeDurToExport() {
+  const fi = $('exp-fadein');  if (fi) fi.checked = fadeIn;
+  const fo = $('exp-fadeout'); if (fo) fo.checked = fadeOut;
+  const fiDurRow = $('exp-fadein-dur-row');  if (fiDurRow) fiDurRow.style.display = fadeIn ? 'flex' : 'none';
+  const foDurRow = $('exp-fadeout-dur-row'); if (foDurRow) foDurRow.style.display = fadeOut ? 'flex' : 'none';
+  const fiDur = $('exp-fadein-dur');   if (fiDur) { fiDur.value = fadeInDuration; $('exp-fadein-dur-val').textContent = fadeInDuration + 's'; }
+  const foDur = $('exp-fadeout-dur');  if (foDur) { foDur.value = fadeOutDuration; $('exp-fadeout-dur-val').textContent = fadeOutDuration + 's'; }
+  const edFiDur = $('edit-fadein-dur');  if (edFiDur) { edFiDur.value = fadeInDuration; $('edit-fadein-dur-val').textContent = fadeInDuration + 's'; }
+  const edFoDur = $('edit-fadeout-dur'); if (edFoDur) { edFoDur.value = fadeOutDuration; $('edit-fadeout-dur-val').textContent = fadeOutDuration + 's'; }
 }
 
 /* ── Voiceover Modal ──────────────────────────*/
@@ -7286,7 +7376,7 @@ function musRemove() {
    AUDIO TRACKS SYSTEM (Mehrspurige Timeline)
    ═══════════════════════════════════════════════ */
 if (!window.audioTracks) window.audioTracks = [];
-let audioFxState = { fadein: false, fadeout: false, loop: false };
+let audioFxState = { fadein: false, fadeout: false, loop: false, echo: false, reverb: false, reverse: false };
 
 function addAudioTrack(type) {
   const id = 'atr_' + Date.now();
@@ -7297,7 +7387,8 @@ function addAudioTrack(type) {
                 : '🎵 Spur ' + (window.audioTracks.filter(t=>t.type!=='voiceover').length + 1),
     type: isVo ? 'voiceover' : 'music',
     trackName: '', vol: 80, startFrame: 0, musicKey: null, audio: null,
-    fx: { fadein: false, fadeout: false, loop: false },
+    fx: { fadein: false, fadeout: false, loop: false, echo: false, reverb: false, reverse: false, speed: 1 },
+    fadeDuration: 1,
     voiceover: null, voiceoverBlob: null
   };
   window.audioTracks.push(track);
@@ -7411,10 +7502,13 @@ function renderAudioTracks() {
       </div>
       <!-- Per-track FX -->
       <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:8px;display:flex;flex-direction:column;gap:6px">
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
           <button class="audio-fx-btn${fx.fadein?' active':''}" onclick="toggleTrackFx('${track.id}','fadein')">⬛→🌅 Fade In</button>
           <button class="audio-fx-btn${fx.fadeout?' active':''}" onclick="toggleTrackFx('${track.id}','fadeout')">🌅→⬛ Fade Out</button>
           <button class="audio-fx-btn${fx.loop?' active':''}" onclick="toggleTrackFx('${track.id}','loop')">🔁 Loop</button>
+          <button class="audio-fx-btn${fx.echo?' active':''}" onclick="toggleTrackFx('${track.id}','echo')">🔊 Echo</button>
+          <button class="audio-fx-btn${fx.reverb?' active':''}" onclick="toggleTrackFx('${track.id}','reverb')">🏛 Hall</button>
+          <button class="audio-fx-btn${fx.reverse?' active':''}" onclick="toggleTrackFx('${track.id}','reverse')">⏪ Rückwärts</button>
         </div>
         ${(fx.fadein || fx.fadeout) ? `
         <div style="display:flex;align-items:center;gap:8px;padding:4px 0">
@@ -7424,6 +7518,13 @@ function renderAudioTracks() {
             style="flex:1;accent-color:var(--teal)"/>
           <span style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--teal);min-width:32px">${track.fadeDuration || 1}s</span>
         </div>` : ''}
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 0">
+          <span style="font-size:11px;color:var(--muted);min-width:72px">⚡ Tempo:</span>
+          <input type="range" min="0.5" max="2" step="0.05" value="${fx.speed || 1}"
+            oninput="setTrackSpeed('${track.id}',+this.value);this.nextElementSibling.textContent=Math.round(this.value*100)+'%'"
+            style="flex:1;accent-color:var(--purple)"/>
+          <span style="font-family:'Fredoka One',cursive;font-size:12px;color:var(--purple);min-width:36px">${Math.round((fx.speed || 1) * 100)}%</span>
+        </div>
       </div>
     `;
     if (track.sceneIdx !== undefined && track.sceneIdx >= 0) {
@@ -7437,10 +7538,18 @@ function renderAudioTracks() {
 function toggleTrackFx(trackId, fx) {
   const track = window.audioTracks.find(t => t.id === trackId);
   if (!track) return;
-  if (!track.fx) track.fx = { fadein: false, fadeout: false, loop: false };
+  if (!track.fx) track.fx = { fadein: false, fadeout: false, loop: false, echo: false, reverb: false, reverse: false, speed: 1 };
   track.fx[fx] = !track.fx[fx];
   renderAudioTracks();
-  showToast((track.fx[fx] ? '✅' : '❌') + ' ' + fx + ' für ' + track.name);
+  const labels = { fadein:'Fade In', fadeout:'Fade Out', loop:'Loop', echo:'Echo', reverb:'Hall', reverse:'Rückwärts' };
+  showToast((track.fx[fx] ? '✅' : '❌') + ' ' + (labels[fx]||fx) + ' für ' + track.name);
+}
+
+function setTrackSpeed(id, speed) {
+  const track = window.audioTracks.find(t => t.id === id);
+  if (!track) return;
+  if (!track.fx) track.fx = {};
+  track.fx.speed = speed;
 }
 
 function setTrackScene(id, sceneIdx) {
@@ -7524,10 +7633,11 @@ function toggleAudioFx(fx) {
   audioFxState[fx] = !audioFxState[fx];
   const btn = $('afx-' + fx);
   if (btn) btn.classList.toggle('active', audioFxState[fx]);
-  // Apply to S state
+  // Apply to S state for video fades
   if (fx === 'fadein')  { S.fadeIn  = audioFxState.fadein;  try { togFade('in'); } catch(e){} }
   if (fx === 'fadeout') { S.fadeOut = audioFxState.fadeout; try { togFade('out'); } catch(e){} }
-  showToast((audioFxState[fx] ? '✅' : '❌') + ' Effekt: ' + fx);
+  const labels = { fadein:'Fade In', fadeout:'Fade Out', loop:'Wiederholen', echo:'Echo', reverb:'Hall', reverse:'Rückwärts' };
+  showToast((audioFxState[fx] ? '✅' : '❌') + ' ' + (labels[fx]||fx));
 }
 
 // Init tracks on load
@@ -8168,7 +8278,6 @@ function deleteSubtitle(i) {
 // ── Multi-track audio mixer for export ──────────
 async function mixAudioTracksIntoStream(stream) {
   const tracks = window.audioTracks || [];
-  // Also consider legacy S.music if no audioTracks exist
   const hasAudioTracks = tracks.some(t => t.musicKey || t.voiceover);
   if (!hasAudioTracks && !S.music) return;
 
@@ -8178,63 +8287,109 @@ async function mixAudioTracksIntoStream(stream) {
     const fps = S.fps || 8;
     const totalDuration = S.shots.length / fps;
 
-    // Helper to load and schedule a single track
     const scheduleTrack = (track) => new Promise(resolve => {
-      const startSec = (track.startFrame || 0) / fps;
+      const delaySec = (track.startFrame || 0) / fps;
       const vol = (track.vol || 80) / 100;
       const fx = track.fx || {};
+      const fadeDur = track.fadeDuration || 1;
+
+      const wireUp = (decoded) => {
+        const src = actx.createBufferSource();
+        src.buffer = decoded;
+        if (fx.loop) src.loop = true;
+
+        // Playback rate (speed/pitch)
+        if (fx.speed && fx.speed !== 1) src.playbackRate.value = fx.speed;
+
+        const gain = actx.createGain();
+        const now = actx.currentTime;
+        const startAt = now + delaySec;
+        const trackEndSec = fx.loop ? totalDuration - delaySec : decoded.duration / (fx.speed || 1);
+        const endAt = now + delaySec + trackEndSec;
+
+        // Fade scheduling — all times relative to actx.currentTime
+        if (fx.fadein) {
+          gain.gain.setValueAtTime(0, startAt);
+          gain.gain.linearRampToValueAtTime(vol, startAt + fadeDur);
+          if (!fx.fadeout) {
+            gain.gain.setValueAtTime(vol, startAt + fadeDur + 0.001);
+          }
+        } else {
+          gain.gain.setValueAtTime(vol, startAt);
+        }
+
+        if (fx.fadeout) {
+          const fadeStart = Math.max(startAt, endAt - fadeDur);
+          if (!fx.fadein || fadeStart > startAt + fadeDur) {
+            gain.gain.setValueAtTime(vol, fadeStart);
+          }
+          gain.gain.linearRampToValueAtTime(0, endAt);
+        }
+
+        // Echo / reverb
+        let lastNode = gain;
+        if (fx.echo) {
+          const delay = actx.createDelay(1.0);
+          delay.delayTime.value = 0.25;
+          const feedback = actx.createGain();
+          feedback.gain.value = 0.35;
+          const wet = actx.createGain();
+          wet.gain.value = 0.4;
+          gain.connect(delay);
+          delay.connect(feedback);
+          feedback.connect(delay);
+          delay.connect(wet);
+          wet.connect(dest);
+        }
+        if (fx.reverb) {
+          // Simple convolver-based reverb
+          try {
+            const convolver = actx.createConvolver();
+            const len = actx.sampleRate * 2;
+            const impulse = actx.createBuffer(2, len, actx.sampleRate);
+            for (let ch = 0; ch < 2; ch++) {
+              const d = impulse.getChannelData(ch);
+              for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5);
+            }
+            convolver.buffer = impulse;
+            const wet = actx.createGain();
+            wet.gain.value = 0.3;
+            gain.connect(convolver);
+            convolver.connect(wet);
+            wet.connect(dest);
+          } catch(e) {}
+        }
+
+        src.connect(gain);
+        gain.connect(dest);
+
+        // Reverse: flip the buffer data before playback
+        if (fx.reverse) {
+          for (let ch = 0; ch < decoded.numberOfChannels; ch++) {
+            const data = decoded.getChannelData(ch);
+            data.reverse();
+          }
+        }
+
+        src.start(startAt);
+        if (!fx.loop) {
+          const endFrame = (track.endFrame !== undefined && track.endFrame >= 0) ? track.endFrame : -1;
+          if (endFrame >= 0) {
+            const dur = (endFrame - (track.startFrame || 0)) / fps;
+            src.stop(startAt + dur);
+          }
+        }
+        resolve();
+      };
 
       if (track.type === 'voiceover' && track.voiceover) {
-        // Voiceover: decode data URL
         fetch(track.voiceover).then(r => r.arrayBuffer()).then(buf => {
-          actx.decodeAudioData(buf, decoded => {
-            const src = actx.createBufferSource();
-            src.buffer = decoded;
-            if (fx.loop) src.loop = true;
-            const gain = actx.createGain();
-            gain.gain.value = vol;
-            // Audio fade in/out
-            if (fx.fadein) {
-              const fadeDur = track.fadeDuration || 1;
-              gain.gain.setValueAtTime(0, startSec);
-              gain.gain.linearRampToValueAtTime(vol, startSec + fadeDur);
-            }
-            if (fx.fadeout) {
-              const fadeDur = track.fadeDuration || 1;
-              const endTime = fx.loop ? totalDuration : Math.min(startSec + decoded.duration, totalDuration);
-              gain.gain.setValueAtTime(vol, Math.max(0, endTime - fadeDur));
-              gain.gain.linearRampToValueAtTime(0, endTime);
-            }
-            src.connect(gain); gain.connect(dest);
-            src.start(startSec);
-            resolve();
-          }, () => resolve());
+          actx.decodeAudioData(buf, wireUp, () => resolve());
         }).catch(() => resolve());
       } else if (track.musicKey) {
         idbGetMusic(track.musicKey, buffer => {
           if (!buffer) { resolve(); return; }
-          actx.decodeAudioData(buffer.slice(0), decoded => {
-            const src = actx.createBufferSource();
-            src.buffer = decoded;
-            if (fx.loop) src.loop = true;
-            const gain = actx.createGain();
-            gain.gain.value = vol;
-            // Audio fade in/out
-            if (fx.fadein) {
-              const fadeDur = track.fadeDuration || 1;
-              gain.gain.setValueAtTime(0, startSec);
-              gain.gain.linearRampToValueAtTime(vol, startSec + fadeDur);
-            }
-            if (fx.fadeout) {
-              const fadeDur = track.fadeDuration || 1;
-              const endTime = fx.loop ? totalDuration : Math.min(startSec + decoded.duration, totalDuration);
-              gain.gain.setValueAtTime(vol, Math.max(0, endTime - fadeDur));
-              gain.gain.linearRampToValueAtTime(0, endTime);
-            }
-            src.connect(gain); gain.connect(dest);
-            src.start(startSec);
-            resolve();
-          }, () => resolve());
+          actx.decodeAudioData(buffer.slice(0), wireUp, () => resolve());
         });
       } else { resolve(); }
     });
@@ -8242,7 +8397,6 @@ async function mixAudioTracksIntoStream(stream) {
     if (hasAudioTracks) {
       await Promise.all(tracks.filter(t => t.musicKey || t.voiceover).map(scheduleTrack));
     } else if (S.music) {
-      // Legacy fallback: single S.music track
       const buf = await loadMusicBuffer();
       if (buf) {
         await new Promise(resolve => {
@@ -8260,7 +8414,6 @@ async function mixAudioTracksIntoStream(stream) {
     }
 
     dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
-    // Store context reference so it stays alive during export
     window._exportAudioCtx = actx;
   } catch(e) { console.error('Audio mix error:', e); }
 }
@@ -10260,16 +10413,28 @@ function initRetouchModal() {
    FX MODAL — 10 Spezialeffekte
    ═══════════════════════════════════════════════ */
 const FX_LIST = [
-  { id:'sunset',  icon:'🌅', name:'Sonnenuntergang', desc:'Warme orange Überblendung über die Szene' },
-  { id:'freeze',  icon:'❄️', name:'Einfrieren',      desc:'Bild hält inne – wiederholte Frames' },
-  { id:'rain',    icon:'🌧️', name:'Regen',           desc:'Animierte Regentropfen-Linien' },
-  { id:'lightning',icon:'⚡', name:'Blitz',          desc:'Helle Blitze in der Szene' },
-  { id:'oldfilm', icon:'🎞️', name:'Alter Film',     desc:'Sepia-Tönung mit Körnigkeit' },
-  { id:'rainbow', icon:'🌈', name:'Regenbogen',      desc:'Farbwechsel über alle Frames' },
-  { id:'night',   icon:'🌙', name:'Tag zu Nacht',    desc:'Szene wird progressiv dunkler' },
-  { id:'zoom',    icon:'🔍', name:'Zoom-In',         desc:'Langsam heranzoomen' },
-  { id:'shake',   icon:'💥', name:'Explosion',       desc:'Bild wackelt und zittert' },
-  { id:'vignette',icon:'🎬', name:'Kino-Vignette',  desc:'Dunkle Ränder wie im Kino' },
+  { id:'sunset',    icon:'🌅', name:'Sonnenuntergang', desc:'Warme orange Überblendung über die Szene' },
+  { id:'freeze',    icon:'❄️', name:'Einfrieren',      desc:'Bild hält inne – wiederholte Frames' },
+  { id:'rain',      icon:'🌧️', name:'Regen',           desc:'Animierte Regentropfen-Linien' },
+  { id:'lightning',  icon:'⚡', name:'Blitz',          desc:'Helle Blitze in der Szene' },
+  { id:'oldfilm',   icon:'🎞️', name:'Alter Film',     desc:'Sepia-Tönung mit Körnigkeit' },
+  { id:'rainbow',   icon:'🌈', name:'Regenbogen',      desc:'Farbwechsel über alle Frames' },
+  { id:'night',     icon:'🌙', name:'Tag zu Nacht',    desc:'Szene wird progressiv dunkler' },
+  { id:'zoom',      icon:'🔍', name:'Zoom-In',         desc:'Langsam heranzoomen' },
+  { id:'shake',     icon:'💥', name:'Explosion',       desc:'Bild wackelt und zittert' },
+  { id:'vignette',  icon:'🎬', name:'Kino-Vignette',  desc:'Dunkle Ränder wie im Kino' },
+  { id:'snow',      icon:'🌨️', name:'Schnee',          desc:'Sanft fallende Schneeflocken' },
+  { id:'blur',      icon:'💨', name:'Weichzeichner',   desc:'Szene wird langsam unscharf' },
+  { id:'glitch',    icon:'📺', name:'Glitch',          desc:'Digitale Störungen und Verzerrungen' },
+  { id:'fire',      icon:'🔥', name:'Feuer',           desc:'Warmes Feuerschein-Glühen von unten' },
+  { id:'underwater',icon:'🫧', name:'Unter Wasser',    desc:'Blaustich und Lichtbrechung' },
+  { id:'stars',     icon:'✨', name:'Sternenhimmel',   desc:'Funkelnde Sterne und Glitzer' },
+  { id:'negative',  icon:'🔳', name:'Negativ',         desc:'Farben werden invertiert' },
+  { id:'spotlight', icon:'💡', name:'Spotlight',       desc:'Scheinwerferlicht folgt der Mitte' },
+  { id:'dreamy',    icon:'☁️', name:'Traumhaft',       desc:'Weiches Leuchten und helle Überblendung' },
+  { id:'pixelate',  icon:'🧱', name:'Pixel-Art',       desc:'Verpixelungseffekt wie Retro-Spiele' },
+  { id:'heartbeat', icon:'💓', name:'Herzschlag',      desc:'Rhythmisches Pulsieren des Bildes' },
+  { id:'matrix',    icon:'🟢', name:'Matrix',          desc:'Grüne fallende Zeichen wie in "Matrix"' },
 ];
 
 let fxSelectedId = null;
@@ -10482,11 +10647,205 @@ function fxApplyToContext(ctx, w, h, fxId, t, intensity) {
       break;
     }
     case 'freeze': {
-      // Freeze = no tint change, just vignette pulse
       if (t > 0.5) {
         ctx.globalCompositeOperation = 'source-over';
         ctx.fillStyle = `rgba(180,220,255,${intensity * 0.08})`;
         ctx.fillRect(0, 0, w, h);
+      }
+      break;
+    }
+    case 'snow': {
+      ctx.globalCompositeOperation = 'source-over';
+      const flakes = Math.floor(50 * intensity);
+      const seed = Math.floor(t * 100);
+      for (let i = 0; i < flakes; i++) {
+        const x = ((seed * 41 + i * 83) % w);
+        const y = ((seed * 17 + i * 53 + Math.floor(t * h * 2)) % h);
+        const r = 1 + (i % 3);
+        ctx.fillStyle = `rgba(255,255,255,${0.3 + (i % 5) * 0.12})`;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      break;
+    }
+    case 'blur': {
+      // Simulate blur with semi-transparent overlay of averaged colors
+      ctx.globalCompositeOperation = 'source-over';
+      const blurAlpha = intensity * t * 0.45;
+      ctx.fillStyle = `rgba(128,128,128,${blurAlpha})`;
+      ctx.fillRect(0, 0, w, h);
+      // Stack shifted copies for blur illusion
+      ctx.globalAlpha = intensity * t * 0.15;
+      const shift = Math.ceil(3 * intensity * t);
+      ctx.drawImage(ctx.canvas, shift, 0);
+      ctx.drawImage(ctx.canvas, -shift, 0);
+      ctx.drawImage(ctx.canvas, 0, shift);
+      ctx.drawImage(ctx.canvas, 0, -shift);
+      ctx.globalAlpha = 1;
+      break;
+    }
+    case 'glitch': {
+      ctx.globalCompositeOperation = 'source-over';
+      const glitchBands = Math.floor(6 * intensity);
+      const seed2 = Math.floor(t * 1000);
+      for (let i = 0; i < glitchBands; i++) {
+        const bandY = ((seed2 * 31 + i * 67) % h);
+        const bandH = 2 + ((seed2 + i * 13) % 8);
+        const shiftX = ((seed2 * 7 + i * 41) % 20) - 10;
+        const imgData = ctx.getImageData(0, bandY, w, Math.min(bandH, h - bandY));
+        ctx.putImageData(imgData, shiftX * intensity, bandY);
+      }
+      // Color channel shift
+      if (t > 0.3 && t < 0.7) {
+        ctx.globalCompositeOperation = 'screen';
+        ctx.fillStyle = `rgba(255,0,0,${intensity * 0.08})`;
+        ctx.fillRect(3, 0, w, h);
+        ctx.fillStyle = `rgba(0,255,255,${intensity * 0.08})`;
+        ctx.fillRect(-3, 0, w, h);
+      }
+      break;
+    }
+    case 'fire': {
+      ctx.globalCompositeOperation = 'screen';
+      const fireGrad = ctx.createLinearGradient(0, h, 0, h * 0.4);
+      const fireAlpha = intensity * (0.2 + Math.sin(t * 12) * 0.1);
+      fireGrad.addColorStop(0, `rgba(255,100,0,${fireAlpha})`);
+      fireGrad.addColorStop(0.4, `rgba(255,180,0,${fireAlpha * 0.6})`);
+      fireGrad.addColorStop(1, 'rgba(255,200,0,0)');
+      ctx.fillStyle = fireGrad;
+      ctx.fillRect(0, 0, w, h);
+      break;
+    }
+    case 'underwater': {
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = `rgba(0,80,160,${intensity * 0.35})`;
+      ctx.fillRect(0, 0, w, h);
+      // Light caustics (wavy lines)
+      ctx.globalCompositeOperation = 'screen';
+      ctx.strokeStyle = `rgba(100,200,255,${intensity * 0.12})`;
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 5; i++) {
+        ctx.beginPath();
+        for (let x = 0; x < w; x += 4) {
+          const y2 = h * 0.2 + i * h * 0.15 + Math.sin((x + t * 200) * 0.03 + i) * 15;
+          x === 0 ? ctx.moveTo(x, y2) : ctx.lineTo(x, y2);
+        }
+        ctx.stroke();
+      }
+      break;
+    }
+    case 'stars': {
+      ctx.globalCompositeOperation = 'screen';
+      const starCount = Math.floor(40 * intensity);
+      const seed3 = Math.floor(t * 50);
+      for (let i = 0; i < starCount; i++) {
+        const sx = ((seed3 * 37 + i * 89) % w);
+        const sy = ((seed3 * 23 + i * 71) % h);
+        const brightness = 0.4 + Math.sin(t * 8 + i) * 0.4;
+        const sr = 1 + (i % 3) * 0.5;
+        ctx.fillStyle = `rgba(255,255,200,${brightness * intensity})`;
+        ctx.beginPath();
+        ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+        ctx.fill();
+        // Star cross for bigger ones
+        if (i % 5 === 0) {
+          ctx.strokeStyle = `rgba(255,255,220,${brightness * intensity * 0.5})`;
+          ctx.lineWidth = 0.5;
+          ctx.beginPath(); ctx.moveTo(sx - 4, sy); ctx.lineTo(sx + 4, sy); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(sx, sy - 4); ctx.lineTo(sx, sy + 4); ctx.stroke();
+        }
+      }
+      break;
+    }
+    case 'negative': {
+      const imgData = ctx.getImageData(0, 0, w, h);
+      const d = imgData.data;
+      const mix = intensity;
+      for (let i = 0; i < d.length; i += 4) {
+        d[i]     = d[i]     + (255 - 2 * d[i])     * mix;
+        d[i + 1] = d[i + 1] + (255 - 2 * d[i + 1]) * mix;
+        d[i + 2] = d[i + 2] + (255 - 2 * d[i + 2]) * mix;
+      }
+      ctx.putImageData(imgData, 0, 0);
+      break;
+    }
+    case 'spotlight': {
+      // Dark overlay with bright circle in center
+      ctx.globalCompositeOperation = 'source-over';
+      const spotR = (0.15 + t * 0.15) * Math.min(w, h);
+      const spotGrad = ctx.createRadialGradient(w/2, h/2, spotR * 0.2, w/2, h/2, spotR);
+      spotGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      spotGrad.addColorStop(0.7, `rgba(0,0,0,${intensity * 0.3})`);
+      spotGrad.addColorStop(1, `rgba(0,0,0,${intensity * 0.75})`);
+      ctx.fillStyle = spotGrad;
+      ctx.fillRect(0, 0, w, h);
+      break;
+    }
+    case 'dreamy': {
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = `rgba(255,240,220,${intensity * 0.2})`;
+      ctx.fillRect(0, 0, w, h);
+      // Soft glow from center
+      const dGrad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w*0.6);
+      dGrad.addColorStop(0, `rgba(255,255,240,${intensity * 0.15})`);
+      dGrad.addColorStop(1, 'rgba(255,255,240,0)');
+      ctx.fillStyle = dGrad;
+      ctx.fillRect(0, 0, w, h);
+      break;
+    }
+    case 'pixelate': {
+      const pixelSize = Math.max(2, Math.round(2 + intensity * t * 14));
+      const imgD = ctx.getImageData(0, 0, w, h);
+      const pxCtx = ctx;
+      for (let py = 0; py < h; py += pixelSize) {
+        for (let px = 0; px < w; px += pixelSize) {
+          const i4 = (py * w + px) * 4;
+          pxCtx.fillStyle = `rgb(${imgD.data[i4]},${imgD.data[i4+1]},${imgD.data[i4+2]})`;
+          pxCtx.fillRect(px, py, pixelSize, pixelSize);
+        }
+      }
+      break;
+    }
+    case 'heartbeat': {
+      // Pulsing dark/light overlay
+      const pulse = Math.sin(t * Math.PI * 6) * 0.5 + 0.5;
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = `rgba(200,0,50,${pulse * intensity * 0.12})`;
+      ctx.fillRect(0, 0, w, h);
+      // Vignette pulse
+      const hGrad = ctx.createRadialGradient(w/2, h/2, h*0.25, w/2, h/2, h * (0.7 + pulse * 0.15));
+      hGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      hGrad.addColorStop(1, `rgba(0,0,0,${(1 - pulse) * intensity * 0.35})`);
+      ctx.fillStyle = hGrad;
+      ctx.fillRect(0, 0, w, h);
+      break;
+    }
+    case 'matrix': {
+      ctx.globalCompositeOperation = 'source-over';
+      // Darken slightly
+      ctx.fillStyle = `rgba(0,10,0,${intensity * 0.25})`;
+      ctx.fillRect(0, 0, w, h);
+      // Green tint
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = `rgba(0,40,0,${intensity * 0.15})`;
+      ctx.fillRect(0, 0, w, h);
+      // Falling characters
+      ctx.globalCompositeOperation = 'source-over';
+      const chars = 'ｱｲｳｴｵｶｷｸ01';
+      ctx.font = `${Math.max(8, Math.round(12 * intensity))}px monospace`;
+      const cols = Math.floor(w / 14);
+      const seed4 = Math.floor(t * 60);
+      for (let c = 0; c < cols; c++) {
+        const cx = c * 14 + 2;
+        const rows = 3 + (c * 7 + seed4) % 8;
+        for (let r = 0; r < rows; r++) {
+          const cy = ((seed4 * 3 + c * 17 + r * 22) % h);
+          const charIdx = (c + r + seed4) % chars.length;
+          const alpha = intensity * (0.3 + (rows - r) / rows * 0.5);
+          ctx.fillStyle = `rgba(0,255,70,${alpha})`;
+          ctx.fillText(chars[charIdx], cx, cy);
+        }
       }
       break;
     }
