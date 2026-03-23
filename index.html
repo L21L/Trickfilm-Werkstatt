@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
 <meta name="theme-color" content="#060914"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -17,6 +17,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet"/>
 <style>
+/* Block pinch-zoom and double-tap zoom globally */
+html{touch-action:manipulation}
+body{touch-action:manipulation}
 /* ═══════════════════════════════════════════════
    MEINE TRICKFILM WERKSTATT — styles
    ═══════════════════════════════════════════════ */
@@ -182,7 +185,7 @@ textarea{resize:vertical}
 .tl-empty{color:var(--muted);font-size:12px;font-family:'Fredoka One',cursive;margin:auto}
 
 /* ── Frame context overlay ── */
-#frame-ctx{position:absolute;z-index:300;background:rgba(13,17,23,.92);
+#frame-ctx{position:fixed;z-index:300;background:rgba(13,17,23,.92);
   border:1px solid var(--glass-border);border-radius:12px;
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   padding:6px;display:flex;gap:4px;box-shadow:0 8px 32px rgba(0,0,0,.6);
@@ -262,15 +265,17 @@ textarea{resize:vertical}
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  padding: 9px 12px;
+  padding: 9px 0;
   border-radius: 14px;
   background: rgba(13,17,28,.7);
   border: 1px solid rgba(255,255,255,.12);
   color: rgba(200,220,240,0.75);
   cursor: pointer;
   transition: all .2s cubic-bezier(.4,0,.2,1);
-  min-width: 58px;
+  width: 74px;
+  min-width: 74px;
   font-family: 'Fredoka One', cursive;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -923,6 +928,9 @@ textarea.field-input{min-height:80px;line-height:1.5}
 .frm-card.selected{border-color:var(--yellow);box-shadow:0 0 0 1px rgba(251,191,36,.3)}
 .frm-card.drag-over{border-color:var(--yellow);transform:scale(1.04);outline:2px solid var(--yellow)}
 .frm-card.drag-active{opacity:.3;transform:scale(.95);border-color:var(--muted)}
+.frm-card.frm-dragging{opacity:.4;transform:scale(.95);border-color:var(--muted)}
+.frm-card.frm-dragover{border-color:var(--yellow);transform:scale(1.06);
+  box-shadow:0 0 12px rgba(251,191,36,.4);outline:2px dashed var(--yellow)}
 /* Sort mode */
 .frm-sort-btns{position:absolute;inset:0;display:flex;align-items:center;
   justify-content:space-between;padding:4px;background:rgba(0,0,0,.5)}
@@ -1842,15 +1850,10 @@ textarea.field-input{min-height:80px;line-height:1.5}
 
   /* ── Frame-Kontext-Overlay ── */
   #frame-ctx{
-    left: 50% !important;
-    transform: translateX(-50%) translateY(4px) !important;
-    bottom: calc(var(--timeline-h) + 8px);
-    top: auto !important;
-    flex-wrap: wrap;
     max-width: calc(100vw - 16px);
+    flex-wrap: wrap;
     justify-content: center;
   }
-  #frame-ctx.show{ transform: translateX(-50%) translateY(0) !important; }
   .ctx-btn{ padding: 8px 10px; min-width: 50px; font-size: 9px; }
   .ctx-btn .ctx-icon{ font-size: 18px; }
 
@@ -1859,7 +1862,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
   #cam-shoot-row-main{ padding: 4px 8px; }
   .cam-shoot-left{ margin-right: 10px; gap: 5px; }
   .cam-shoot-right{ margin-left: 10px; gap: 5px; }
-  .cam-side-btn{ padding: 6px 8px; min-width: 48px; font-size: 11px; }
+  .cam-side-btn{ padding: 6px 0; width: 62px; min-width: 62px; font-size: 11px; }
   #shoot-btn{ width: 64px; height: 64px; font-size: 26px; }
   .cam-row1{ gap: 4px; }
   .cch{ font-size: 11px; padding: 5px 9px; }
@@ -2679,7 +2682,7 @@ textarea.field-input{min-height:80px;line-height:1.5}
         </div>
         <!-- CENTER: Shutter -->
         <button id="shoot-btn" onclick="takeShot()" title="Foto aufnehmen">
-          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:38px;height:38px;display:block">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:38px;height:38px;display:block;margin:auto">
             <!-- Kameragehäuse -->
             <rect x="4" y="14" width="40" height="28" rx="6" fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
             <!-- Sucher-Buckel -->
@@ -3682,7 +3685,7 @@ function ckGoMode(mode) {
   const target = $('ck-' + mode);
   if (target) target.classList.add('active');
   // Trigger cam init if switching to cam
-  if (mode === 'cam') { try { if (typeof camStream !== 'undefined' && !camStream) initCam(); sizeCamViewfinder(); } catch(e){} }
+  if (mode === 'cam') { try { if (typeof camStream !== 'undefined' && !camStream) initCam(); sizeCamViewfinder(); if (onionOn) drawOnion(); } catch(e){} }
   try { playSwoosh(); } catch(e){}
 }
 
@@ -3749,26 +3752,28 @@ function showFrameCtx(e, idx) {
   ckCtxIdx = idx;
   const ctx = $('frame-ctx');
   if (!ctx) return;
-  // First show briefly to measure width
+  // First show briefly to measure
   ctx.style.visibility = 'hidden';
   ctx.classList.add('show');
   const menuW = ctx.offsetWidth || 220;
   const menuH = ctx.offsetHeight || 80;
   ctx.style.visibility = '';
   const rect = e.currentTarget.getBoundingClientRect();
-  // Clamp left so menu never goes off-screen
+  // Horizontal: center on thumb, clamp to viewport
   let left = rect.left + rect.width / 2 - menuW / 2;
   left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
-  // Position above thumb, but if not enough space above, show below
-  let bottom = window.innerHeight - rect.top + 8;
-  if (rect.top - menuH - 8 < 0) {
-    // Not enough space above – use top instead
-    ctx.style.bottom = '';
-    ctx.style.top = (rect.bottom + 8) + 'px';
-  } else {
-    ctx.style.top = '';
-    ctx.style.bottom = bottom + 'px';
+  // Vertical: always above thumb if possible (using fixed positioning)
+  let top = rect.top - menuH - 8;
+  if (top < 8) {
+    // Not enough space above — show below thumb
+    top = rect.bottom + 8;
   }
+  // Ensure it doesn't go below viewport either
+  if (top + menuH > window.innerHeight - 8) {
+    top = window.innerHeight - menuH - 8;
+  }
+  ctx.style.top = top + 'px';
+  ctx.style.bottom = 'auto';
   ctx.style.left = left + 'px';
   ctx.style.right = 'auto';
   e.stopPropagation();
@@ -3849,7 +3854,7 @@ function initCockpit() {
   if (ctxDel) ctxDel.addEventListener('click', () => {
     if (ckCtxIdx >= 0 && ckCtxIdx < S.shots.length) {
       S.shots.splice(ckCtxIdx, 1);
-      try { idbSaveShots(S.shots); renderStrip(); updateShotCount(); renderFrames(); renderBottomTimeline(); } catch(e){}
+      try { idbSaveShots(S.shots); renderStrip(); updateShotCount(); renderFrames(); renderBottomTimeline(); if (onionOn) drawOnion(); } catch(e){}
       showToast('🗑️ Frame gelöscht');
     }
     hideFrameCtx();
@@ -3858,7 +3863,7 @@ function initCockpit() {
     if (ckCtxIdx >= 0 && ckCtxIdx < S.shots.length) {
       const copy = Object.assign({}, S.shots[ckCtxIdx], {id: 'f' + Date.now() + '_dup'});
       S.shots.splice(ckCtxIdx + 1, 0, copy);
-      try { idbSaveShots(S.shots); renderStrip(); updateShotCount(); renderFrames(); renderBottomTimeline(); } catch(e){}
+      try { idbSaveShots(S.shots); renderStrip(); updateShotCount(); renderFrames(); renderBottomTimeline(); if (onionOn) drawOnion(); } catch(e){}
       showToast('📋 Frame dupliziert');
     }
     hideFrameCtx();
@@ -4328,6 +4333,9 @@ function addCustomBg(item) {
   scheduleSave();
   renderCustomBgGrid();
   updateDrawBgProjectButton();
+  // Refresh GS and Retouch bg palettes so drawn BGs appear there too
+  try { refreshGsBgLib(); } catch(e) {}
+  try { refreshRetouchBgOptions(); } catch(e) {}
   // Mark it selected
   document.querySelectorAll('.bg-card').forEach(c => c.classList.remove('selected'));
   const newCard = document.querySelector(`[data-cbg-id="${id}"]`);
@@ -4380,6 +4388,8 @@ function deleteCustomBg(id, e) {
   scheduleSave();
   renderCustomBgGrid();
   updateDrawBgProjectButton();
+  try { refreshGsBgLib(); } catch(e2) {}
+  try { refreshRetouchBgOptions(); } catch(e2) {}
   showToast('🗑 Hintergrund gelöscht');
 }
 
@@ -4957,7 +4967,10 @@ function initDrawModal() {
 /* ═══════════════════════════════════════════════
    INTRO
    ═══════════════════════════════════════════════ */
+let _introAlreadyClosed = false;
 function closeIntro() {
+  if (_introAlreadyClosed) return;
+  _introAlreadyClosed = true;
   const el = $('intro');
   el.style.transition = 'opacity 0.4s ease';
   el.style.opacity = '0';
@@ -4970,6 +4983,7 @@ function initIntro() {
   // Skip if user previously chose to skip
   if (localStorage.getItem('tfw-skip-intro') === '1') {
     $('intro').classList.add('hidden');
+    _introAlreadyClosed = true;
     checkOnboarding();
     return;
   }
@@ -5206,32 +5220,68 @@ function playClick() {
 }
 
 /* ── Kamera Init ────────────────────────────── */
+let _camInitLock = false;
 async function initCam() {
-  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
-  const vid = $('cam-vid');
+  if (_camInitLock) return;
+  _camInitLock = true;
   try {
-    let stream;
+    if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+    const vid = $('cam-vid');
     try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        video:{facingMode:{exact:camFacing},width:{ideal:1280},height:{ideal:720}},
-        audio:false
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video:{facingMode:{exact:camFacing},width:{ideal:1280},height:{ideal:720}},
+          audio:false
+        });
+      } catch(e) {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video:{facingMode:camFacing,width:{ideal:1280},height:{ideal:720}},
+          audio:false
+        });
+      }
+      vid.srcObject = stream;
+      camStream = stream;
+      // Monitor tracks for unexpected end (e.g. OS revokes camera)
+      stream.getVideoTracks().forEach(track => {
+        track.addEventListener('ended', () => {
+          console.warn('Camera track ended unexpectedly');
+          camStream = null;
+          if (ckCurrentMode === 'cam' && !document.hidden) {
+            setTimeout(() => initCam(), 300);
+          }
+        });
       });
+      vid.addEventListener('loadedmetadata', () => { sizeCamViewfinder(); applyCamFilter(); }, {once:true});
+      const fb = $('cam-fallback');
+      if (fb) fb.style.display = 'none';
+      vid.style.display = 'block';
     } catch(e) {
-      stream = await navigator.mediaDevices.getUserMedia({
-        video:{facingMode:camFacing,width:{ideal:1280},height:{ideal:720}},
-        audio:false
-      });
+      showCamFallback(e);
     }
-    vid.srcObject = stream;
-    camStream = stream;
-    vid.addEventListener('loadedmetadata', () => { sizeCamViewfinder(); applyCamFilter(); }, {once:true});
-    const fb = $('cam-fallback');
-    if (fb) fb.style.display = 'none';
-    vid.style.display = 'block';
-  } catch(e) {
-    showCamFallback(e);
+  } finally {
+    _camInitLock = false;
   }
 }
+
+/* ── Camera lifecycle: recover from background/tab switches ── */
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && ckCurrentMode === 'cam') {
+    const vid = $('cam-vid');
+    // Check if stream is dead or video is frozen
+    const tracks = camStream ? camStream.getVideoTracks() : [];
+    const alive = tracks.length > 0 && tracks.every(t => t.readyState === 'live');
+    if (!alive) {
+      initCam();
+    } else if (vid && vid.paused) {
+      vid.play().catch(() => {});
+    }
+  }
+});
+// Also recover on page show (bfcache)
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted && ckCurrentMode === 'cam') initCam();
+});
 
 function showCamFallback(e) {
   const box = $('cam-box');
@@ -6201,6 +6251,77 @@ function setGsBgFromLib(index) {
   img.src = url;
 }
 
+/* ── Refresh GS BG Library (called when custom BGs change) ── */
+function refreshGsBgLib() {
+  const container = $('gs-bg-lib');
+  if (!container) return;
+  container.innerHTML = '';
+  // Re-add BG_LIB entries
+  BG_LIB.forEach((bg, i) => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'flex-shrink:0;cursor:pointer;border-radius:4px;overflow:hidden;' +
+      'border:2px solid transparent;transition:border-color .15s;width:52px;';
+    wrap.title = bg.name;
+    wrap.innerHTML = bg.svg.replace('<svg ', '<svg preserveAspectRatio="xMidYMid slice" ');
+    wrap.querySelector('svg').style.cssText = 'width:52px;height:39px;display:block;pointer-events:none';
+    wrap.addEventListener('click', () => {
+      setGsBgFromLib(i);
+      container.querySelectorAll('div').forEach(el => el.style.borderColor = 'transparent');
+      wrap.style.borderColor = 'var(--yellow)';
+    });
+    container.appendChild(wrap);
+  });
+  // Re-add custom backgrounds
+  getCustomBgs().forEach(item => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'flex-shrink:0;cursor:pointer;border-radius:4px;overflow:hidden;' +
+      'border:2px solid transparent;transition:border-color .15s;width:52px;height:39px;' +
+      `background-image:url(${item.dataUrl});background-size:cover;`;
+    wrap.title = item.name;
+    wrap.addEventListener('click', () => {
+      const img = new Image();
+      img.onload = () => { gsBgImage = img; $('gs-bg-label').textContent = '✓ ' + item.name; };
+      img.src = item.dataUrl;
+      container.querySelectorAll('div').forEach(el => el.style.borderColor = 'transparent');
+      wrap.style.borderColor = 'var(--yellow)';
+    });
+    container.appendChild(wrap);
+  });
+}
+
+/* ── Refresh Retouch BG Options (called when custom BGs change) ── */
+function refreshRetouchBgOptions() {
+  const bgRow = document.getElementById('retouch-bg-row');
+  if (!bgRow) return;
+  // Remove all options except transparent and upload button
+  bgRow.querySelectorAll('.retouch-bg-option').forEach(opt => {
+    if (opt.dataset.rbg !== 'transparent' && opt.id !== 'retouch-bg-upload-btn') {
+      opt.remove();
+    }
+  });
+  const uploadBtn = document.getElementById('retouch-bg-upload-btn');
+  // Re-add BG_LIB entries
+  BG_LIB.forEach((bg, i) => {
+    const div = document.createElement('div');
+    div.className = 'retouch-bg-option';
+    div.dataset.rbg = String(i);
+    div.title = bg.name;
+    const svgWithSlice = bg.svg.replace('<svg ', '<svg preserveAspectRatio="xMidYMid slice" ');
+    div.innerHTML = svgWithSlice;
+    bgRow.insertBefore(div, uploadBtn);
+  });
+  // Re-add custom backgrounds
+  getCustomBgs().forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'retouch-bg-option';
+    div.dataset.rbg = 'custom:' + item.id;
+    div.title = item.name;
+    div.style.backgroundImage = 'url(' + item.dataUrl + ')';
+    div.style.backgroundSize = 'cover';
+    bgRow.insertBefore(div, uploadBtn);
+  });
+}
+
 /* ── Kamera Tab aktivieren ──────────────────── */
 function initCamTab() {
   // Activate camera when tab is clicked
@@ -6408,6 +6529,8 @@ function moveFrame(fromIdx, dir) {
   idbSaveShots(S.shots);
   renderFrames();
   renderStrip();
+  try { renderBottomTimeline(); } catch(e){}
+  try { if (onionOn) drawOnion(); } catch(e){}
   // Keep focus on moved card
   requestAnimationFrame(() => {
     const cards = document.querySelectorAll('.frm-card');
@@ -6440,6 +6563,7 @@ function renderFrames() {
     card.className = 'frm-card' + (selFrames.has(shot.id) ? ' selected' : '');
     card.dataset.id  = shot.id;
     card.dataset.idx = i;
+    card.draggable = true;
 
     card.innerHTML = `
       <img src="${shot.data}" alt="${i+1}" draggable="false"/>
@@ -6453,6 +6577,136 @@ function renderFrames() {
           <button class="frm-mv-r" title="Nach rechts" ${i===S.shots.length-1?'disabled':''}>▶</button>
         </div>` : ''}
     `;
+
+    // ── Drag & Drop (Desktop) ──
+    let _deskClone = null;
+    card.addEventListener('dragstart', e => {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(i));
+      // Hide native drag ghost
+      const emptyImg = new Image();
+      emptyImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+      e.dataTransfer.setDragImage(emptyImg, 0, 0);
+      card.classList.add('frm-dragging');
+      // Create following clone
+      _deskClone = card.cloneNode(true);
+      _deskClone.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;opacity:0.8;transform:scale(1.05);transition:none;box-shadow:0 8px 24px rgba(0,0,0,.5);border:2px solid var(--yellow);border-radius:10px;overflow:hidden;';
+      _deskClone.style.width = card.offsetWidth + 'px';
+      _deskClone.style.height = card.offsetHeight + 'px';
+      _deskClone.style.left = (e.clientX - card.offsetWidth/2) + 'px';
+      _deskClone.style.top = (e.clientY - card.offsetHeight/2) + 'px';
+      document.body.appendChild(_deskClone);
+    });
+    card.addEventListener('drag', e => {
+      if (_deskClone && e.clientX > 0 && e.clientY > 0) {
+        _deskClone.style.left = (e.clientX - card.offsetWidth/2) + 'px';
+        _deskClone.style.top = (e.clientY - card.offsetHeight/2) + 'px';
+      }
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('frm-dragging');
+      if (_deskClone) { _deskClone.remove(); _deskClone = null; }
+      grid.querySelectorAll('.frm-card').forEach(c => c.classList.remove('frm-dragover'));
+    });
+    card.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (!card.classList.contains('frm-dragging')) card.classList.add('frm-dragover');
+    });
+    card.addEventListener('dragleave', () => {
+      card.classList.remove('frm-dragover');
+    });
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      card.classList.remove('frm-dragover');
+      const fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+      const toIdx = parseInt(card.dataset.idx, 10);
+      if (isNaN(fromIdx) || isNaN(toIdx) || fromIdx === toIdx) return;
+      const [moved] = S.shots.splice(fromIdx, 1);
+      S.shots.splice(toIdx, 0, moved);
+      idbSaveShots(S.shots);
+      renderFrames();
+      renderStrip();
+      try { renderBottomTimeline(); } catch(ex){}
+      try { if (onionOn) drawOnion(); } catch(ex){}
+      showToast('↕ Frame verschoben');
+    });
+
+    // ── Touch Drag & Drop (mobile) ──
+    let _touchDragIdx = null;
+    let _touchClone = null;
+    let _touchStartY = 0;
+    let _touchStartX = 0;
+    let _touchMoved = false;
+    let _longPressTimer = null;
+
+    function _cleanupTouchDrag() {
+      if (_longPressTimer) { clearTimeout(_longPressTimer); _longPressTimer = null; }
+      if (_touchClone) { _touchClone.remove(); _touchClone = null; }
+      card.classList.remove('frm-dragging');
+      grid.querySelectorAll('.frm-card').forEach(c => c.classList.remove('frm-dragover'));
+      _touchDragIdx = null;
+    }
+
+    card.addEventListener('touchstart', e => {
+      _touchStartX = e.touches[0].clientX;
+      _touchStartY = e.touches[0].clientY;
+      _touchMoved = false;
+      _longPressTimer = setTimeout(() => {
+        _touchDragIdx = i;
+        card.classList.add('frm-dragging');
+        // Create ghost
+        _touchClone = card.cloneNode(true);
+        _touchClone.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;opacity:0.8;transform:scale(1.05);transition:none;box-shadow:0 8px 24px rgba(0,0,0,.5);border:2px solid var(--yellow);border-radius:10px;overflow:hidden;';
+        _touchClone.style.width = card.offsetWidth + 'px';
+        _touchClone.style.height = card.offsetHeight + 'px';
+        _touchClone.style.left = (_touchStartX - card.offsetWidth/2) + 'px';
+        _touchClone.style.top = (_touchStartY - card.offsetHeight/2) + 'px';
+        document.body.appendChild(_touchClone);
+        try { navigator.vibrate && navigator.vibrate(30); } catch(ex){}
+      }, 400);
+    }, {passive: true});
+
+    card.addEventListener('touchmove', e => {
+      const dx = Math.abs(e.touches[0].clientX - _touchStartX);
+      const dy = Math.abs(e.touches[0].clientY - _touchStartY);
+      if (dx > 8 || dy > 8) _touchMoved = true;
+      if (_touchDragIdx === null) {
+        if (_touchMoved && _longPressTimer) { clearTimeout(_longPressTimer); _longPressTimer = null; }
+        return;
+      }
+      e.preventDefault();
+      const tx = e.touches[0].clientX, ty = e.touches[0].clientY;
+      if (_touchClone) {
+        _touchClone.style.left = (tx - card.offsetWidth/2) + 'px';
+        _touchClone.style.top = (ty - card.offsetHeight/2) + 'px';
+      }
+      // Highlight target
+      grid.querySelectorAll('.frm-card').forEach(c => c.classList.remove('frm-dragover'));
+      const target = document.elementFromPoint(tx, ty)?.closest('.frm-card');
+      if (target && target !== card) target.classList.add('frm-dragover');
+    }, {passive: false});
+
+    card.addEventListener('touchend', e => {
+      if (_longPressTimer) { clearTimeout(_longPressTimer); _longPressTimer = null; }
+      if (_touchDragIdx === null) return;
+      const touch = e.changedTouches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.frm-card');
+      _cleanupTouchDrag();
+      if (target && target !== card) {
+        const toIdx = parseInt(target.dataset.idx, 10);
+        if (!isNaN(toIdx) && i !== toIdx) {
+          const [moved] = S.shots.splice(i, 1);
+          S.shots.splice(toIdx, 0, moved);
+          idbSaveShots(S.shots);
+          renderFrames(); renderStrip();
+          try { renderBottomTimeline(); } catch(ex){}
+          try { if (onionOn) drawOnion(); } catch(ex){}
+          showToast('↕ Frame verschoben');
+        }
+      }
+    });
+    card.addEventListener('touchcancel', () => _cleanupTouchDrag());
 
     if (sortModeOn) {
       card.querySelector('.frm-mv-l').addEventListener('click', e => {
@@ -8984,7 +9238,10 @@ function initExportTab() {
 /* ═══════════════════════════════════════════════
    INIT APP
    ═══════════════════════════════════════════════ */
+let _appInitialized = false;
 function initApp() {
+  if (_appInitialized) return;
+  _appInitialized = true;
   $('topbar-title').textContent = S.project.title || 'Mein Film';
   goPage('pg-plan');
 }
@@ -12283,6 +12540,21 @@ function switchLegalTab(tab,btn){
   document.getElementById('legal-'+tab).classList.add('active');
   btn.classList.add('active');
 }
+
+// ── Prevent pinch-zoom and Ctrl+scroll zoom ──
+document.addEventListener('gesturestart', e => e.preventDefault(), {passive:false});
+document.addEventListener('gesturechange', e => e.preventDefault(), {passive:false});
+document.addEventListener('gestureend', e => e.preventDefault(), {passive:false});
+document.addEventListener('wheel', e => {
+  if (e.ctrlKey || e.metaKey) e.preventDefault();
+}, {passive:false});
+// Prevent double-tap zoom on iOS
+let _lastTouchEnd = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - _lastTouchEnd < 300) e.preventDefault();
+  _lastTouchEnd = now;
+}, {passive:false});
 
 // ── PWA Service Worker Registration ──
 if ('serviceWorker' in navigator) {
