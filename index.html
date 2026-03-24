@@ -47,6 +47,16 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
     radial-gradient(ellipse 45% 35% at 85% 70%,rgba(45,212,191,.035) 0%,transparent 65%),
     radial-gradient(ellipse 35% 30% at 50% 50%,rgba(168,85,247,.025) 0%,transparent 60%)}
 button{font-family:inherit;cursor:pointer;border:none;background:none}
+/* Undo/Redo topbar buttons */
+#topbar-undo,#topbar-redo{width:34px;height:34px;border-radius:var(--r-sm);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .2s,background .2s,transform .15s;color:var(--text);flex-shrink:0}
+#topbar-undo:not(:disabled):hover,#topbar-redo:not(:disabled):hover{background:rgba(251,191,36,.15);transform:scale(1.1)}
+#topbar-undo:not(:disabled):active,#topbar-redo:not(:disabled):active{transform:scale(.9)}
+/* Undo/Redo editor toolbar highlight */
+#global-undo-btn:not(:disabled),#global-redo-btn:not(:disabled){transition:all .2s}
+#global-redo-btn:not(:disabled){background:rgba(45,212,191,.08);border-color:rgba(45,212,191,.3);color:var(--teal)}
+#global-redo-btn:not(:disabled):hover{background:rgba(45,212,191,.18);border-color:rgba(45,212,191,.55)}
 input,textarea,select{font-family:inherit}
 textarea{resize:vertical}
 
@@ -2213,6 +2223,8 @@ textarea.field-input{min-height:80px;line-height:1.5}
     </div>
   </div>
   <span class="topbar-title" id="topbar-title">Mein Film</span>
+  <button onclick="UndoRedo.undo()" id="topbar-undo" class="btn-icon" title="Rückgängig (Strg+Z)" style="opacity:0.35;font-size:15px" disabled>↩</button>
+  <button onclick="UndoRedo.redo()" id="topbar-redo" class="btn-icon" title="Wiederherstellen (Strg+Y)" style="opacity:0.35;font-size:15px" disabled>↪</button>
   <button onclick="exportProject()" id="save-btn" title="Projekt speichern">💾</button>
   <button onclick="showBadges()" id="badge-btn" title="Abzeichen anzeigen">🏆</button>
 </header>
@@ -2630,11 +2642,16 @@ textarea.field-input{min-height:80px;line-height:1.5}
     <!-- ── Shoot controls ── -->
     <div id="cam-overlay-bottom">
       <div class="cam-row2">
-        <button class="cam-action-btn" onclick="undoShot()">
+        <button class="cam-action-btn" id="global-undo-btn-cam" onclick="UndoRedo.undo()" style="opacity:0.35" disabled title="Nichts zum Rückgängigmachen">
           <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:4px">
             <path d="M3.5 8.5C4.8 5.3 8 3 11.5 3C15.6 3 19 6.4 19 10.5C19 14.6 15.6 18 11.5 18C8 18 5.1 15.8 4 12.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
             <path d="M3.5 3.5V8.5H8.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>Rückgängig</button>
+        <button class="cam-action-btn" id="global-redo-btn-cam" onclick="UndoRedo.redo()" style="opacity:0.35" disabled title="Nichts zum Wiederherstellen">
+          <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:4px">
+            <path d="M16.5 8.5C15.2 5.3 12 3 8.5 3C4.4 3 1 6.4 1 10.5C1 14.6 4.4 18 8.5 18C12 18 14.9 15.8 16 12.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M16.5 3.5V8.5H11.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>Wiederherstellen</button>
         <button class="cam-action-btn" onclick="impPh()">
           <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:4px">
             <rect x="2" y="5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/>
@@ -2949,9 +2966,13 @@ textarea.field-input{min-height:80px;line-height:1.5}
     <div class="edit-toolbar">
       <!-- Primäre Aktionen immer sichtbar -->
       <div class="edit-tool-row">
-        <button class="etb" onclick="undoLastFrame()">
+        <button class="etb" id="global-undo-btn" onclick="UndoRedo.undo()" style="opacity:0.35" disabled title="Nichts zum Rückgängigmachen">
           <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M2.5 6.5C3.5 4 6 2.5 8.8 2.5C12.2 2.5 15 5.3 15 8.7C15 12.1 12.2 15 8.8 15C6.2 15 4 13.5 3 11.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2.5 2.5V6.5H6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Rückgängig
+          Rückgängig<span id="undo-count" style="font-size:10px;opacity:.6;margin-left:2px"></span>
+        </button>
+        <button class="etb" id="global-redo-btn" onclick="UndoRedo.redo()" style="opacity:0.35" disabled title="Nichts zum Wiederherstellen">
+          <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M13.5 6.5C12.5 4 10 2.5 7.2 2.5C3.8 2.5 1 5.3 1 8.7C1 12.1 3.8 15 7.2 15C9.8 15 12 13.5 13 11.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M13.5 2.5V6.5H9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Wiederherstellen<span id="redo-count" style="font-size:10px;opacity:.6;margin-left:2px"></span>
         </button>
         <button class="etb danger" onclick="delSel()">
           <svg viewBox="0 0 16 16" fill="none" style="width:13px;height:13px;flex-shrink:0"><path d="M3 4.5h10M6.5 4.5V3h3v1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 4.5l.6 8.5a1.2 1.2 0 001.2 1.2h3.4a1.2 1.2 0 001.2-1.2l.6-8.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M6.5 7.5v3.5M9.5 7.5v3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/></svg>
@@ -6071,6 +6092,7 @@ function genShotId() {
   return 'f' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
 }
 function addShot(dataUrl, isTransparent) {
+  UndoRedo.pushUndo('Foto aufgenommen');
   const shot = { id: genShotId(), data: dataUrl, groupId: null, transparent: !!isTransparent };
   S.shots.push(shot);
   idbSaveShots(S.shots);
@@ -6089,6 +6111,7 @@ function addShot(dataUrl, isTransparent) {
 /* ── Undo / Clear ───────────────────────────── */
 function undoShot() {
   if (S.shots.length === 0) return;
+  UndoRedo.pushUndo('Foto gelöscht');
   S.shots.pop();
   idbSaveShots(S.shots);
   renderStrip();
@@ -6100,6 +6123,7 @@ function undoShot() {
 function clearAllShots() {
   if (S.shots.length === 0) return;
   if (!confirm(`Wirklich alle ${S.shots.length} Fotos löschen?`)) return;
+  UndoRedo.pushUndo('Alle Fotos gelöscht');
   S.shots = [];
   idbSaveShots(S.shots);
   renderStrip();
@@ -6147,6 +6171,7 @@ function renderStrip() {
   try { renderBottomTimeline(); } catch(e){}
 }
 function deleteShotAt(i) {
+  UndoRedo.pushUndo('Foto gelöscht');
   const shot = S.shots[i];
   // Remove from groups
   if (shot && shot.groupId) {
@@ -6374,6 +6399,116 @@ let tcMode      = 'title';
 
 const GROUP_COLORS = ['#a855f7','#2dd4bf','#f59e0b','#ef4444','#22c55e','#3b82f6'];
 
+/* ═══════════════════════════════════════════════
+   GLOBALES UNDO / REDO SYSTEM
+   ═══════════════════════════════════════════════ */
+const UndoRedo = {
+  _undoStack: [],
+  _redoStack: [],
+  MAX_STACK: 40,
+
+  /** Snapshot des aktuellen Zustands erstellen */
+  _snapshot() {
+    return {
+      shots:  JSON.parse(JSON.stringify(S.shots)),
+      groups: JSON.parse(JSON.stringify(S.groups)),
+    };
+  },
+
+  /** Zustand vor einer Aktion speichern */
+  pushUndo(label) {
+    this._undoStack.push({ label, snap: this._snapshot() });
+    if (this._undoStack.length > this.MAX_STACK) this._undoStack.shift();
+    // Neue Aktion löscht Redo-History
+    this._redoStack = [];
+    this._updateUI();
+  },
+
+  /** Letzte Aktion rückgängig machen */
+  undo() {
+    if (this._undoStack.length === 0) { showToast('↩ Nichts zum Rückgängigmachen'); return; }
+    // Aktuellen Zustand auf Redo-Stack
+    const entry = this._undoStack.pop();
+    this._redoStack.push({ label: entry.label, snap: this._snapshot() });
+    // Zustand wiederherstellen
+    this._restore(entry.snap);
+    showToast(`↩ Rückgängig: ${entry.label}`);
+    this._updateUI();
+  },
+
+  /** Letzte Rückgängig-Aktion wiederherstellen */
+  redo() {
+    if (this._redoStack.length === 0) { showToast('↪ Nichts zum Wiederherstellen'); return; }
+    const entry = this._redoStack.pop();
+    this._undoStack.push({ label: entry.label, snap: this._snapshot() });
+    this._restore(entry.snap);
+    showToast(`↪ Wiederhergestellt: ${entry.label}`);
+    this._updateUI();
+  },
+
+  /** Snapshot wiederherstellen */
+  _restore(snap) {
+    S.shots  = snap.shots;
+    S.groups = snap.groups;
+    // Gruppen-IDs in Shots müssen konsistent sein
+    S.shots.forEach(shot => {
+      if (shot.groupId) {
+        const grp = S.groups.find(g => g.id === shot.groupId);
+        if (!grp) shot.groupId = null;
+      }
+    });
+    idbSaveShots(S.shots);
+    persist();
+    try { renderStrip(); } catch(e){}
+    try { renderFrames(); } catch(e){}
+    try { updateShotCount(); } catch(e){}
+    try { renderGroupBar(); } catch(e){}
+    try { renderBottomTimeline(); } catch(e){}
+    try { renderCamMiniStrip(); } catch(e){}
+    try { if (onionOn) drawOnion(); } catch(e){}
+  },
+
+  /** UI-Buttons aktualisieren (enabled/disabled + Tooltip) */
+  _updateUI() {
+    const undoBtn = document.getElementById('global-undo-btn');
+    const redoBtn = document.getElementById('global-redo-btn');
+    const undoBtnCam = document.getElementById('global-undo-btn-cam');
+    const redoBtnCam = document.getElementById('global-redo-btn-cam');
+    const undoBtnTop = document.getElementById('topbar-undo');
+    const redoBtnTop = document.getElementById('topbar-redo');
+    const canUndo = this._undoStack.length > 0;
+    const canRedo = this._redoStack.length > 0;
+    [undoBtn, undoBtnCam, undoBtnTop].forEach(btn => {
+      if (!btn) return;
+      btn.disabled = !canUndo;
+      btn.style.opacity = canUndo ? '1' : '0.35';
+      btn.title = canUndo ? `Rückgängig: ${this._undoStack[this._undoStack.length-1].label}` : 'Nichts zum Rückgängigmachen';
+    });
+    [redoBtn, redoBtnCam, redoBtnTop].forEach(btn => {
+      if (!btn) return;
+      btn.disabled = !canRedo;
+      btn.style.opacity = canRedo ? '1' : '0.35';
+      btn.title = canRedo ? `Wiederherstellen: ${this._redoStack[this._redoStack.length-1].label}` : 'Nichts zum Wiederherstellen';
+    });
+    // Badge counter
+    const undoCnt = document.getElementById('undo-count');
+    const redoCnt = document.getElementById('redo-count');
+    if (undoCnt) undoCnt.textContent = canUndo ? this._undoStack.length : '';
+    if (redoCnt) redoCnt.textContent = canRedo ? this._redoStack.length : '';
+  },
+
+  canUndo() { return this._undoStack.length > 0; },
+  canRedo() { return this._redoStack.length > 0; },
+};
+
+// Keyboard shortcuts: Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') { e.preventDefault(); UndoRedo.undo(); }
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z')  { e.preventDefault(); UndoRedo.redo(); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'y')                { e.preventDefault(); UndoRedo.redo(); }
+});
+
 /* ── Card & Credits Style Definitions ─────── */
 const CARD_STYLES = [
   { label:'Klassisch',
@@ -6523,6 +6658,7 @@ function toggleSortMode() {
 function moveFrame(fromIdx, dir) {
   const toIdx = fromIdx + dir;
   if (toIdx < 0 || toIdx >= S.shots.length) return;
+  UndoRedo.pushUndo('Frame verschoben');
   const tmp = S.shots[fromIdx];
   S.shots[fromIdx] = S.shots[toIdx];
   S.shots[toIdx]   = tmp;
@@ -6622,6 +6758,7 @@ function renderFrames() {
       const fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
       const toIdx = parseInt(card.dataset.idx, 10);
       if (isNaN(fromIdx) || isNaN(toIdx) || fromIdx === toIdx) return;
+      UndoRedo.pushUndo('Frame verschoben');
       const [moved] = S.shots.splice(fromIdx, 1);
       S.shots.splice(toIdx, 0, moved);
       idbSaveShots(S.shots);
@@ -6696,6 +6833,7 @@ function renderFrames() {
       if (target && target !== card) {
         const toIdx = parseInt(target.dataset.idx, 10);
         if (!isNaN(toIdx) && i !== toIdx) {
+          UndoRedo.pushUndo('Frame verschoben');
           const [moved] = S.shots.splice(i, 1);
           S.shots.splice(toIdx, 0, moved);
           idbSaveShots(S.shots);
@@ -6763,6 +6901,7 @@ function deselAll() { selFrames.clear();                              renderFram
 function delSel() {
   if (selFrames.size === 0) { showToast('Keine Frames markiert'); return; }
   if (!confirm(`${selFrames.size} Frame(s) löschen?`)) return;
+  UndoRedo.pushUndo(`${selFrames.size} Frame(s) gelöscht`);
   // Clean groups
   selFrames.forEach(id => {
     const s = S.shots.find(x => x.id === id);
@@ -6782,6 +6921,7 @@ function delSel() {
 /* ── Duplicate selected ───────────────────────*/
 function dupSel() {
   if (selFrames.size === 0) { showToast('Keine Frames markiert'); return; }
+  UndoRedo.pushUndo('Frames dupliziert');
   const toInsert = [];
   S.shots.forEach(s => {
     if (selFrames.has(s.id)) toInsert.push({...s, id:genShotId(), groupId:null});
@@ -6797,6 +6937,7 @@ function dupSel() {
 
 /* ── Reverse all ──────────────────────────────*/
 function revFrames() {
+  UndoRedo.pushUndo('Reihenfolge umgekehrt');
   S.shots.reverse();
   idbSaveShots(S.shots);
   renderFrames(); renderStrip();
@@ -6806,6 +6947,7 @@ function revFrames() {
 /* ── Undo last frame (editor) ─────────────────*/
 function undoLastFrame() {
   if (S.shots.length === 0) return;
+  UndoRedo.pushUndo('Letzter Frame gelöscht');
   const removed = S.shots.pop();
   if (removed && removed.groupId) {
     const grp = S.groups.find(g => g.id === removed.groupId);
@@ -6820,6 +6962,7 @@ function undoLastFrame() {
 /* ── Rotate selected ──────────────────────────*/
 function rotSel() {
   if (selFrames.size === 0) { showToast('Keine Frames markiert'); return; }
+  UndoRedo.pushUndo('Frames gedreht');
   let done = 0;
   S.shots.forEach(shot => {
     if (!selFrames.has(shot.id)) return;
@@ -6845,6 +6988,7 @@ function rotSel() {
 /* ── Groups ───────────────────────────────────*/
 function createGroup() {
   if (selFrames.size === 0) { showToast('Keine Frames markiert'); return; }
+  UndoRedo.pushUndo('Gruppe erstellt');
   const n    = S.groups.length + 1;
   const name = `Szene ${n}`;
   const color= GROUP_COLORS[(n-1) % GROUP_COLORS.length];
@@ -6860,6 +7004,7 @@ function createGroup() {
 
 function dissolveGroup() {
   if (selFrames.size === 0) { showToast('Keine Frames markiert'); return; }
+  UndoRedo.pushUndo('Gruppe aufgelöst');
   S.shots.forEach(s => {
     if (!selFrames.has(s.id)) return;
     if (!s.groupId) return;
@@ -6919,6 +7064,7 @@ function renderGroupBar() {
 
 function deleteGroup(id, e) {
   e.stopPropagation();
+  UndoRedo.pushUndo('Gruppe gelöscht');
   S.shots.forEach(s => { if (s.groupId === id) s.groupId = null; });
   S.groups = S.groups.filter(g => g.id !== id);
   persist();
@@ -7441,6 +7587,7 @@ function doInsertTitleCard() {
   const frames = +($('tc-frames').value || 8);
   const st     = CARD_STYLES[tcStyleIdx] || CARD_STYLES[0];
   if (!st || !st.draw) { showToast('⚠️ Kein Stil ausgewählt'); return; }
+  UndoRedo.pushUndo('Titelkarte eingefügt');
   const w=640, h=480;
   const cv = document.createElement('canvas'); cv.width=w; cv.height=h;
   st.draw(cv.getContext('2d'), w, h, text, sub, fg, bg, accent);
@@ -7463,6 +7610,7 @@ function doInsertCredits() {
   const accent    = $('cr-accent').value;
   const totalFr   = +($('cr-frames').value || 32);
   const st        = CREDITS_STYLES[crStyleIdx];
+  UndoRedo.pushUndo('Abspann eingefügt');
   const w=640, h=480;
 
   // Build full credits text as list: title line + empty + credit lines
@@ -9373,8 +9521,8 @@ const KARL_KB = [
     a: '📁 Gruppen helfen dir, Szenen zu organisieren! Markiere mehrere Frames und klicke auf 📁 Gruppe erstellen. Du kannst dann den ganzen Szene einen Voiceover-Kommentar hinzufügen!' },
   { q: ['voiceover','stimme','sprechen','kommentar','erzähler'],
     a: '🎙 Mit Voiceover kannst du Kommentare zu einzelnen Szenen aufnehmen! Erstelle zuerst eine Gruppe, dann klicke auf 🎙 Voiceover im Editor-Tab.' },
-  { q: ['fehler','rückgängig','undo','gelöscht','falsch'],
-    a: '↩️ Keine Panik! Im Editor-Tab gibt es den ↩ Rückgängig-Button, der das letzte Foto zurückbringt. Und im Kamera-Tab gibt es auch einen ↩ Rückgängig-Button!' },
+  { q: ['fehler','rückgängig','undo','gelöscht','falsch','redo','wiederherstellen'],
+    a: '↩️ Keine Panik! Du kannst fast jede Aktion rückgängig machen! Nutze die ↩/↪ Buttons in der Topbar oder im Editor. Tastenkürzel: Strg+Z (Rückgängig), Strg+Y oder Strg+Shift+Z (Wiederherstellen). Das funktioniert für Fotos, FX-Effekte, Titelkarten, Gruppen, Freistellen und vieles mehr!' },
   { q: ['greenscreen','grüner hintergrund','chroma','hintergrund wechseln'],
     a: '🟢 Greenscreen ist super cool! Halte deine Figur vor einen grünen Hintergrund (z.B. grünes Papier) und aktiviere 🟢 Greenscreen im Kamera-Tab. Dann wird das Grün automatisch durch deinen Wunsch-Hintergrund ersetzt!' },
   { q: ['timelapse','zeitraffer','automatisch fotografieren'],
@@ -10035,7 +10183,8 @@ const HELP = {
         <li>☑ <strong>Alle / ☐ Keine</strong> – Alles auswählen oder abwählen</li>
         <li>🗑 <strong>Löschen</strong> – Markierte Frames löschen</li>
         <li>📋 <strong>Kopieren</strong> – Markierte Frames duplizieren</li>
-        <li>↩ <strong>Rückgängig</strong> – Letztes Foto rückgängig machen</li>
+        <li>↩ <strong>Rückgängig</strong> – Letzte Aktion rückgängig machen (auch Strg+Z)</li>
+        <li>↪ <strong>Wiederherstellen</strong> – Rückgängig gemachte Aktion wiederherstellen (Strg+Y)</li>
       </ul>
       <h4>📁 Gruppen &amp; Extras (einklappbar)</h4>
       <ul>
@@ -10606,6 +10755,7 @@ function initRetouchModal() {
 
   // Save
   document.getElementById('retouch-save').addEventListener('click', () => {
+    UndoRedo.pushUndo('Retusche gespeichert');
     // Save: composite bgImage + fgCanvas as PNG (preserves transparency if no bg)
     const saveCv = document.createElement('canvas');
     saveCv.width  = Retouch.fgCanvas ? Retouch.fgCanvas.width  : Retouch.canvas.width;
@@ -11140,6 +11290,7 @@ function fxApplyToContext(ctx, w, h, fxId, t, intensity) {
 async function applyFx() {
   if (!fxSelectedId || fxShotRange.length === 0) return;
 
+  UndoRedo.pushUndo('FX-Effekt angewendet');
   const btn = document.getElementById('fx-apply-btn');
   btn.disabled = true;
   btn.textContent = '⏳ Wird angewendet…';
@@ -11536,6 +11687,7 @@ async function confirmFreistellen() {
   const selected = (typeof S !== 'undefined' && typeof selFrames !== 'undefined')
     ? S.shots.filter(s => selFrames.has(s.id)) : [];
   if (!selected.length) return;
+  UndoRedo.pushUndo('Freistellen angewendet');
   document.getElementById('frei-step2').style.display = 'none';
   document.getElementById('frei-step1').style.display = '';
   document.getElementById('frei-progress').style.display = '';
@@ -12296,9 +12448,10 @@ async function bubApply() {
     return;
   }
 
-  const confirmed = confirm(`Sprechblasen auf ${targetIds.length} Frame(s) einbrennen?\n\nDieser Vorgang kann nicht rückgängig gemacht werden.`);
+  const confirmed = confirm(`Sprechblasen auf ${targetIds.length} Frame(s) einbrennen?\n\nDieser Vorgang kann mit ↩ Rückgängig rückgängig gemacht werden.`);
   if (!confirmed) return;
 
+  UndoRedo.pushUndo('Sprechblasen eingebrannt');
   showToast('💬 Sprechblasen werden eingebrannt…');
 
   let processed = 0;
